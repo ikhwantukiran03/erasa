@@ -65,6 +65,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    // Venue Management Routes
+    Route::get('/venues', [App\Http\Controllers\Admin\VenueController::class, 'index'])->name('venues.index');
+    Route::get('/venues/create', [App\Http\Controllers\Admin\VenueController::class, 'create'])->name('venues.create');
+    Route::post('/venues', [App\Http\Controllers\Admin\VenueController::class, 'store'])->name('venues.store');
+    Route::get('/venues/{venue}', [App\Http\Controllers\Admin\VenueController::class, 'show'])->name('venues.show');
+    Route::get('/venues/{venue}/edit', [App\Http\Controllers\Admin\VenueController::class, 'edit'])->name('venues.edit');
+    Route::put('/venues/{venue}', [App\Http\Controllers\Admin\VenueController::class, 'update'])->name('venues.update');
+    Route::delete('/venues/{venue}', [App\Http\Controllers\Admin\VenueController::class, 'destroy'])->name('venues.destroy');
     
     Route::get('/bookings', function () {
         if (!auth()->user()->isAdmin()) {
