@@ -57,4 +57,15 @@ class User extends Authenticatable
     {
         return $this->role === 'admin';
     }
+
+    // app/Models/User.php - add this method
+/**
+ * Check if the user has staff role.
+ *
+ * @return bool
+ */
+public function isStaff(): bool
+{
+    return $this->role === 'staff';
+}
 }

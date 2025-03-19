@@ -53,4 +53,15 @@ class UserFactory extends Factory
             'role' => 'admin',
         ]);
     }
+
+    // database/factories/UserFactory.php - add this method
+/**
+ * Indicate that the user is a staff member.
+ */
+public function staff(): static
+{
+    return $this->state(fn (array $attributes) => [
+        'role' => 'staff',
+    ]);
+}
 }

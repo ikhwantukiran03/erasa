@@ -10,12 +10,12 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('whatsapp')->after('email')->nullable();
-            $table->string('role')->after('password')->default('user');
-        });
-    }
+{
+    Schema::table('users', function (Blueprint $table) {
+        $table->string('whatsapp')->after('email')->nullable();
+        $table->enum('role', ['user', 'admin', 'staff'])->after('password')->default('user');
+    });
+}
 
     /**
      * Reverse the migrations.

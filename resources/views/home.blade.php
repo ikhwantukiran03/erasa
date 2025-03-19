@@ -23,16 +23,22 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="container">
-            <div class="hero-content" data-aos="fade-up" data-aos-duration="1000">
-                <h1>Create Unforgettable Wedding Memories</h1>
-                <p>Enak Rasa Wedding Hall offers an elegant setting for your perfect day. Our dedicated team will transform your dreams into a celebration to remember.</p>
+<!-- Hero Section -->
+<section class="hero" id="home">
+    <div class="container">
+        <div class="hero-content" data-aos="fade-up" data-aos-duration="1000">
+            <h1>Create Unforgettable Wedding Memories</h1>
+            <p>Enak Rasa Wedding Hall offers an elegant setting for your perfect day. Our dedicated team will transform your dreams into a celebration to remember.</p>
+            <div class="mt-6 flex flex-wrap gap-4 justify-center">
                 <a href="#booking" class="cta-btn">Book Your Date</a>
+                @guest
+                    <a href="{{ route('login') }}" class="cta-btn bg-transparent border-white text-white hover:bg-white hover:text-primary">Login</a>
+                    <a href="{{ route('register') }}" class="cta-btn bg-white text-primary border-white hover:bg-transparent hover:text-white">Register</a>
+                @endguest
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- About Section -->
     <section class="about" id="about">

@@ -21,24 +21,35 @@ class LoginController extends Controller
     /**
      * Handle login request.
      */
-    public function login(Request $request): RedirectResponse
-    {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+    // app/Http/Controllers/Auth/LoginController.php
+/**
+ * Handle login request.
+ */
+public function login(Request $request): RedirectResponse
+{
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
+    if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $request->session()->regenerate();
 
-            return redirect()->intended('/');
+        // Redirect based on role
+        $user = Auth::user();
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->isStaff()) {
+            return redirect()->route('staff.dashboard');
         }
-
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
+        
+        return redirect()->intended('/dashboard');
     }
 
+    return back()->withErrors([
+        'email' => 'The provided credentials do not match our records.',
+    ])->onlyInput('email');
+}
     /**
      * Handle logout request.
      */
