@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Admin\UserController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -56,14 +57,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         return view('admin.dashboard');
     })->name('dashboard');
     
-    Route::get('/users', function () {
-        if (!auth()->user()->isAdmin()) {
-            return redirect()->route('dashboard')
-                ->with('error', 'You do not have permission to access this resource.');
-        }
-        $users = \App\Models\User::all();
-        return view('admin.users.index', compact('users'));
-    })->name('users.index');
+    // User Management Routes
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     
     Route::get('/bookings', function () {
         if (!auth()->user()->isAdmin()) {
