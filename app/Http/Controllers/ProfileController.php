@@ -50,4 +50,28 @@ class ProfileController extends Controller
 
         return back()->with('status', 'Profile updated successfully.');
     }
+    
+    /**
+     * Delete the user's account.
+     */
+    public function destroy(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = Auth::user();
+
+        // Log the user out
+        Auth::logout();
+        
+        // Invalidate the session
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        
+        // Delete the user
+        $user->delete();
+
+        return redirect('/')->with('success', 'Your account has been successfully deleted.');
+    }
 }

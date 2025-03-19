@@ -46,9 +46,13 @@
                                 <div class="font-semibold">View Bookings</div>
                                 <p class="text-sm mt-1">Check your upcoming and past reservations</p>
                             </a>
-                            <a href="#" class="block bg-primary bg-opacity-10 text-primary p-4 rounded hover:bg-opacity-20 transition">
+                            <a href="{{ route('profile.edit') }}" class="block bg-primary bg-opacity-10 text-primary p-4 rounded hover:bg-opacity-20 transition">
                                 <div class="font-semibold">Update Profile</div>
                                 <p class="text-sm mt-1">Edit your personal information</p>
+                            </a>
+                            <a href="{{ route('profile.edit') }}#delete-account" class="block bg-red-100 text-red-600 p-4 rounded hover:bg-red-200 transition">
+                                <div class="font-semibold">Delete Account</div>
+                                <p class="text-sm mt-1">Permanently delete your account</p>
                             </a>
                         </div>
                     </div>
