@@ -31,10 +31,10 @@
             <p>Enak Rasa Wedding Hall offers an elegant setting for your perfect day. Our dedicated team will transform your dreams into a celebration to remember.</p>
             <div class="mt-6 flex flex-wrap gap-4 justify-center">
                 <a href="#booking" class="cta-btn">Book Your Date</a>
-                @guest
+                
                     <a href="{{ route('login') }}" class="cta-btn bg-transparent border-white text-white hover:bg-white hover:text-primary">Login</a>
                     <a href="{{ route('register') }}" class="cta-btn bg-white text-primary border-white hover:bg-transparent hover:text-white">Register</a>
-                @endguest
+                
             </div>
         </div>
     </div>
@@ -48,7 +48,7 @@
             </div>
             <div class="about-content">
                 <div class="about-image" data-aos="fade-right" data-aos-duration="1000">
-                    <img src="https://images.unsplash.com/photo-1519741347686-c1e331c20a2d?q=80&w=2670&auto=format&fit=crop" alt="Enak Rasa Wedding Hall">
+                    <img src="https://scontent.fkul8-2.fna.fbcdn.net/v/t39.30808-6/477277295_471515166032449_6589999265876936820_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEyi4LM_FIQ3jxeHJwFDPuuEpMpTz5j_DUSkylPPmP8NR88oAt4ljhfJ4s_-gFpPI3pJXDP1K8ZcX6jMgyjVp9f&_nc_ohc=X7j4VqL4lMcQ7kNvgFoNnjd&_nc_oc=AdlPIDpWZiK9mwye0jzGX9Mn_7ojN5H9k-CDY-jSjHWe0DlTL7holE0Jblt5PMyjlvQ&_nc_zt=23&_nc_ht=scontent.fkul8-2.fna&_nc_gid=e0FVTbDIhDREkjNUPq9kjQ&oh=00_AYEydLSibMtvCh4hjO4rg0Dy9JiZ60TpedBmssY4VDkbdg&oe=67E03D76" alt="Enak Rasa Wedding Hall">
                 </div>
                 <div class="about-text" data-aos="fade-left" data-aos-duration="1000">
                     <h3>The Perfect Setting for Your Special Day</h3>
@@ -494,7 +494,7 @@
         /* Hero Section */
         .hero {
             height: 100vh;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=2670&auto=format&fit=crop');
+            background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://scontent.fkul8-3.fna.fbcdn.net/v/t39.30808-6/476350610_468705386313427_3344429432169983636_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeHm8_RZ-ThOy3uAa7CEoebdOUMqw389l1g5QyrDfz2XWAvhKAwGhW1Jrq9DIOOaCOBjYxJTyVu4KPgeff7p2in0&_nc_ohc=p1C2qEJKv90Q7kNvgHiVKXW&_nc_oc=AdnU4cq_1P4w5s95ePs7mDurBnYuO6gDg3UOUnBfvup7o4VhYa9cKSDQzNYnEAyNmgM&_nc_zt=23&_nc_ht=scontent.fkul8-3.fna&_nc_gid=WD9DVxSPjdf0w98eszH7mw&oh=00_AYFSbqzZ13OeyohJeiP--nLCirIE5kHhESjMzm5lgJy40A&oe=67E0271D&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
             display: flex;

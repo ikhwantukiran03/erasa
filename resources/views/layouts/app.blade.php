@@ -71,6 +71,15 @@
             margin-top: 0.25rem;
             font-size: 0.875rem;
         }
+
+        /* Dropdown styles */
+        .dropdown-menu {
+            display: none; /* Hidden by default */
+        }
+        
+        .dropdown-menu.show {
+            display: block; /* Show when active */
+        }
     </style>
     @stack('styles')
 </head>
@@ -87,14 +96,14 @@
                     <a href="{{ route('login') }}" class="text-dark hover:text-primary transition">Login</a>
                     <a href="{{ route('register') }}" class="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90 transition">Register</a>
                 @else
-                    <div class="relative group">
-                        <button class="flex items-center text-dark hover:text-primary transition">
+                    <div class="relative" id="userDropdown">
+                        <button class="flex items-center text-dark hover:text-primary transition" id="dropdownToggle">
                             {{ Auth::user()->name }}
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
-                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-50">
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 dropdown-menu z-50" id="userMenu">
                             <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -186,6 +195,25 @@
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
+
+        // User dropdown toggle
+        const dropdownToggle = document.getElementById('dropdownToggle');
+        const userMenu = document.getElementById('userMenu');
+        
+        if (dropdownToggle) {
+            dropdownToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                userMenu.classList.toggle('show');
+            });
+            
+            // Close the dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                const userDropdown = document.getElementById('userDropdown');
+                if (userDropdown && !userDropdown.contains(e.target)) {
+                    userMenu.classList.remove('show');
+                }
+            });
+        }
     </script>
     @stack('scripts')
 </body>

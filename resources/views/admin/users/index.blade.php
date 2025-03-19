@@ -16,7 +16,7 @@
         <div class="mt-8 bg-white rounded-lg shadow overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                 <h2 class="text-xl font-semibold text-gray-800">All Users</h2>
-                <a href="#" class="bg-primary text-white px-4 py-2 rounded text-sm hover:bg-opacity-90 transition">Add New User</a>
+                <a href="{{ route('admin.users.create') }}" class="bg-primary text-white px-4 py-2 rounded text-sm hover:bg-opacity-90 transition">Add New User</a>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -55,8 +55,8 @@
                                 {{ $user->created_at->format('M d, Y') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
+                                <a href="{{ route('admin.users.edit') }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                                <a href="{{ route('admin.users.delete') }}" class="text-red-600 hover:text-red-900">Delete</a>
                             </td>
                         </tr>
                         @endforeach
