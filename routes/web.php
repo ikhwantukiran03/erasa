@@ -39,38 +39,56 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     
-    // Routes for regular users
-    Route::middleware(['role:user'])->group(function () {
-        Route::get('/bookings', function () {
-            return view('bookings.index');
-        })->name('bookings.index');
-    });
+    // Routes for regular users - temporarily disable the role middleware
+    Route::get('/bookings', function () {
+        return view('bookings.index');
+    })->name('bookings.index');
 });
 
-// Admin Routes
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+// Admin Routes - temporarily remove the role middleware
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
+        // Check role directly in the route to maintain security
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.');
+        }
         return view('admin.dashboard');
     })->name('dashboard');
     
     Route::get('/users', function () {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.');
+        }
         $users = \App\Models\User::all();
         return view('admin.users.index', compact('users'));
     })->name('users.index');
     
     Route::get('/bookings', function () {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.');
+        }
         return view('admin.bookings.index');
     })->name('bookings.index');
 });
 
-// Staff Routes
-Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->group(function () {
+// Staff Routes - temporarily remove the role middleware
+Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () {
     Route::get('/dashboard', function () {
+        if (!auth()->user()->isStaff()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.');
+        }
         return view('staff.dashboard');
     })->name('dashboard');
     
     Route::get('/bookings', function () {
-        // Staff have more capabilities for managing bookings
+        if (!auth()->user()->isStaff()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.');
+        }
         return view('staff.bookings.index');
     })->name('bookings.index');
 });
