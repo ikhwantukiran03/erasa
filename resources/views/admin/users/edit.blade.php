@@ -1,89 +1,119 @@
 @extends('layouts.app')
 
-@section('title', 'Manage Users - Enak Rasa Wedding Hall')
+@section('title', 'Edit User - Enak Rasa Wedding Hall')
 
 @section('content')
 <div class="bg-gray-50 py-6">
     <div class="container mx-auto px-4">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-3xl font-display font-bold text-dark">Manage Users</h1>
-                <p class="text-gray-600 mt-2">View and manage user accounts</p>
+                <h1 class="text-3xl font-display font-bold text-dark">Edit User</h1>
+                <p class="text-gray-600 mt-2">Update user information</p>
             </div>
-            <a href="{{ route('admin.dashboard') }}" class="text-primary hover:underline">Back to Admin Dashboard</a>
+            <a href="{{ route('admin.users.index') }}" class="text-primary hover:underline">Back to Users</a>
         </div>
         
         <div class="mt-8 bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-gray-800">All Users</h2>
-                <a href="{{ route('admin.users.create') }}" class="bg-primary text-white px-4 py-2 rounded text-sm hover:bg-opacity-90 transition">Add New User</a>
-            </div>
-            
-            @if(session('success'))
-                <div class="mx-6 mt-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4">
-                    {{ session('success') }}
-                </div>
-            @endif
-            
-            @if(session('error'))
-                <div class="mx-6 mt-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
-                    {{ session('error') }}
-                </div>
-            @endif
-            
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">WhatsApp</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined Date</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @foreach($users as $user)
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-500">
-                                {{ $user->id }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="font-medium text-gray-900">{{ $user->name }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-gray-500">{{ $user->email }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-gray-500">{{ $user->whatsapp }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    {{ $user->role === 'admin' ? 'bg-red-100 text-red-800' : 
-                                       ($user->role === 'staff' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800') }}">
-                                    {{ ucfirst($user->role) }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-500">
-                                {{ $user->created_at->format('M d, Y') }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                
-                                @if(auth()->id() !== $user->id)
-                                <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
-                                </form>
-                                @endif
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+            <div class="p-6">
+                @if($errors->any())
+                    <div class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+                        <p class="font-bold">Please fix the following errors:</p>
+                        <ul class="list-disc ml-4 mt-2">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form action="{{ route('admin.users.update', $user) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="name" class="block text-dark font-medium mb-1">Full Name</label>
+                            <input 
+                                type="text" 
+                                id="name" 
+                                name="name" 
+                                value="{{ old('name', $user->name) }}" 
+                                required 
+                                class="form-input @error('name') border-red-500 @enderror" 
+                                placeholder="John Doe"
+                            >
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-dark font-medium mb-1">Email Address</label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                value="{{ old('email', $user->email) }}" 
+                                required 
+                                class="form-input @error('email') border-red-500 @enderror" 
+                                placeholder="user@example.com"
+                            >
+                        </div>
+                        
+                        <div>
+                            <label for="whatsapp" class="block text-dark font-medium mb-1">WhatsApp Number</label>
+                            <input 
+                                type="text" 
+                                id="whatsapp" 
+                                name="whatsapp" 
+                                value="{{ old('whatsapp', $user->whatsapp) }}" 
+                                required 
+                                class="form-input @error('whatsapp') border-red-500 @enderror" 
+                                placeholder="+1234567890"
+                            >
+                        </div>
+                        
+                        <div>
+                            <label for="role" class="block text-dark font-medium mb-1">Role</label>
+                            <select 
+                                id="role" 
+                                name="role" 
+                                required 
+                                class="form-input @error('role') border-red-500 @enderror"
+                            >
+                                <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>User</option>
+                                <option value="staff" {{ old('role', $user->role) == 'staff' ? 'selected' : '' }}>Staff</option>
+                                <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="password" class="block text-dark font-medium mb-1">Password</label>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="form-input @error('password') border-red-500 @enderror" 
+                                placeholder="Leave blank to keep current password"
+                            >
+                            <p class="text-sm text-gray-500 mt-1">Leave blank to keep current password</p>
+                        </div>
+                        
+                        <div>
+                            <label for="password_confirmation" class="block text-dark font-medium mb-1">Confirm Password</label>
+                            <input 
+                                type="password" 
+                                id="password_confirmation" 
+                                name="password_confirmation" 
+                                class="form-input" 
+                                placeholder="Leave blank to keep current password"
+                            >
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end">
+                        <button type="submit" class="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90 transition">
+                            Update User
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

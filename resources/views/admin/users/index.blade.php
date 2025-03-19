@@ -18,6 +18,19 @@
                 <h2 class="text-xl font-semibold text-gray-800">All Users</h2>
                 <a href="{{ route('admin.users.create') }}" class="bg-primary text-white px-4 py-2 rounded text-sm hover:bg-opacity-90 transition">Add New User</a>
             </div>
+            
+            @if(session('success'))
+                <div class="mx-6 mt-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4">
+                    {{ session('success') }}
+                </div>
+            @endif
+            
+            @if(session('error'))
+                <div class="mx-6 mt-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+                    {{ session('error') }}
+                </div>
+            @endif
+            
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -55,8 +68,15 @@
                                 {{ $user->created_at->format('M d, Y') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('admin.users.edit') }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                <a href="{{ route('admin.users.delete') }}" class="text-red-600 hover:text-red-900">Delete</a>
+                                <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                                
+                                @if(auth()->id() !== $user->id)
+                                <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                                </form>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
