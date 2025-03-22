@@ -19,4 +19,12 @@
          'name',
          'description',
      ];
+
+     /**
+ * Get the items for the category.
+ */
+public function items()
+{
+    return $this->hasMany(Item::class);
+}
  }
