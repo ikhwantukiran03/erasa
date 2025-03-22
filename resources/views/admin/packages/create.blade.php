@@ -152,7 +152,7 @@
                             </div>
                             
                             <div class="md:col-span-2 flex justify-end">
-                                <button type="button" id="add-item-btn" class="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90 transition" disabled>
+                                <button type="button" id="add-item-btn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition mr-2" disabled>
                                     Add Item to Package
                                 </button>
                             </div>
