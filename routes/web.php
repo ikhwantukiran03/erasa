@@ -7,7 +7,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VenueController;
-
+use App\Http\Controllers\Admin\CategoryController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -69,13 +69,22 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
     // Venue Management Routes
-    Route::get('/venues', [App\Http\Controllers\Admin\VenueController::class, 'index'])->name('venues.index');
-    Route::get('/venues/create', [App\Http\Controllers\Admin\VenueController::class, 'create'])->name('venues.create');
-    Route::post('/venues', [App\Http\Controllers\Admin\VenueController::class, 'store'])->name('venues.store');
-    Route::get('/venues/{venue}', [App\Http\Controllers\Admin\VenueController::class, 'show'])->name('venues.show');
-    Route::get('/venues/{venue}/edit', [App\Http\Controllers\Admin\VenueController::class, 'edit'])->name('venues.edit');
-    Route::put('/venues/{venue}', [App\Http\Controllers\Admin\VenueController::class, 'update'])->name('venues.update');
-    Route::delete('/venues/{venue}', [App\Http\Controllers\Admin\VenueController::class, 'destroy'])->name('venues.destroy');
+    Route::get('/venues', [VenueController::class, 'index'])->name('venues.index');
+    Route::get('/venues/create', [VenueController::class, 'create'])->name('venues.create');
+    Route::post('/venues', [VenueController::class, 'store'])->name('venues.store');
+    Route::get('/venues/{venue}', [VenueController::class, 'show'])->name('venues.show');
+    Route::get('/venues/{venue}/edit', [VenueController::class, 'edit'])->name('venues.edit');
+    Route::put('/venues/{venue}', [VenueController::class, 'update'])->name('venues.update');
+    Route::delete('/venues/{venue}', [VenueController::class, 'destroy'])->name('venues.destroy');
+    
+    // Category Management Routes
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
+    Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
     
     Route::get('/bookings', function () {
         if (!auth()->user()->isAdmin()) {
