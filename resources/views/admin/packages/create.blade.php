@@ -118,8 +118,9 @@
                         <h2 class="text-lg font-semibold text-gray-800 mb-4">Package Items</h2>
                         <p class="text-gray-600 mb-4">Select items to include in this package</p>
                         
-                        <div id="selected-items-container" class="mb-6 space-y-4">
-                            <!-- Selected items will appear here -->
+                        <!-- Container for items sorted by categories -->
+                        <div id="categories-container" class="mb-6 space-y-4">
+                            <!-- Items will be grouped by categories here -->
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border border-gray-200 rounded-lg">
@@ -128,7 +129,7 @@
                                 <select id="category-select" class="form-input">
                                     <option value="">-- Select Category --</option>
                                     @foreach($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        <option value="{{ $category->id }}" data-category-name="{{ $category->name }}">{{ $category->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -183,7 +184,7 @@
         const itemSelect = document.getElementById('item-select');
         const itemDescription = document.getElementById('item-description');
         const addItemButton = document.getElementById('add-item-btn');
-        const selectedItemsContainer = document.getElementById('selected-items-container');
+        const categoriesContainer = document.getElementById('categories-container');
         
         // Items data by category
         const itemsByCategory = {
@@ -200,8 +201,18 @@
             @endforeach
         };
         
+        // Category names mapping
+        const categoryNames = {
+            @foreach($categories as $category)
+                {{ $category->id }}: "{{ $category->name }}",
+            @endforeach
+        };
+        
         // Track selected items to prevent duplicates
         const selectedItems = new Set();
+        
+        // Track selected items by category
+        const itemsBySelectedCategory = {};
         
         // Add price tier button
         addPriceButton.addEventListener('click', function() {
@@ -303,40 +314,75 @@
             itemDescription.value = selectedOption.dataset.description || '';
         });
         
-        // Add item button click
+        // Function to update the categories display
+        function updateCategoriesDisplay() {
+            // Clear current display
+            categoriesContainer.innerHTML = '';
+            
+            // Iterate through categories and create sections
+            for (const categoryId in itemsBySelectedCategory) {
+                if (itemsBySelectedCategory[categoryId].length === 0) continue;
+                
+                const categoryName = categoryNames[categoryId];
+                const items = itemsBySelectedCategory[categoryId];
+                
+                // Create category section
+                const categorySection = document.createElement('div');
+                categorySection.className = 'category-section bg-gray-50 p-4 rounded-lg';
+                
+                // Create category header
+                const categoryHeader = document.createElement('h3');
+                categoryHeader.className = 'text-md font-semibold text-gray-700 mb-2';
+                categoryHeader.textContent = categoryName;
+                
+                // Create items container
+                const itemsContainer = document.createElement('div');
+                itemsContainer.className = 'flex flex-wrap gap-2';
+                itemsContainer.dataset.categoryId = categoryId;
+                
+                // Add all items
+                items.forEach(item => {
+                    itemsContainer.appendChild(item);
+                });
+                
+                // Assemble category section
+                categorySection.appendChild(categoryHeader);
+                categorySection.appendChild(itemsContainer);
+                
+                // Add to main container
+                categoriesContainer.appendChild(categorySection);
+            }
+        }
+        
+        // Add item button click - MODIFIED FOR SORTING BY CATEGORY
         addItemButton.addEventListener('click', function() {
             const itemId = itemSelect.value;
             const itemName = itemSelect.options[itemSelect.selectedIndex].text;
             const description = itemDescription.value;
+            const categoryId = categorySelect.value;
+            const categoryName = categorySelect.options[categorySelect.selectedIndex].text;
             
-            // Add to selected items
+            // Add to selected items set
             selectedItems.add(parseInt(itemId));
             
-            // Create selected item element
+            // Create selected item element with compact design
             const itemElement = document.createElement('div');
-            itemElement.className = 'selected-item grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border border-gray-200 rounded-lg';
+            itemElement.className = 'selected-item bg-gray-50 p-2 border border-gray-200 rounded-md flex items-center';
             itemElement.dataset.itemId = itemId;
+            itemElement.dataset.categoryId = categoryId;
             
             itemElement.innerHTML = `
-                <div class="md:col-span-1">
-                    <p class="font-medium text-gray-800">${itemName}</p>
-                    <p class="text-sm text-gray-500">
-                        ${categorySelect.options[categorySelect.selectedIndex].text}
-                    </p>
+                <div class="mr-2">
+                    <p class="font-medium text-sm text-gray-800">${itemName}</p>
                     <input type="hidden" name="items[${itemId}][item_id]" value="${itemId}">
                     <input type="hidden" name="items[${itemId}][selected]" value="1">
+                    <input type="hidden" name="items[${itemId}][description]" value="${description}">
                 </div>
-                <div class="md:col-span-2">
-                    <p class="text-sm text-gray-600 mb-1">Custom Description:</p>
-                    <textarea name="items[${itemId}][description]" rows="1" class="form-input text-sm">${description}</textarea>
-                </div>
-                <div class="md:col-span-1 flex justify-end items-start">
-                    <button type="button" class="remove-item text-red-500 hover:text-red-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
+                <button type="button" class="remove-item text-red-500 hover:text-red-700 ml-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             `;
             
             // Add event listener to remove button
@@ -345,8 +391,16 @@
                 // Remove from selected items set
                 selectedItems.delete(parseInt(itemId));
                 
-                // Remove element
-                itemElement.remove();
+                // Remove element from category list
+                if (itemsBySelectedCategory[categoryId]) {
+                    const index = itemsBySelectedCategory[categoryId].findIndex(el => el.dataset.itemId === itemId);
+                    if (index !== -1) {
+                        itemsBySelectedCategory[categoryId].splice(index, 1);
+                    }
+                }
+                
+                // Update display
+                updateCategoriesDisplay();
                 
                 // Reset category select to refresh available items
                 const currentCategoryId = categorySelect.value;
@@ -355,8 +409,14 @@
                 }
             });
             
-            // Add to selected items container
-            selectedItemsContainer.appendChild(itemElement);
+            // Add to the appropriate category
+            if (!itemsBySelectedCategory[categoryId]) {
+                itemsBySelectedCategory[categoryId] = [];
+            }
+            itemsBySelectedCategory[categoryId].push(itemElement);
+            
+            // Update the display
+            updateCategoriesDisplay();
             
             // Reset item selection fields
             itemSelect.value = '';
@@ -378,7 +438,12 @@
             }
             
             // Check if at least one item is selected
-            if (selectedItemsContainer.childElementCount === 0) {
+            let totalItems = 0;
+            for (const categoryId in itemsBySelectedCategory) {
+                totalItems += itemsBySelectedCategory[categoryId].length;
+            }
+            
+            if (totalItems === 0) {
                 event.preventDefault();
                 alert('Please select at least one item for the package.');
                 return false;
