@@ -60,8 +60,8 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($package->prices->count() > 0)
                                     <div class="text-gray-500">
-                                        Rp {{ number_format($package->min_price, 0, ',', '.') }} - 
-                                        Rp {{ number_format($package->max_price, 0, ',', '.') }}
+                                        RM {{ number_format($package->min_price, 0, ',', '.') }} - 
+                                        RM {{ number_format($package->max_price, 0, ',', '.') }}
                                     </div>
                                     <div class="text-xs text-gray-400">
                                         for {{ $package->prices->min('pax') }} - {{ $package->prices->max('pax') }} pax
