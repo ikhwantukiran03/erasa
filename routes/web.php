@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VenueController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ItemController;
+use App\Http\Controllers\Admin\PackageController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -88,13 +89,22 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 
     // Item Management Routes
-Route::get('/items', [ItemController::class, 'index'])->name('items.index');
-Route::get('/items/create', [ItemController::class, 'create'])->name('items.create');
-Route::post('/items', [ItemController::class, 'store'])->name('items.store');
-Route::get('/items/{item}', [ItemController::class, 'show'])->name('items.show');
-Route::get('/items/{item}/edit', [ItemController::class, 'edit'])->name('items.edit');
-Route::put('/items/{item}', [ItemController::class, 'update'])->name('items.update');
-Route::delete('/items/{item}', [ItemController::class, 'destroy'])->name('items.destroy');
+    Route::get('/items', [ItemController::class, 'index'])->name('items.index');
+    Route::get('/items/create', [ItemController::class, 'create'])->name('items.create');
+    Route::post('/items', [ItemController::class, 'store'])->name('items.store');
+    Route::get('/items/{item}', [ItemController::class, 'show'])->name('items.show');
+    Route::get('/items/{item}/edit', [ItemController::class, 'edit'])->name('items.edit');
+    Route::put('/items/{item}', [ItemController::class, 'update'])->name('items.update');
+    Route::delete('/items/{item}', [ItemController::class, 'destroy'])->name('items.destroy');
+    
+    // Package Management Routes
+    Route::get('/packages', [PackageController::class, 'index'])->name('packages.index');
+    Route::get('/packages/create', [PackageController::class, 'create'])->name('packages.create');
+    Route::post('/packages', [PackageController::class, 'store'])->name('packages.store');
+    Route::get('/packages/{package}', [PackageController::class, 'show'])->name('packages.show');
+    Route::get('/packages/{package}/edit', [PackageController::class, 'edit'])->name('packages.edit');
+    Route::put('/packages/{package}', [PackageController::class, 'update'])->name('packages.update');
+    Route::delete('/packages/{package}', [PackageController::class, 'destroy'])->name('packages.destroy');
     
     Route::get('/bookings', function () {
         if (!auth()->user()->isAdmin()) {

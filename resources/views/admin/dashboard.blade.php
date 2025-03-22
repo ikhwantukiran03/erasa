@@ -69,6 +69,20 @@
     </div>
     <a href="{{ route('admin.items.index') }}" class="mt-4 inline-block text-sm text-yellow-600 hover:underline">Manage items →</a>
 </div>
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-center">
+        <div class="bg-yellow-100 rounded-full p-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+        </div>
+        <div class="ml-4">
+            <h2 class="text-lg font-semibold text-gray-800">Total Packages</h2>
+            <p class="text-2xl font-bold text-gray-900">{{ \App\Models\Package::count() }}</p>
+        </div>
+    </div>
+    <a href="{{ route('admin.packages.index') }}" class="mt-4 inline-block text-sm text-yellow-600 hover:underline">Manage Packages →</a>
+</div>
     </div>
     
     <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">

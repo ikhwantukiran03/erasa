@@ -27,4 +27,22 @@ class Item extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    /**
+     * Get the package items for the item.
+     */
+    public function packageItems()
+    {
+        return $this->hasMany(PackageItem::class);
+    }
+
+    /**
+     * Get the packages that contain this item.
+     */
+    public function packages()
+    {
+        return $this->belongsToMany(Package::class, 'package_items')
+            ->withPivot('description')
+            ->withTimestamps();
+    }
 }
