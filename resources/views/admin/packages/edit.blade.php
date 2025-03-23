@@ -93,7 +93,7 @@
                                         >
                                     </div>
                                     <div class="relative">
-                                        <label class="block text-dark font-medium mb-1">Price (Rp)</label>
+                                        <label class="block text-dark font-medium mb-1">Price (RM)</label>
                                         <input 
                                             type="number" 
                                             name="prices[{{ $index }}][price]" 
@@ -126,7 +126,7 @@
                                         >
                                     </div>
                                     <div>
-                                        <label class="block text-dark font-medium mb-1">Price (Rp)</label>
+                                        <label class="block text-dark font-medium mb-1">Price (RM)</label>
                                         <input 
                                             type="number" 
                                             name="prices[0][price]" 
@@ -376,7 +376,7 @@
                     >
                 </div>
                 <div class="relative">
-                    <label class="block text-dark font-medium mb-1">Price (Rp)</label>
+                    <label class="block text-dark font-medium mb-1">Price (RM)</label>
                     <input 
                         type="number" 
                         name="prices[${priceCount}][price]" 

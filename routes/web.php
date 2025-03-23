@@ -105,7 +105,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/packages/{package}/edit', [PackageController::class, 'edit'])->name('packages.edit');
     Route::put('/packages/{package}', [PackageController::class, 'update'])->name('packages.update');
     Route::delete('/packages/{package}', [PackageController::class, 'destroy'])->name('packages.destroy');
-    
+    Route::post('/packages/{package}/duplicate', [PackageController::class, 'duplicate'])->name('packages.duplicate');
+
+
     Route::get('/bookings', function () {
         if (!auth()->user()->isAdmin()) {
             return redirect()->route('dashboard')

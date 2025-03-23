@@ -100,6 +100,12 @@
                                     <a href="{{ route('admin.packages.edit', $package) }}" class="text-indigo-600 hover:text-indigo-800 transition bg-indigo-50 hover:bg-indigo-100 rounded-md px-3 py-1.5 text-sm font-medium">
                                         Edit
                                     </a>
+                                    <form action="{{ route('admin.packages.duplicate', $package) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="text-green-600 hover:text-green-800 transition bg-green-50 hover:bg-green-100 rounded-md px-3 py-1.5 text-sm font-medium">
+                                            Duplicate
+                                        </button>
+                                    </form>
                                 </div>
                                 <form action="{{ route('admin.packages.destroy', $package) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this package?');">
                                     @csrf

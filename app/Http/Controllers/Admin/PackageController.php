@@ -286,4 +286,58 @@ class PackageController extends Controller
                 ->with('error', 'An error occurred while deleting the package: ' . $e->getMessage());
         }
     }
+
+    /**
+ * Duplicate the specified package.
+ *
+ * @param  \App\Models\Package  $package
+ * @return \Illuminate\Http\RedirectResponse
+ */
+public function duplicate(Package $package)
+{
+    if (!auth()->user()->isAdmin()) {
+        return redirect()->route('dashboard')
+            ->with('error', 'You do not have permission to access this resource.');
+    }
+    
+    try {
+        DB::beginTransaction();
+        
+        // Create a new package with same data but append "(Copy)" to the name
+        $newPackage = Package::create([
+            'name' => $package->name . ' (Copy)',
+            'description' => $package->description,
+            'venue_id' => $package->venue_id,
+        ]);
+        
+        // Duplicate prices
+        foreach ($package->prices as $price) {
+            Price::create([
+                'package_id' => $newPackage->id,
+                'pax' => $price->pax,
+                'price' => $price->price,
+            ]);
+        }
+        
+        // Duplicate package items
+        foreach ($package->packageItems as $packageItem) {
+            PackageItem::create([
+                'package_id' => $newPackage->id,
+                'item_id' => $packageItem->item_id,
+                'description' => $packageItem->description,
+            ]);
+        }
+        
+        DB::commit();
+        
+        return redirect()->route('admin.packages.index')
+            ->with('success', 'Package duplicated successfully.');
+            
+    } catch (\Exception $e) {
+        DB::rollBack();
+        
+        return redirect()->back()
+            ->with('error', 'An error occurred while duplicating the package: ' . $e->getMessage());
+    }
+}
 }
