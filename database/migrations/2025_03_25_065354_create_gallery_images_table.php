@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('description')->nullable();
             $table->string('image_path')->nullable(); // For uploaded pictures
-            $table->string('image_url')->nullable(); // For social media links
+            $table->text('image_url')->nullable(); // For social media links
             $table->boolean('is_featured')->default(false);
             $table->integer('display_order')->default(0);
             $table->string('source')->default('local');
