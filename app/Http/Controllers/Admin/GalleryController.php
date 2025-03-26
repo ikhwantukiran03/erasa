@@ -14,17 +14,42 @@ class GalleryController extends Controller
     /**
      * Display a listing of the gallery items.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         if(!auth()->user()->isAdmin()) {
             return redirect()->route('dashboard')
                 ->with('error', 'You do not have permission to access this resource.'); 
         }
-            
-        $galleries = Gallery::with('venue')->orderBy("venue_id")->orderBy('display_order')->get();
-        return view('admin.galleries.index', compact('galleries'));
+        
+        // Base query for galleries
+        $query = Gallery::with('venue');
+        
+        // Filter by venue if requested
+        if ($request->has('venue_id') && $request->venue_id) {
+            $query->where('venue_id', $request->venue_id);
+        }
+        
+        // Get galleries with sorting
+        $galleries = $query->orderBy('venue_id')
+                           ->orderBy('display_order')
+                           ->orderBy('created_at', 'desc')
+                           ->get();
+        
+        // Get venues for the filter dropdown
+        $venues = Venue::orderBy('name')->get();
+        
+        // Calculate some statistics
+        $stats = [
+            'total' => $galleries->count(),
+            'local' => $galleries->where('source', 'local')->count(),
+            'external' => $galleries->where('source', 'external')->count(),
+            'featured' => $galleries->where('is_featured', true)->count(),
+        ];
+        
+        return view('admin.galleries.index', compact('galleries', 'venues', 'stats'));
     }
 
     /**
@@ -44,7 +69,7 @@ class GalleryController extends Controller
     }
 
     /**
-     * Store a newly created gallery item in storage.
+     * Store newly created gallery items in storage.
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
@@ -56,15 +81,9 @@ class GalleryController extends Controller
                 ->with('error', 'You do not have permission to access this resource.');
         }
 
+        // Validate basic fields first
         $validator = Validator::make($request->all(), [
             'venue_id' => ['required', 'exists:venues,id'],
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'source' => ['required', 'in:local,external'],
-            'image' => ['required_if:source,local', 'nullable', 'image', 'max:5120'], // 5MB max
-            'image_url' => ['required_if:source,external', 'nullable', 'url'],
-            'is_featured' => ['sometimes', 'boolean'],
-            'display_order' => ['nullable', 'integer', 'min:0'],
         ]);
 
         if ($validator->fails()) {
@@ -73,21 +92,96 @@ class GalleryController extends Controller
                 ->withInput();
         }
 
-        $data = $request->except(['image']);
+        $venue_id = $request->venue_id;
+        $source_type = $request->source_type ?? 'local'; // Default to local
+        $default_title = $request->default_title;
+        $default_description = $request->default_description;
+        $is_featured = $request->has('is_featured');
+        $display_order = $request->display_order ?? 0;
+        $count = 0;
 
-        // handle file upload
-        if ($request->source === 'local' && $request->hasFile('image')) {
-            $path = $request->file('image')->store('venues/gallery', 'public');
-            $data['image_path'] = $path;
-            $data['image_url'] = null;
-        } else {
-            $data['image_path'] = null;
+        // Process local uploads
+        if ($source_type === 'local' && $request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                // Validate image
+                $validator = Validator::make(['image' => $image], [
+                    'image' => ['required', 'image', 'max:5120'], // 5MB max
+                ]);
+
+                if ($validator->fails()) {
+                    continue;
+                }
+
+                // Upload the image
+                $path = $image->store('venues/gallery', 'public');
+                
+                // Get title and description for this image
+                $title = $request->titles[$index] ?? $default_title ?? $image->getClientOriginalName();
+                $description = $request->descriptions[$index] ?? $default_description;
+                
+                // Mark first image as featured if requested
+                $is_image_featured = ($count === 0 && $is_featured) ? true : false;
+                
+                // Create gallery item
+                Gallery::create([
+                    'venue_id' => $venue_id,
+                    'title' => $title,
+                    'description' => $description,
+                    'image_path' => $path,
+                    'image_url' => null,
+                    'is_featured' => $is_image_featured,
+                    'display_order' => $display_order + $count,
+                    'source' => 'local',
+                ]);
+                
+                $count++;
+            }
+        }
+        // Process external URLs
+        elseif ($source_type === 'external' && !empty($request->image_urls)) {
+            foreach ($request->image_urls as $index => $url) {
+                if (empty($url)) continue;
+                
+                // Validate URL
+                $validator = Validator::make(['url' => $url], [
+                    'url' => ['required', 'url'],
+                ]);
+
+                if ($validator->fails()) {
+                    continue;
+                }
+                
+                // Get title and description for this URL
+                $title = $request->url_titles[$index] ?? $default_title ?? 'Gallery Image';
+                $description = $request->url_descriptions[$index] ?? $default_description;
+                
+                // Mark first image as featured if requested
+                $is_image_featured = ($count === 0 && $is_featured) ? true : false;
+                
+                // Create gallery item
+                Gallery::create([
+                    'venue_id' => $venue_id,
+                    'title' => $title,
+                    'description' => $description,
+                    'image_path' => null,
+                    'image_url' => $url,
+                    'is_featured' => $is_image_featured,
+                    'display_order' => $display_order + $count,
+                    'source' => 'external',
+                ]);
+                
+                $count++;
+            }
         }
 
-        Gallery::create($data);
-
-        return redirect()->route('admin.galleries.index')
-            ->with('success', 'Gallery item created successfully.');
+        if ($count > 0) {
+            return redirect()->route('admin.galleries.index')
+                ->with('success', $count . ' image(s) added successfully.');
+        } else {
+            return redirect()->back()
+                ->with('error', 'No images were uploaded. Please select at least one image.')
+                ->withInput();
+        }
     }
 
     /**
