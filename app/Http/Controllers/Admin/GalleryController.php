@@ -14,32 +14,31 @@ class GalleryController extends Controller
     /**
      * Display a listing of the gallery items.
      *
-     * 
-     * @return \Illuminate\View\View|\Illuminate\Http\RediretResponse
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
+    public function index()
+    {
+        if(!auth()->user()->isAdmin()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.'); 
+        }
+            
+        $galleries = Gallery::with('venue')->orderBy("venue_id")->orderBy('display_order')->get();
+        return view('admin.galleries.index', compact('galleries'));
+    }
 
-     public function index()
-     {
-         if(auth()->user()->isAdmin()){
-             return redirect()->route('dashboard')
-             -> with('error', 'You do not have permission to access this resource.'); 
-             }
-    $galleries = Gallery::with('venue')->orderBy("venue_id")->orderBy('display_order')->get();
-    return view('admin.galleries.index', compact('galleries'));
-     }
-
-     /**
-      * Show the form for creating a new gallery item.
-      *
-      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
-      */
-
+    /**
+     * Show the form for creating a new gallery item.
+     *
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
     public function create()
     {
-        if(auth()->user()->isAdmin()){
+        if(!auth()->user()->isAdmin()) {
             return redirect()->route('dashboard')
-            ->with('error', 'You do not have permission to access this resource.');
+                ->with('error', 'You do not have permission to access this resource.');
         }
+        
         $venues = Venue::orderBy('name')->get();
         return view('admin.galleries.create', compact('venues'));
     }
@@ -50,12 +49,11 @@ class GalleryController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-
     public function store(Request $request)
     {
         if (!auth()->user()->isAdmin()) {
             return redirect()->route('dashboard')
-            ->with('error', 'You do not have permission to access this resource.');
+                ->with('error', 'You do not have permission to access this resource.');
         }
 
         $validator = Validator::make($request->all(), [
@@ -71,14 +69,14 @@ class GalleryController extends Controller
 
         if ($validator->fails()) {
             return redirect()->back()
-            ->withErrors($validator)
-            ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
-        $data=$request->except(['image']);
+        $data = $request->except(['image']);
 
         // handle file upload
-        if ($request->source==='local' && $request->hasFile('image')){
+        if ($request->source === 'local' && $request->hasFile('image')) {
             $path = $request->file('image')->store('venues/gallery', 'public');
             $data['image_path'] = $path;
             $data['image_url'] = null;
@@ -89,22 +87,22 @@ class GalleryController extends Controller
         Gallery::create($data);
 
         return redirect()->route('admin.galleries.index')
-        ->with('success', 'Gallery item created successfully.');
+            ->with('success', 'Gallery item created successfully.');
     }
 
     /**
-     *Display the specified gallery item.
+     * Display the specified gallery item.
      *
      * @param \App\Models\Gallery $gallery
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-
     public function show(Gallery $gallery)
     {
-        if (auth()->user()->isAdmin()){
+        if (!auth()->user()->isAdmin()) {
             return redirect()->route('dashboard')
-            ->with('error', 'You do not have permission to access this resource.');
+                ->with('error', 'You do not have permission to access this resource.');
         }
+        
         return view('admin.galleries.show', compact('gallery'));
     }
 
@@ -116,10 +114,11 @@ class GalleryController extends Controller
      */
     public function edit(Gallery $gallery)
     {
-        if (auth()->user()->isAdmin()){
+        if (!auth()->user()->isAdmin()) {
             return redirect()->route('dashboard')
-            ->with('error', 'You do not have permission to access this resource.');
+                ->with('error', 'You do not have permission to access this resource.');
         }
+        
         $venues = Venue::orderBy('name')->get();
         return view('admin.galleries.edit', compact('gallery', 'venues'));
     }
@@ -131,7 +130,7 @@ class GalleryController extends Controller
      * @param \App\Models\Gallery $gallery
      * @return \Illuminate\Http\RedirectResponse
      */
-     public function update(Request $request, Gallery $gallery)
+    public function update(Request $request, Gallery $gallery)
     {
         if (!auth()->user()->isAdmin()) {
             return redirect()->route('dashboard')
