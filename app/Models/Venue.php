@@ -39,4 +39,14 @@ class Venue extends Model
         
         return $address . ', ' . $this->city . ', ' . $this->state . ' ' . $this->postal_code;
     }
+
+    // Add this method to app/Models/Venue.php inside the Venue class
+
+/**
+ * Get the gallery images for the venue.
+ */
+public function galleries()
+{
+    return $this->hasMany(Gallery::class);
+}
 }

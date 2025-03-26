@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\VenueController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\PackageController;
-
+use App\Http\Controllers\Admin\GalleryController;
 // Home page
 Route::get('/', [HomeController::class, 'index']);
 
@@ -107,6 +107,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::delete('/packages/{package}', [PackageController::class, 'destroy'])->name('packages.destroy');
     Route::post('/packages/{package}/duplicate', [PackageController::class, 'duplicate'])->name('packages.duplicate');
 
+    // Add these lines to routes/web.php inside the Admin Routes group
+
+// Gallery Management Routes
+Route::get('/galleries', [GalleryController::class, 'index'])->name('galleries.index');
+Route::get('/galleries/create', [GalleryController::class, 'create'])->name('galleries.create');
+Route::post('/galleries', [GalleryController::class, 'store'])->name('galleries.store');
+Route::get('/galleries/{gallery}', [GalleryController::class, 'show'])->name('galleries.show');
+Route::get('/galleries/{gallery}/edit', [GalleryController::class, 'edit'])->name('galleries.edit');
+Route::put('/galleries/{gallery}', [GalleryController::class, 'update'])->name('galleries.update');
+Route::delete('/galleries/{gallery}', [GalleryController::class, 'destroy'])->name('galleries.destroy');
+Route::patch('/galleries/{gallery}/toggle-featured', [GalleryController::class, 'toggleFeatured'])->name('galleries.toggleFeatured');
+Route::post('/galleries/update-order', [GalleryController::class, 'updateOrder'])->name('galleries.updateOrder');
 
     Route::get('/bookings', function () {
         if (!auth()->user()->isAdmin()) {
