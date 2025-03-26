@@ -16,9 +16,8 @@ return new class extends Migration
             $table->foreignId('venue_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->string('description')->nullable();
-            $table->string('description')->nullable();
-            $table->string('image_path')->nullable();//for  uploaded pictures
-            $table->string('image_url')->nullable();//for social media links
+            $table->string('image_path')->nullable(); // For uploaded pictures
+            $table->string('image_url')->nullable(); // For social media links
             $table->boolean('is_featured')->default(false);
             $table->integer('display_order')->default(0);
             $table->string('source')->default('local');
