@@ -11,11 +11,14 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\GalleryController;
-
+use App\Http\Controllers\PublicController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
 
+// Add these to your existing routes
+Route::get('/wedding-venues', [PublicController::class, 'showVenues'])->name('public.venues');
+Route::get('/wedding-package/{package}', [PublicController::class, 'showPackage'])->name('public.package');
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
