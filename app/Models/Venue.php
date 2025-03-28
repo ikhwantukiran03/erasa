@@ -49,4 +49,12 @@ public function galleries()
 {
     return $this->hasMany(Gallery::class);
 }
+
+/**
+ * Get the packages for the venue.
+ */
+public function packages()
+{
+    return $this->hasMany(Package::class);
+}
 }
