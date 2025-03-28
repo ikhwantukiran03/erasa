@@ -340,4 +340,52 @@ public function duplicate(Package $package)
             ->with('error', 'An error occurred while duplicating the package: ' . $e->getMessage());
     }
 }
+
+
+/**
+ * Display a public listing of packages organized by venues.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @return \Illuminate\View\View
+ */
+public function publicIndex(Request $request)
+{
+    // Get all venues for the filter
+    $venues = Venue::all();
+    
+    // If venue_id is provided, show packages for that specific venue
+    if ($request->has('venue_id')) {
+        $venueWithPackages = Venue::with(['packages.prices', 'packages.packageItems.item', 'galleries'])
+            ->findOrFail($request->venue_id);
+        
+        return view('packages.index', compact('venues', 'venueWithPackages'));
+    }
+    
+    // Otherwise, show all venues with their packages
+    $venuesWithPackages = Venue::with(['packages.prices', 'packages.packageItems.item'])
+        ->has('packages')
+        ->get();
+    
+    return view('packages.index', compact('venues', 'venuesWithPackages'));
+}
+
+/**
+ * Display the public view of the specified package.
+ *
+ * @param  \App\Models\Package  $package
+ * @return \Illuminate\View\View
+ */
+public function publicShow(Package $package)
+{
+    $package->load(['venue', 'prices', 'packageItems.item.category']);
+    
+    // Get related packages from the same venue
+    $relatedPackages = Package::where('venue_id', $package->venue_id)
+        ->where('id', '!=', $package->id)
+        ->with(['prices', 'venue'])
+        ->take(3)
+        ->get();
+    
+    return view('packages.show', compact('package', 'relatedPackages'));
+}
 }

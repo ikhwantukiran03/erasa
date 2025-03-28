@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\GalleryController;
+
 // Home page
 Route::get('/', [HomeController::class, 'index']);
 
@@ -107,6 +108,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::delete('/packages/{package}', [PackageController::class, 'destroy'])->name('packages.destroy');
     Route::post('/packages/{package}/duplicate', [PackageController::class, 'duplicate'])->name('packages.duplicate');
 
+
     // Add these lines to routes/web.php inside the Admin Routes group
 
 // Gallery Management Routes
@@ -146,4 +148,7 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
         }
         return view('staff.bookings.index');
     })->name('bookings.index');
-});
+}
+
+
+);
