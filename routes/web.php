@@ -11,16 +11,11 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\GalleryController;
-use App\Http\Controllers\PublicVenueController;
+
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
 
-// Public Venue Routes
-Route::get('/venues', [PublicVenueController::class, 'index'])->name('publicvenues.index');
-Route::get('/venues/{venue}', [PublicVenueController::class, 'show'])->name('publicvenues.show');
-Route::post('/venue-inquiry', [PublicVenueController::class, 'submitInquiry'])->name('publicvenues.inquiry');
-Route::get('/search-venues', [PublicVenueController::class, 'search'])->name('publicvenues.search');
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {

@@ -11,7 +11,7 @@
                     <a href="#home">Home</a>
                     <a href="#about">About</a>
                     <a href="#gallery">Gallery</a>
-                    <a href="{{ route('publicvenues.index') }}">Packages</a>
+                    <a href="#pricing">Packages</a>
                     <a href="#booking" class="cta-btn">Book Now</a>
                 </nav>
                 <button class="mobile-menu-btn">
