@@ -91,7 +91,7 @@
                 <a href="/" class="text-dark hover:text-primary transition">Home</a>
                 <a href="#about" class="text-dark hover:text-primary transition">About</a>
                 <a href="#gallery" class="text-dark hover:text-primary transition">Gallery</a>
-                <a href="#pricing" class="text-dark hover:text-primary transition">Packages</a>
+                <a href="{{ route('public.venues') }}" class="text-dark hover:text-primary transition">Packages</a>
                 @guest
                     <a href="{{ route('login') }}" class="text-dark hover:text-primary transition">Login</a>
                     <a href="{{ route('register') }}" class="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90 transition">Register</a>
@@ -126,7 +126,7 @@
                 <a href="/" class="block px-3 py-2 rounded-md text-base font-medium text-dark hover:bg-gray-50">Home</a>
                 <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium text-dark hover:bg-gray-50">About</a>
                 <a href="#gallery" class="block px-3 py-2 rounded-md text-base font-medium text-dark hover:bg-gray-50">Gallery</a>
-                <a href="#pricing" class="block px-3 py-2 rounded-md text-base font-medium text-dark hover:bg-gray-50">Packages</a>
+                <a href="{{ route('public.venues') }}" class="block px-3 py-2 rounded-md text-base font-medium text-dark hover:bg-gray-50">Packages</a>
                 @guest
                     <a href="{{ route('login') }}" class="block px-3 py-2 rounded-md text-base font-medium text-dark hover:bg-gray-50">Login</a>
                     <a href="{{ route('register') }}" class="block px-3 py-2 rounded-md text-base font-medium bg-primary text-white hover:bg-opacity-90">Register</a>
