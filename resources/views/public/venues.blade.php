@@ -3,14 +3,6 @@
 @section('title', 'Wedding Venues - Enak Rasa Wedding Hall')
 
 @section('content')
-<!-- Hero Section -->
-<div class="relative h-[300px] bg-gray-900">
-    <div class="absolute inset-0 bg-gradient-to-r from-primary/80 to-primary/40"></div>
-    <div class="absolute inset-0 flex items-center justify-center text-center px-4">
-        <h1 class="text-4xl font-display font-bold text-white drop-shadow-lg">Our Wedding Venues</h1>
-    </div>
-</div>
-
 <!-- Venues Overview -->
 <div class="bg-white py-10">
     <div class="container mx-auto px-4">
@@ -94,8 +86,6 @@
                                     @endif
                                 </p>
                             </div>
-                            
-                            
                         </div>
                     </div>
                 </a>
@@ -157,7 +147,7 @@
             <!-- Packages Section -->
             @if($packages->count() > 0)
                 <h3 class="text-xl font-bold text-primary mb-4">Available Packages</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
                     @foreach($packages as $package)
                         <a href="{{ route('public.package', $package) }}" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300 block">
                             <div class="p-1 bg-primary"></div>
@@ -179,8 +169,6 @@
                                                 @endif
                                             </p>
                                         </div>
-                                        
-                                        
                                     </div>
                                 </div>
                             </div>
@@ -188,6 +176,45 @@
                     @endforeach
                 </div>
             @endif
+
+            <!-- Gallery Section -->
+            <h3 class="text-xl font-bold text-primary mb-4">Gallery</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                @foreach($galleries as $gallery)
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="h-64 overflow-hidden">
+                            @if($gallery->source === 'local' && $gallery->image_path)
+                                <img src="{{ asset('storage/' . $gallery->image_path) }}" 
+                                     alt="{{ $gallery->title }}" 
+                                     class="w-full h-full object-cover transition duration-500 hover:scale-105">
+                            @elseif($gallery->source === 'external' && $gallery->image_url)
+                                <img src="{{ $gallery->image_url }}" 
+                                     alt="{{ $gallery->title }}" 
+                                     class="w-full h-full object-cover transition duration-500 hover:scale-105">
+                            @else
+                                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                    <span class="text-gray-400">No image available</span>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="p-4">
+                            <h4 class="text-lg font-semibold text-dark">{{ $gallery->title }}</h4>
+                            @if($gallery->description)
+                                <p class="text-gray-600 mt-1">{{ Str::limit($gallery->description, 100) }}</p>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+
+                @if($galleries->count() === 0)
+                    <div class="col-span-3 text-center py-10 bg-gray-50 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p class="mt-4 text-gray-500">No gallery images available for this venue</p>
+                    </div>
+                @endif
+            </div>
         @endif
     </div>
 </div>
