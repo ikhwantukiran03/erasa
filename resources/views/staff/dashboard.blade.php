@@ -59,6 +59,22 @@
                 </div>
             </div>
         </div>
+        <!-- Add this to the staff dashboard to include a link to requests -->
+
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-center">
+        <div class="bg-amber-100 rounded-full p-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+        </div>
+        <div class="ml-4">
+            <h2 class="text-lg font-semibold text-gray-800">Booking Requests</h2>
+            <p class="text-gray-600 mt-1">View and manage customer booking requests</p>
+        </div>
+    </div>
+    <a href="{{ route('staff.requests.index') }}" class="mt-4 inline-block text-sm text-amber-600 hover:underline">Manage booking requests →</a>
+</div>
     </div>
 </div>
 @endsection

@@ -12,7 +12,7 @@
                     <a href="#about">About</a>
                     <a href="#gallery">Gallery</a>
                     <a href="{{ route('public.venues') }}">Packages</a>
-                    <a href="#booking" class="cta-btn">Book Now</a>
+                    <a href="booking" class="cta-btn">Book Now</a>
                 </nav>
                 <button class="mobile-menu-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
@@ -222,73 +222,125 @@
         </div>
     </section>
 
-    <!-- Pricing Section -->
-    <section class="pricing" id="pricing">
-        <div class="container">
-            <div class="section-title" data-aos="fade-up">
-                <h2>Our Wedding Packages</h2>
-            </div>
-            <div class="pricing-container">
-                <div class="pricing-card" data-aos="fade-up" data-aos-delay="100">
-                    <h3>Intimate Elegance</h3>
-                    <p class="pricing-description">Perfect for smaller, intimate celebrations</p>
-                    <div class="pricing-price">
-                        Rp 25,000,000 <span>/ package</span>
+
+
+<!-- Booking CTA Section (Add form to existing section) -->
+<section class="booking" id="booking">
+    <div class="container mx-auto px-4">
+        <div class="section-title" data-aos="fade-up">
+            <h2>Book Your Special Day</h2>
+        </div>
+        
+        <div class="max-w-4xl mx-auto">
+            <p data-aos="fade-up" data-aos-delay="100" class="text-center text-white mb-8">
+                Ready to start planning your dream wedding? Fill out the form below to check availability for your preferred date and learn more about our customizable wedding packages.
+            </p>
+            
+            <div data-aos="fade-up" data-aos-delay="200" class="bg-white rounded-lg shadow-lg p-6">
+                @if(session('success'))
+                    <div class="mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4">
+                        {{ session('success') }}
                     </div>
-                    <ul class="pricing-features">
-                        <li>Up to 100 guests</li>
-                        <li>5-hour venue rental</li>
-                        <li>Basic decoration setup</li>
-                        <li>Standard catering menu</li>
-                        <li>Sound system</li>
-                        <li>1 photographer</li>
-                        <li>Wedding coordinator</li>
-                    </ul>
-                    <a href="#booking" class="cta-btn">Book Now</a>
-                </div>
-                <div class="pricing-card featured" data-aos="fade-up" data-aos-delay="200">
-                    <div class="featured-label">Most Popular</div>
-                    <h3>Classic Celebration</h3>
-                    <p class="pricing-description">Our most popular comprehensive package</p>
-                    <div class="pricing-price">
-                        Rp 45,000,000 <span>/ package</span>
+                @endif
+
+                <form action="{{ route('requests.store') }}" method="POST">
+                    @csrf
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Name -->
+                        <div>
+                            <label for="name" class="block text-dark font-medium mb-1">Full Name <span class="text-red-600">*</span></label>
+                            <input 
+                                type="text" 
+                                id="name" 
+                                name="name" 
+                                value="{{ old('name') }}" 
+                                required 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary @error('name') border-red-500 @enderror" 
+                                placeholder="Enter your full name"
+                            >
+                            @error('name')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        
+                        <!-- WhatsApp -->
+                        <div>
+                            <label for="whatsapp" class="block text-dark font-medium mb-1">WhatsApp Number <span class="text-red-600">*</span></label>
+                            <input 
+                                type="text" 
+                                id="whatsapp" 
+                                name="whatsapp" 
+                                value="{{ old('whatsapp') }}" 
+                                required 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary @error('whatsapp') border-red-500 @enderror" 
+                                placeholder="e.g. +60123456789"
+                            >
+                            @error('whatsapp')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        
+                        <!-- Email -->
+                        <div>
+                            <label for="email" class="block text-dark font-medium mb-1">Email Address <span class="text-red-600">*</span></label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                value="{{ old('email') }}" 
+                                required 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary @error('email') border-red-500 @enderror" 
+                                placeholder="Enter your email address"
+                            >
+                            @error('email')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        
+                        <!-- Event Date -->
+                        <div>
+                            <label for="event_date" class="block text-dark font-medium mb-1">Event Date</label>
+                            <input 
+                                type="date" 
+                                id="event_date" 
+                                name="event_date" 
+                                value="{{ old('event_date') }}" 
+                                min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary @error('event_date') border-red-500 @enderror" 
+                            >
+                            @error('event_date')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        
+                        <!-- Message -->
+                        <div class="md:col-span-2">
+                            <label for="message" class="block text-dark font-medium mb-1">Message <span class="text-red-600">*</span></label>
+                            <textarea 
+                                id="message" 
+                                name="message" 
+                                rows="4" 
+                                required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary @error('message') border-red-500 @enderror" 
+                                placeholder="Please share any specific requirements or questions you may have..."
+                            >{{ old('message') }}</textarea>
+                            @error('message')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
-                    <ul class="pricing-features">
-                        <li>Up to 200 guests</li>
-                        <li>8-hour venue rental</li>
-                        <li>Premium decoration setup</li>
-                        <li>Deluxe catering menu</li>
-                        <li>Full sound & lighting system</li>
-                        <li>Photography & videography</li>
-                        <li>Wedding planner</li>
-                        <li>Bridal suite access</li>
-                        <li>Wedding cake</li>
-                    </ul>
-                    <a href="#booking" class="cta-btn">Book Now</a>
-                </div>
-                <div class="pricing-card" data-aos="fade-up" data-aos-delay="300">
-                    <h3>Grand Luxury</h3>
-                    <p class="pricing-description">The ultimate wedding experience</p>
-                    <div class="pricing-price">
-                        Rp 75,000,000 <span>/ package</span>
+                    
+                    <div class="mt-6">
+                        <button type="submit" class="w-full bg-primary text-white px-6 py-3 rounded-md font-semibold hover:bg-opacity-90 transition">
+                            Submit Booking Request
+                        </button>
                     </div>
-                    <ul class="pricing-features">
-                        <li>Up to 500 guests</li>
-                        <li>Full-day venue exclusive use</li>
-                        <li>Luxury decoration & florals</li>
-                        <li>Premium catering & beverages</li>
-                        <li>Complete entertainment system</li>
-                        <li>Full photography & cinematography</li>
-                        <li>Dedicated wedding planner</li>
-                        <li>Bridal & groom suite access</li>
-                        <li>Custom wedding cake</li>
-                        <li>Honeymoon suite (1 night)</li>
-                    </ul>
-                    <a href="#booking" class="cta-btn">Book Now</a>
-                </div>
+                </form>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
 
 
