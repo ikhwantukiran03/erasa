@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('venue_id')->nullabvle()->constrained()->nullOnDelete();
             $table->foreignId('package_id')->nullable()->constrained()->nullOnDelete();
             $table->date('event_date')->nullable();
-            $table->text('message')->nullable();
+            $table->enum('request',['Reservation','Viewing,','Booking']);
             $table->enum('status', ['pending', 'confirmed', 'contacted','canceled'])->default('pending');
             $table->timestamps();
         });
