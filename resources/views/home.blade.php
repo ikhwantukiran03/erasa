@@ -218,129 +218,82 @@
             <p data-aos="fade-up" data-aos-delay="100">
                 Ready to start planning your dream wedding? Check availability for your preferred date and learn more about our customizable wedding packages.
             </p>
-            <a href="#pricing" class="cta-btn" data-aos="fade-up" data-aos-delay="200">View Packages</a>
+            <a href="{{ route('public.venues') }}" class="cta-btn" data-aos="fade-up" data-aos-delay="200">View Packages</a>
         </div>
     </section>
 
 
 
-<!-- Booking CTA Section (Add form to existing section) -->
+<!-- Booking CTA Section -->
 <section class="booking" id="booking">
-    <div class="container mx-auto px-4">
-        <div class="section-title" data-aos="fade-up">
-            <h2>Book Your Special Day</h2>
-        </div>
-        
-        <div class="max-w-4xl mx-auto">
-            <p data-aos="fade-up" data-aos-delay="100" class="text-center text-white mb-8">
-                Ready to start planning your dream wedding? Fill out the form below to check availability for your preferred date and learn more about our customizable wedding packages.
-            </p>
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Book Your Special Day</h2>
+            </div>
             
-            <div data-aos="fade-up" data-aos-delay="200" class="bg-white rounded-lg shadow-lg p-6">
-                @if(session('success'))
-                    <div class="mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                <form action="{{ route('requests.store') }}" method="POST">
-                    @csrf
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Name -->
-                        <div>
-                            <label for="name" class="block text-dark font-medium mb-1">Full Name <span class="text-red-600">*</span></label>
-                            <input 
-                                type="text" 
-                                id="name" 
-                                name="name" 
-                                value="{{ old('name') }}" 
-                                required 
-                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary @error('name') border-red-500 @enderror" 
-                                placeholder="Enter your full name"
-                            >
-                            @error('name')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
+            <div class="form-container">
+                <p data-aos="fade-up" data-aos-delay="100" class="text-center">
+                    Ready to start planning your dream wedding? Fill out the form below to check availability for your preferred date and learn more about our customizable wedding packages.
+                </p>
+                
+                <div data-aos="fade-up" data-aos-delay="200" class="form-box">
+                    <form action="{{ route('requests.store') }}" method="POST">
+                        @csrf
+                        
+                        <div class="form-grid">
+                            <div>
+                                <label for="name">Full Name <span>*</span></label>
+                                <input type="text" id="name" name="name" value="{{ old('name') }}" required>
+                            </div>
+                            
+                            <div>
+                                <label for="whatsapp">WhatsApp Number <span>*</span></label>
+                                <input type="text" id="whatsapp" name="whatsapp" value="{{ old('whatsapp') }}" required>
+                            </div>
+                            
+                            <div>
+                                <label for="email">Email Address <span>*</span></label>
+                                <input type="email" id="email" name="email" value="{{ old('email') }}" required>
+                            </div>
+                            
+                            <div>
+                                <label for="event_date">Event Date <span>*</span></label>
+                                <input type="date" id="event_date" name="event_date" value="{{ old('event_date') }}" min="{{ date('Y-m-d', strtotime('+1 day')) }}" required>
+                            </div>
+                            
+                            <div>
+                                <label for="venue_id">Preferred Venue</label>
+                                <select id="venue_id" name="venue_id">
+                                    <option value="">-- Select Venue --</option>
+                                    @foreach(\App\Models\Venue::orderBy('name')->get() as $venue)
+                                        <option value="{{ $venue->id }}">{{ $venue->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="package_id">Interested In Package</label>
+                                <select id="package_id" name="package_id">
+                                    <option value="">-- Select Package --</option>
+                                    @foreach(\App\Models\Package::orderBy('name')->get() as $package)
+                                        <option value="{{ $package->id }}">{{ $package->name }} ({{ $package->venue->name }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <div class="full-width">
+                                <label for="message">Message <span>*</span></label>
+                                <textarea id="message" name="message" rows="4" required>{{ old('message') }}</textarea>
+                            </div>
                         </div>
                         
-                        <!-- WhatsApp -->
-                        <div>
-                            <label for="whatsapp" class="block text-dark font-medium mb-1">WhatsApp Number <span class="text-red-600">*</span></label>
-                            <input 
-                                type="text" 
-                                id="whatsapp" 
-                                name="whatsapp" 
-                                value="{{ old('whatsapp') }}" 
-                                required 
-                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary @error('whatsapp') border-red-500 @enderror" 
-                                placeholder="e.g. +60123456789"
-                            >
-                            @error('whatsapp')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <!-- Email -->
-                        <div>
-                            <label for="email" class="block text-dark font-medium mb-1">Email Address <span class="text-red-600">*</span></label>
-                            <input 
-                                type="email" 
-                                id="email" 
-                                name="email" 
-                                value="{{ old('email') }}" 
-                                required 
-                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary @error('email') border-red-500 @enderror" 
-                                placeholder="Enter your email address"
-                            >
-                            @error('email')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <!-- Event Date -->
-                        <div>
-                            <label for="event_date" class="block text-dark font-medium mb-1">Event Date</label>
-                            <input 
-                                type="date" 
-                                id="event_date" 
-                                name="event_date" 
-                                value="{{ old('event_date') }}" 
-                                min="{{ date('Y-m-d', strtotime('+1 day')) }}"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary @error('event_date') border-red-500 @enderror" 
-                            >
-                            @error('event_date')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <!-- Message -->
-                        <div class="md:col-span-2">
-                            <label for="message" class="block text-dark font-medium mb-1">Message <span class="text-red-600">*</span></label>
-                            <textarea 
-                                id="message" 
-                                name="message" 
-                                rows="4" 
-                                required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary @error('message') border-red-500 @enderror" 
-                                placeholder="Please share any specific requirements or questions you may have..."
-                            >{{ old('message') }}</textarea>
-                            @error('message')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
-                    
-                    <div class="mt-6">
-                        <button type="submit" class="w-full bg-primary text-white px-6 py-3 rounded-md font-semibold hover:bg-opacity-90 transition">
-                            Submit Booking Request
-                        </button>
-                    </div>
-                </form>
+                        <button type="submit" class="submit-button">Submit Booking Request</button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+    <script src="scripts.js"></script>
 
 
 
