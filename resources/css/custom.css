@@ -20,3 +20,119 @@
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
+
+/* Add these styles to your custom.css file or include them in a <style> tag */
+
+/* Form styling */
+.booking .form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.booking input,
+.booking select,
+.booking textarea {
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+.booking input:focus,
+.booking select:focus,
+.booking textarea:focus {
+    border-color: #D4A373;
+    box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.2);
+}
+
+/* Focus animation for form labels */
+.input-focused label {
+    color: #D4A373;
+    font-weight: 600;
+}
+
+/* Submit button styling */
+.booking button[type="submit"] {
+    background-color: #D4A373;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.booking button[type="submit"]:hover {
+    background-color: #C69C6D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.booking button[type="submit"]:active {
+    transform: translateY(0);
+}
+
+/* Animation for button */
+.booking button[type="submit"]::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.booking button[type="submit"]:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    20% {
+        transform: scale(25, 25);
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 0;
+        transform: scale(40, 40);
+    }
+}
+
+/* Card effect for form */
+.booking .bg-white {
+    transition: all 0.3s ease;
+}
+
+.booking .bg-white:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .booking .grid-cols-1 {
+        gap: 1rem;
+    }
+    
+    .booking button[type="submit"] {
+        width: 100%;
+    }
+}
+
+/* Animation for success message */
+.booking .bg-green-100 {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -223,77 +223,64 @@
     </section>
 
 
-
 <!-- Booking CTA Section -->
 <section class="booking" id="booking">
-        <div class="container">
-            <div class="section-title" data-aos="fade-up">
-                <h2>Book Your Special Day</h2>
-            </div>
-            
-            <div class="form-container">
-                <p data-aos="fade-up" data-aos-delay="100" class="text-center">
+    <div class="container mx-auto px-4 py-16">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-primary mb-4">Book Your Special Day</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
                     Ready to start planning your dream wedding? Fill out the form below to check availability for your preferred date and learn more about our customizable wedding packages.
                 </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                <!-- Booking Form -->
+                <div class="order-2 lg:order-1">
+                    @include('components.booking-form')
+                </div>
                 
-                <div data-aos="fade-up" data-aos-delay="200" class="form-box">
-                    <form action="{{ route('requests.store') }}" method="POST">
-                        @csrf
+                <!-- Image or Content -->
+                <div class="order-1 lg:order-2">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=2670&auto=format&fit=crop" 
+                             alt="Wedding Reception" 
+                             class="rounded-lg shadow-lg w-full h-auto object-cover"
+                             style="min-height: 300px; max-height: 600px;">
+                             
+                        <div class="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent rounded-lg"></div>
                         
-                        <div class="form-grid">
-                            <div>
-                                <label for="name">Full Name <span>*</span></label>
-                                <input type="text" id="name" name="name" value="{{ old('name') }}" required>
-                            </div>
-                            
-                            <div>
-                                <label for="whatsapp">WhatsApp Number <span>*</span></label>
-                                <input type="text" id="whatsapp" name="whatsapp" value="{{ old('whatsapp') }}" required>
-                            </div>
-                            
-                            <div>
-                                <label for="email">Email Address <span>*</span></label>
-                                <input type="email" id="email" name="email" value="{{ old('email') }}" required>
-                            </div>
-                            
-                            <div>
-                                <label for="event_date">Event Date <span>*</span></label>
-                                <input type="date" id="event_date" name="event_date" value="{{ old('event_date') }}" min="{{ date('Y-m-d', strtotime('+1 day')) }}" required>
-                            </div>
-                            
-                            <div>
-                                <label for="venue_id">Preferred Venue</label>
-                                <select id="venue_id" name="venue_id">
-                                    <option value="">-- Select Venue --</option>
-                                    @foreach(\App\Models\Venue::orderBy('name')->get() as $venue)
-                                        <option value="{{ $venue->id }}">{{ $venue->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label for="package_id">Interested In Package</label>
-                                <select id="package_id" name="package_id">
-                                    <option value="">-- Select Package --</option>
-                                    @foreach(\App\Models\Package::orderBy('name')->get() as $package)
-                                        <option value="{{ $package->id }}">{{ $package->name }} ({{ $package->venue->name }})</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            
-                            <div class="full-width">
-                                <label for="message">Message <span>*</span></label>
-                                <textarea id="message" name="message" rows="4" required>{{ old('message') }}</textarea>
+                        <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                            <div class="bg-primary/80 backdrop-blur-sm p-4 rounded-lg inline-block">
+                                <h3 class="text-xl font-display font-bold mb-2">Why Book With Us?</h3>
+                                <ul class="space-y-2">
+                                    <li class="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span>Dedicated Wedding Coordinators</span>
+                                    </li>
+                                    <li class="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span>Customizable Packages</span>
+                                    </li>
+                                    <li class="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span>Premium Venues & Catering</span>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
-                        
-                        <button type="submit" class="submit-button">Submit Booking Request</button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
-    <script src="scripts.js"></script>
+    </div>
+</section>
 
 
 
