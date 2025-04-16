@@ -12,7 +12,7 @@ use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\PublicController;
-use App\Http\Controllers\RequestController;
+
 // Home page
 Route::get('/', [HomeController::class, 'index']);
 
@@ -20,9 +20,6 @@ Route::get('/', [HomeController::class, 'index']);
 Route::get('/wedding-venues', [PublicController::class, 'showVenues'])->name('public.venues');
 Route::get('/wedding-package/{package}', [PublicController::class, 'showPackage'])->name('public.package');
 
-//Public Booking Request Routes
-Route::post('/booking-requests', [RequestController::class, 'store'])->name('requests.store');
-Route::get('/booking-request', [RequestController::class, 'create'])->name('requests.create');
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
@@ -158,8 +155,7 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
         return view('staff.bookings.index');
     })->name('bookings.index');
 
-    Route::get('/requests', [RequestController::class, 'index'])->name('requests.index');
-Route::patch('/requests/{bookingRequest}/status', [RequestController::class, 'updateStatus'])->name('requests.updateStatus');
+    
 }
 
 
