@@ -23,10 +23,10 @@ Route::get('/wedding-venues', [PublicController::class, 'showVenues'])->name('pu
 Route::get('/wedding-package/{package}', [PublicController::class, 'showPackage'])->name('public.package');
 
 // Booking Request Routes - Public
-Route::get('/booking-request', [App\Http\Controllers\BookingRequestController::class, 'create'])->name('booking-requests.create');
-Route::post('/booking-request', [App\Http\Controllers\BookingRequestController::class, 'store'])->name('booking-requests.store');
-Route::get('/booking-request/confirmation', [App\Http\Controllers\BookingRequestController::class, 'confirmation'])->name('booking-requests.confirmation');
-Route::get('/my-requests', [App\Http\Controllers\BookingRequestController::class, 'myRequests'])->name('booking-requests.my-requests');
+Route::get('/booking-request', [BookingRequestController::class, 'create'])->name('booking-requests.create');
+Route::post('/booking-request', [BookingRequestController::class, 'store'])->name('booking-requests.store');
+Route::get('/booking-request/confirmation', [BookingRequestController::class, 'confirmation'])->name('booking-requests.confirmation');
+Route::get('/my-requests', [BookingRequestController::class, 'myRequests'])->name('booking-requests.my-requests');
 
 
 // Authentication Routes
@@ -122,19 +122,16 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::delete('/packages/{package}', [PackageController::class, 'destroy'])->name('packages.destroy');
     Route::post('/packages/{package}/duplicate', [PackageController::class, 'duplicate'])->name('packages.duplicate');
 
-
-    // Add these lines to routes/web.php inside the Admin Routes group
-
-// Gallery Management Routes
-Route::get('/galleries', [GalleryController::class, 'index'])->name('galleries.index');
-Route::get('/galleries/create', [GalleryController::class, 'create'])->name('galleries.create');
-Route::post('/galleries', [GalleryController::class, 'store'])->name('galleries.store');
-Route::get('/galleries/{gallery}', [GalleryController::class, 'show'])->name('galleries.show');
-Route::get('/galleries/{gallery}/edit', [GalleryController::class, 'edit'])->name('galleries.edit');
-Route::put('/galleries/{gallery}', [GalleryController::class, 'update'])->name('galleries.update');
-Route::delete('/galleries/{gallery}', [GalleryController::class, 'destroy'])->name('galleries.destroy');
-Route::patch('/galleries/{gallery}/toggle-featured', [GalleryController::class, 'toggleFeatured'])->name('galleries.toggleFeatured');
-Route::post('/galleries/update-order', [GalleryController::class, 'updateOrder'])->name('galleries.updateOrder');
+    // Gallery Management Routes
+    Route::get('/galleries', [GalleryController::class, 'index'])->name('galleries.index');
+    Route::get('/galleries/create', [GalleryController::class, 'create'])->name('galleries.create');
+    Route::post('/galleries', [GalleryController::class, 'store'])->name('galleries.store');
+    Route::get('/galleries/{gallery}', [GalleryController::class, 'show'])->name('galleries.show');
+    Route::get('/galleries/{gallery}/edit', [GalleryController::class, 'edit'])->name('galleries.edit');
+    Route::put('/galleries/{gallery}', [GalleryController::class, 'update'])->name('galleries.update');
+    Route::delete('/galleries/{gallery}', [GalleryController::class, 'destroy'])->name('galleries.destroy');
+    Route::patch('/galleries/{gallery}/toggle-featured', [GalleryController::class, 'toggleFeatured'])->name('galleries.toggleFeatured');
+    Route::post('/galleries/update-order', [GalleryController::class, 'updateOrder'])->name('galleries.updateOrder');
 
     Route::get('/bookings', function () {
         if (!auth()->user()->isAdmin()) {
@@ -164,11 +161,9 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
     })->name('bookings.index');
 
     // Booking Request Management
-    Route::get('/requests', [App\Http\Controllers\Staff\BookingRequestController::class, 'index'])->name('requests.index');
-    Route::get('/requests/{bookingRequest}', [App\Http\Controllers\Staff\BookingRequestController::class, 'show'])->name('requests.show');
-    Route::get('/requests/{bookingRequest}/edit', [App\Http\Controllers\Staff\BookingRequestController::class, 'edit'])->name('requests.edit');
-    Route::post('/requests/{bookingRequest}/approve', [App\Http\Controllers\Staff\BookingRequestController::class, 'approve'])->name('requests.approve');
-    Route::post('/requests/{bookingRequest}/reject', [App\Http\Controllers\Staff\BookingRequestController::class, 'reject'])->name('requests.reject');
+    Route::get('/requests', [StaffBookingRequestController::class, 'index'])->name('requests.index');
+    Route::get('/requests/{bookingRequest}', [StaffBookingRequestController::class, 'show'])->name('requests.show');
+    Route::get('/requests/{bookingRequest}/edit', [StaffBookingRequestController::class, 'edit'])->name('requests.edit');
+    Route::post('/requests/{bookingRequest}/approve', [StaffBookingRequestController::class, 'approve'])->name('requests.approve');
+    Route::post('/requests/{bookingRequest}/reject', [StaffBookingRequestController::class, 'reject'])->name('requests.reject');
 });
-
-
