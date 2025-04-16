@@ -12,6 +12,8 @@ use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\BookingRequestController;
+use App\Http\Controllers\BookingController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -19,6 +21,12 @@ Route::get('/', [HomeController::class, 'index']);
 //Public Routes
 Route::get('/wedding-venues', [PublicController::class, 'showVenues'])->name('public.venues');
 Route::get('/wedding-package/{package}', [PublicController::class, 'showPackage'])->name('public.package');
+
+// Booking Request Routes - Public
+Route::get('/booking-request', [App\Http\Controllers\BookingRequestController::class, 'create'])->name('booking-requests.create');
+Route::post('/booking-request', [App\Http\Controllers\BookingRequestController::class, 'store'])->name('booking-requests.store');
+Route::get('/booking-request/confirmation', [App\Http\Controllers\BookingRequestController::class, 'confirmation'])->name('booking-requests.confirmation');
+Route::get('/my-requests', [App\Http\Controllers\BookingRequestController::class, 'myRequests'])->name('booking-requests.my-requests');
 
 
 // Authentication Routes
@@ -155,7 +163,12 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
         return view('staff.bookings.index');
     })->name('bookings.index');
 
-    
+     // Booking Request Management
+     Route::get('/requests', [App\Http\Controllers\Staff\BookingRequestController::class, 'index'])->name('requests.index');
+     Route::get('/requests/{bookingRequest}', [App\Http\Controllers\Staff\BookingRequestController::class, 'show'])->name('requests.show');
+     Route::get('/requests/{bookingRequest}/edit', [App\Http\Controllers\Staff\BookingRequestController::class, 'edit'])->name('requests.edit');
+     Route::post('/requests/{bookingRequest}/approve', [App\Http\Controllers\Staff\BookingRequestController::class, 'approve'])->name('requests.approve');
+     Route::post('/requests/{bookingRequest}/reject', [App\Http\Controllers\Staff\BookingRequestController::class, 'reject'])->name('requests.reject');
 }
 
 

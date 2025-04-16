@@ -214,6 +214,11 @@
                         <p class="mt-4 text-gray-500">No gallery images available for this venue</p>
                     </div>
                 @endif
+                <div class="mt-6 text-center">
+    <a href="{{ route('booking-requests.create', ['venue_id' => $selectedVenue->id]) }}" class="inline-block bg-primary text-white px-6 py-3 rounded-md font-semibold hover:bg-opacity-90 transition">
+        Book This Venue
+    </a>
+</div>
             </div>
         @endif
     </div>
