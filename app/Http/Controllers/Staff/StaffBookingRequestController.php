@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class BookingRequestController extends Controller
+class StaffBookingRequestController extends Controller
 {
     protected $whatsAppService;
 

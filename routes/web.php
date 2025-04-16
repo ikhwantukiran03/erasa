@@ -145,7 +145,7 @@ Route::post('/galleries/update-order', [GalleryController::class, 'updateOrder']
     })->name('bookings.index');
 });
 
-// Staff Routes - temporarily remove the role middleware
+// Staff Routes 
 Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () {
     Route::get('/dashboard', function () {
         if (!auth()->user()->isStaff()) {
@@ -163,13 +163,12 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
         return view('staff.bookings.index');
     })->name('bookings.index');
 
-     // Booking Request Management
-     Route::get('/requests', [App\Http\Controllers\Staff\BookingRequestController::class, 'index'])->name('requests.index');
-     Route::get('/requests/{bookingRequest}', [App\Http\Controllers\Staff\BookingRequestController::class, 'show'])->name('requests.show');
-     Route::get('/requests/{bookingRequest}/edit', [App\Http\Controllers\Staff\BookingRequestController::class, 'edit'])->name('requests.edit');
-     Route::post('/requests/{bookingRequest}/approve', [App\Http\Controllers\Staff\BookingRequestController::class, 'approve'])->name('requests.approve');
-     Route::post('/requests/{bookingRequest}/reject', [App\Http\Controllers\Staff\BookingRequestController::class, 'reject'])->name('requests.reject');
-}
+    // Booking Request Management
+    Route::get('/requests', [App\Http\Controllers\Staff\BookingRequestController::class, 'index'])->name('requests.index');
+    Route::get('/requests/{bookingRequest}', [App\Http\Controllers\Staff\BookingRequestController::class, 'show'])->name('requests.show');
+    Route::get('/requests/{bookingRequest}/edit', [App\Http\Controllers\Staff\BookingRequestController::class, 'edit'])->name('requests.edit');
+    Route::post('/requests/{bookingRequest}/approve', [App\Http\Controllers\Staff\BookingRequestController::class, 'approve'])->name('requests.approve');
+    Route::post('/requests/{bookingRequest}/reject', [App\Http\Controllers\Staff\BookingRequestController::class, 'reject'])->name('requests.reject');
+});
 
 
-);
