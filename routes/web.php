@@ -12,8 +12,8 @@ use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\Staff\StaffBookingRequestController;
 use App\Http\Controllers\BookingRequestController;
-use App\Http\Controllers\BookingController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);

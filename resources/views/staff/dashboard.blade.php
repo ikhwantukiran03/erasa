@@ -1,4 +1,4 @@
-// staff/dashboard.blade.php
+
 @extends('layouts.app')
 
 @section('title', 'Staff Dashboard - Enak Rasa Wedding Hall')
