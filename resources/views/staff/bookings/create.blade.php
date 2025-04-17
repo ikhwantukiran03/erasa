@@ -10,7 +10,7 @@
                 <h1 class="text-3xl font-display font-bold text-dark">Create New Booking</h1>
                 <p class="text-gray-600 mt-2">Add a new wedding hall booking</p>
             </div>
-            <a href="{{ route('admin.bookings.index') }}" class="text-primary hover:underline">Back to Bookings</a>
+            <a href="{{ route('staff.bookings.index') }}" class="text-primary hover:underline">Back to Bookings</a>
         </div>
         
         <div class="mt-8 bg-white rounded-lg shadow overflow-hidden">
@@ -26,7 +26,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('admin.bookings.store') }}" method="POST">
+                <form action="{{ route('staff.bookings.store') }}" method="POST">
                     @csrf
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -115,7 +115,7 @@
                     </div>
                     
                     <div class="mt-6 flex justify-end">
-                        <a href="{{ route('admin.bookings.index') }}" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition mr-2">
+                        <a href="{{ route('staff.bookings.index') }}" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition mr-2">
                             Cancel
                         </a>
                         <button type="submit" class="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90 transition">

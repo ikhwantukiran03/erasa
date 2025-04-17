@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\Staff\StaffBookingRequestController;
 use App\Http\Controllers\BookingRequestController;
+use App\Http\Controllers\Staff\BookingController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -160,10 +161,20 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
         return view('staff.bookings.index');
     })->name('bookings.index');
 
-    // Booking Request Management
+    // Booking Request Management Routes
     Route::get('/requests', [StaffBookingRequestController::class, 'index'])->name('requests.index');
     Route::get('/requests/{bookingRequest}', [StaffBookingRequestController::class, 'show'])->name('requests.show');
     Route::get('/requests/{bookingRequest}/edit', [StaffBookingRequestController::class, 'edit'])->name('requests.edit');
     Route::post('/requests/{bookingRequest}/approve', [StaffBookingRequestController::class, 'approve'])->name('requests.approve');
     Route::post('/requests/{bookingRequest}/reject', [StaffBookingRequestController::class, 'reject'])->name('requests.reject');
+
+    // Booking Management Routes
+    Route::get('/bookings', [App\Http\Controllers\Staff\BookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/create', [App\Http\Controllers\Staff\BookingController::class, 'create'])->name('bookings.create');
+    Route::post('/bookings', [App\Http\Controllers\Staff\BookingController::class, 'store'])->name('bookings.store');
+    Route::get('/bookings/{booking}', [App\Http\Controllers\Staff\BookingController::class, 'show'])->name('bookings.show');
+    Route::get('/bookings/{booking}/edit', [App\Http\Controllers\Staff\BookingController::class, 'edit'])->name('bookings.edit');
+    Route::put('/bookings/{booking}', [App\Http\Controllers\Staff\BookingController::class, 'update'])->name('bookings.update');
+    Route::delete('/bookings/{booking}', [App\Http\Controllers\Staff\BookingController::class, 'destroy'])->name('bookings.destroy');
+    Route::patch('/bookings/{booking}/cancel', [App\Http\Controllers\Staff\BookingController::class, 'cancel'])->name('bookings.cancel');
 });
