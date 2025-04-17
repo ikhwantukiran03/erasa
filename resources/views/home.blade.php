@@ -30,7 +30,7 @@
             <h1>Create Unforgettable Wedding Memories</h1>
             <p>Enak Rasa Wedding Hall offers an elegant setting for your perfect day. Our dedicated team will transform your dreams into a celebration to remember.</p>
             <div class="mt-6 flex flex-wrap gap-4 justify-center">
-                <a href="#booking" class="cta-btn">Book Your Date</a>
+            <a href="{{ route('booking-requests.create') }}" class="cta-btn">Book Your Date</a>
                 
                     <a href="{{ route('login') }}" class="cta-btn bg-transparent border-white text-white hover:bg-white hover:text-primary">Login</a>
                     <a href="{{ route('register') }}" class="cta-btn bg-white text-primary border-white hover:bg-transparent hover:text-white">Register</a>
@@ -218,7 +218,7 @@
             <p data-aos="fade-up" data-aos-delay="100">
                 Ready to start planning your dream wedding? Check availability for your preferred date and learn more about our customizable wedding packages.
             </p>
-            <a href="{{ route('public.venues') }}" class="cta-btn" data-aos="fade-up" data-aos-delay="200">View Packages</a>
+            <a href="{{ route('booking-requests.create') }}" class="cta-btn" data-aos="fade-up" data-aos-delay="200">Book Now</a>
         </div>
     </section>
 
