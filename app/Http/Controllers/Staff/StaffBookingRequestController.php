@@ -123,8 +123,8 @@ class StaffBookingRequestController extends Controller
             $user = User::where('email', $bookingRequest->email)->first();
             
             if (!$user) {
-                // Create a new user
-                $password = Str::random(10); // Generate a secure random password
+                // Create a new user with a secure random password
+                $password = Str::random(10);
                 
                 $user = User::create([
                     'name' => $bookingRequest->name,

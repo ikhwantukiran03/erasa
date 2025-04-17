@@ -34,38 +34,45 @@ class WhatsAppService
      * @return bool Whether the message was sent successfully
      */
     public function sendMessage($to, $message)
-    {
-        // Clean the phone number - remove any non-numeric characters
-        $to = preg_replace('/[^0-9]/', '', $to);
-        
-        // Add "whatsapp:" prefix required by Twilio
-        $formattedTo = "whatsapp:+$to";
-        $formattedFrom = "whatsapp:" . $this->fromNumber;
-        
-        try {
-            // Check if Twilio client is available
-            if (!$this->client) {
-                Log::warning("Twilio credentials not configured. WhatsApp message not sent.");
-                Log::info("WhatsApp message to $to: $message");
-                return false;
-            }
-            
-            // Send message via Twilio
-            $this->client->messages->create(
-                $formattedTo,
-                [
-                    'from' => $formattedFrom,
-                    'body' => $message
-                ]
-            );
-            
-            Log::info("WhatsApp message sent to $to successfully");
-            return true;
-        } catch (\Exception $e) {
-            Log::error("Failed to send WhatsApp message: " . $e->getMessage());
+{
+    // Clean the phone number - remove any non-numeric characters
+    $to = preg_replace('/[^0-9]/', '', $to);
+    
+    // Add "whatsapp:" prefix required by Twilio
+    $formattedTo = "whatsapp:+$to";
+    $formattedFrom = "whatsapp:" . $this->fromNumber;
+    
+    try {
+        // Check if Twilio client is available
+        if (!$this->client) {
+            Log::warning("Twilio credentials not configured. WhatsApp message not sent.");
+            Log::info("WhatsApp message to $to: $message");
             return false;
         }
+        
+        // Add more detailed logging
+        Log::info("Attempting to send WhatsApp message to $formattedTo from $formattedFrom");
+        
+        // Send message via Twilio
+        $response = $this->client->messages->create(
+            $formattedTo,
+            [
+                'from' => $formattedFrom,
+                'body' => $message
+            ]
+        );
+        
+        // Log success with message SID
+        Log::info("WhatsApp message sent to $to successfully. Message SID: " . $response->sid);
+        return true;
+    } catch (\Exception $e) {
+        // More detailed error logging
+        Log::error("Failed to send WhatsApp message: " . $e->getMessage());
+        Log::error("Error code: " . $e->getCode());
+        Log::error("Error trace: " . $e->getTraceAsString());
+        return false;
     }
+}
 
     /**
      * Generate a WhatsApp URL that can be opened to start a conversation with the given number.
@@ -85,4 +92,5 @@ class WhatsAppService
         // Generate the WhatsApp URL
         return "https://wa.me/{$cleanNumber}?text={$encodedMessage}";
     }
+    
 }
