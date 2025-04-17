@@ -2,8 +2,30 @@
 
 namespace App\Services;
 
+use Twilio\Rest\Client;
+use Illuminate\Support\Facades\Log;
+
 class WhatsAppService
 {
+    protected $sid;
+    protected $token;
+    protected $fromNumber;
+    protected $client;
+
+    /**
+     * Create a new WhatsApp service instance.
+     */
+    public function __construct()
+    {
+        $this->sid = env('TWILIO_SID');
+        $this->token = env('TWILIO_AUTH_TOKEN');
+        $this->fromNumber = env('TWILIO_WHATSAPP_FROM');
+        
+        if ($this->sid && $this->token) {
+            $this->client = new Client($this->sid, $this->token);
+        }
+    }
+
     /**
      * Send a WhatsApp message.
      *
@@ -13,14 +35,36 @@ class WhatsAppService
      */
     public function sendMessage($to, $message)
     {
-        // This is a placeholder for the actual WhatsApp API integration
-        // In a real application, you would use a service like Twilio, MessageBird, or WhatsApp Business API
+        // Clean the phone number - remove any non-numeric characters
+        $to = preg_replace('/[^0-9]/', '', $to);
         
-        // For demonstration purposes, we'll just log the message
-        \Illuminate\Support\Facades\Log::info("WhatsApp message to $to: $message");
+        // Add "whatsapp:" prefix required by Twilio
+        $formattedTo = "whatsapp:+$to";
+        $formattedFrom = "whatsapp:" . $this->fromNumber;
         
-        // Return true as if the message was sent successfully
-        return true;
+        try {
+            // Check if Twilio client is available
+            if (!$this->client) {
+                Log::warning("Twilio credentials not configured. WhatsApp message not sent.");
+                Log::info("WhatsApp message to $to: $message");
+                return false;
+            }
+            
+            // Send message via Twilio
+            $this->client->messages->create(
+                $formattedTo,
+                [
+                    'from' => $formattedFrom,
+                    'body' => $message
+                ]
+            );
+            
+            Log::info("WhatsApp message sent to $to successfully");
+            return true;
+        } catch (\Exception $e) {
+            Log::error("Failed to send WhatsApp message: " . $e->getMessage());
+            return false;
+        }
     }
 
     /**
