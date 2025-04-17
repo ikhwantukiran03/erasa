@@ -71,23 +71,7 @@
                 <a href="{{ route('staff.bookings.index') }}" class="mt-4 inline-block text-sm text-green-600 hover:underline">View all bookings →</a>
             </div>
             
-            <!-- Total Venues -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="bg-purple-100 rounded-full p-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm text-gray-500">Venues Available</p>
-                        <p class="text-2xl font-semibold text-gray-800">
-                            {{ \App\Models\Venue::count() }}
-                        </p>
-                    </div>
-                </div>
-                <a href="{{ route('public.venues') }}" class="mt-4 inline-block text-sm text-purple-600 hover:underline">View venues →</a>
-            </div>
+            
         </div>
 
         <!-- Quick Actions -->
