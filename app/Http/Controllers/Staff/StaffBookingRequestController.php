@@ -124,7 +124,7 @@ class StaffBookingRequestController extends Controller
             
             if (!$user) {
                 // Create a new user
-                $password = Str::random(8); // Generate a random password
+                $password = Str::random(10); // Generate a secure random password
                 
                 $user = User::create([
                     'name' => $bookingRequest->name,
@@ -150,33 +150,40 @@ class StaffBookingRequestController extends Controller
 
         // Prepare WhatsApp message
         $message = "Hello {$bookingRequest->name},\n\n";
-        $message .= "Your booking request has been APPROVED.\n";
+        $message .= "🎉 *Your booking request has been APPROVED!* 🎉\n\n";
         
         if ($bookingRequest->package) {
-            $message .= "Package: {$bookingRequest->package->name}\n";
+            $message .= "*Package:* {$bookingRequest->package->name}\n";
         }
         
         if ($bookingRequest->venue) {
-            $message .= "Venue: {$bookingRequest->venue->name}\n";
+            $message .= "*Venue:* {$bookingRequest->venue->name}\n";
         }
         
         if ($bookingRequest->event_date) {
-            $message .= "Event Date: {$bookingRequest->event_date->format('d M Y')}\n";
+            $message .= "*Event Date:* {$bookingRequest->event_date->format('d M Y')}\n";
         }
         
         if ($request->admin_notes) {
-            $message .= "\nAdditional information:\n{$request->admin_notes}\n";
+            $message .= "\n*Additional information:*\n{$request->admin_notes}\n";
         }
         
         // Add account information if a new account was created
         if ($accountCreated) {
-            $message .= "\nWe've created an account for you on our website:\n";
-            $message .= "Email: {$bookingRequest->email}\n";
-            $message .= "Password: {$password}\n";
-            $message .= "You can log in at: " . route('login') . "\n";
+            $message .= "\n*💻 YOUR ACCOUNT DETAILS:*\n";
+            $message .= "We've created an account for you on our website:\n";
+            $message .= "*Email:* {$bookingRequest->email}\n";
+            $message .= "*Password:* {$password}\n\n";
+            $message .= "*LOGIN LINK:* " . route('login') . "\n\n";
+            $message .= "⚠️ *IMPORTANT:* For security purposes, please log in and change your password as soon as possible by visiting your profile page: " . route('profile.edit') . "\n";
+        } else {
+            $message .= "\n*🔑 ACCESS YOUR BOOKING:*\n";
+            $message .= "You can view the details of your booking by logging into your account: " . route('login') . "\n";
+            $message .= "Then navigate to My Requests: " . route('booking-requests.my-requests') . "\n";
         }
         
-        $message .= "\nThank you for choosing Enak Rasa Wedding Hall.";
+        $message .= "\nThank you for choosing Enak Rasa Wedding Hall! 🙏\n";
+        $message .= "If you have any questions, please contact us at +60 123 456 789.";
 
         // Send WhatsApp message
         $this->whatsAppService->sendMessage($bookingRequest->whatsapp_no, $message);
@@ -228,7 +235,7 @@ class StaffBookingRequestController extends Controller
             
             if (!$user) {
                 // Create a new user
-                $password = Str::random(8); // Generate a random password
+                $password = Str::random(10); // Generate a secure random password
                 
                 $user = User::create([
                     'name' => $bookingRequest->name,
@@ -254,32 +261,39 @@ class StaffBookingRequestController extends Controller
 
         // Prepare WhatsApp message
         $message = "Hello {$bookingRequest->name},\n\n";
-        $message .= "We regret to inform you that your booking request has been DECLINED.\n";
+        $message .= "We regret to inform you that your booking request has been *DECLINED*.\n\n";
         
         if ($bookingRequest->package) {
-            $message .= "Package: {$bookingRequest->package->name}\n";
+            $message .= "*Package:* {$bookingRequest->package->name}\n";
         }
         
         if ($bookingRequest->venue) {
-            $message .= "Venue: {$bookingRequest->venue->name}\n";
+            $message .= "*Venue:* {$bookingRequest->venue->name}\n";
         }
         
         if ($bookingRequest->event_date) {
-            $message .= "Event Date: {$bookingRequest->event_date->format('d M Y')}\n";
+            $message .= "*Event Date:* {$bookingRequest->event_date->format('d M Y')}\n";
         }
         
-        $message .= "\nReason:\n{$request->admin_notes}\n";
+        $message .= "\n*Reason:*\n{$request->admin_notes}\n";
         
         // Add account information if a new account was created
         if ($accountCreated) {
-            $message .= "\nWe've created an account for you on our website:\n";
-            $message .= "Email: {$bookingRequest->email}\n";
-            $message .= "Password: {$password}\n";
-            $message .= "You can log in at: " . route('login') . "\n";
+            $message .= "\n*💻 YOUR ACCOUNT DETAILS:*\n";
+            $message .= "Despite this rejection, we've created an account for you on our website so you can explore other options:\n";
+            $message .= "*Email:* {$bookingRequest->email}\n";
+            $message .= "*Password:* {$password}\n\n";
+            $message .= "*LOGIN LINK:* " . route('login') . "\n\n";
+            $message .= "⚠️ *IMPORTANT:* For security purposes, please log in and change your password as soon as possible by visiting your profile page: " . route('profile.edit') . "\n";
             $message .= "You can explore other packages and venues that might suit your needs.\n";
+        } else {
+            $message .= "\n*🔍 EXPLORE OTHER OPTIONS:*\n";
+            $message .= "You can log into your account to explore other packages and venues that might better suit your needs: " . route('login') . "\n";
+            $message .= "View all available venues: " . route('public.venues') . "\n";
         }
         
-        $message .= "\nThank you for considering Enak Rasa Wedding Hall.";
+        $message .= "\nWe apologize for any inconvenience and thank you for considering Enak Rasa Wedding Hall. 🙏\n";
+        $message .= "If you have any questions, please contact us at +60 123 456 789.";
 
         // Send WhatsApp message
         $this->whatsAppService->sendMessage($bookingRequest->whatsapp_no, $message);
