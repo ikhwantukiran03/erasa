@@ -91,4 +91,20 @@ class BookingRequestController extends Controller
 
         return view('booking-requests.my-requests', compact('bookingRequests'));
     }
+
+    /**
+     * Display the specified booking request.
+     *
+     * @param  \App\Models\BookingRequest  $bookingRequest
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public function show(BookingRequest $bookingRequest)
+    {
+        if (!Auth::check() || $bookingRequest->user_id !== Auth::id()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to view this booking request.');
+        }
+
+        return view('user.show', compact('bookingRequest'));
+    }
 }

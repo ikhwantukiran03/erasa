@@ -178,3 +178,19 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
     Route::delete('/bookings/{booking}', [App\Http\Controllers\Staff\BookingController::class, 'destroy'])->name('bookings.destroy');
     Route::patch('/bookings/{booking}/cancel', [App\Http\Controllers\Staff\BookingController::class, 'cancel'])->name('bookings.cancel');
 });
+
+// User Routes for Bookings and Booking Requests
+Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
+    // Booking Requests
+    Route::get('/booking-requests', [BookingRequestController::class, 'myRequests'])->name('booking-requests');
+    Route::get('/booking-requests/{bookingRequest}', [BookingRequestController::class, 'show'])->name('booking-requests.show');
+    
+    // Bookings
+    Route::get('/bookings', function () {
+        return view('user.bookings');
+    })->name('bookings');
+    Route::get('/bookings/{booking}', function ($booking) {
+        $booking = \App\Models\Booking::findOrFail($booking);
+        return view('user.booking-show', compact('booking'));
+    })->name('bookings.show');
+});
