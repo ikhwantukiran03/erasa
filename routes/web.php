@@ -34,6 +34,10 @@ Route::get('/my-requests', [BookingRequestController::class, 'myRequests'])->nam
 // Booking Calendar Route 
 Route::get('/booking-calendar', [App\Http\Controllers\BookingCalendarController::class, 'index'])->name('booking.calendar');
 
+Route::get('/api/calendar-data', [BookingCalendarApiController::class, 'getCalendarData']);
+Route::get('/api/upcoming-bookings', [BookingCalendarApiController::class, 'getUpcomingBookings']);
+Route::get('/api/venues', [BookingCalendarApiController::class, 'getVenues']);
+
 // Authentication Routes
 Route::middleware('guest')->group(function () {
     // Login Routes
@@ -197,4 +201,7 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
         $booking = \App\Models\Booking::findOrFail($booking);
         return view('user.booking-show', compact('booking'));
     })->name('bookings.show');
-});
+}
+
+
+);

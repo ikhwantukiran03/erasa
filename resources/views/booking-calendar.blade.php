@@ -117,7 +117,7 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Venue</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                    @if(auth()->user()->isAdmin() || auth()->user()->isStaff())
+                                    @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isStaff()))
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     @endif
                                 </tr>
@@ -425,7 +425,7 @@
             row.appendChild(typeCell);
             
             // Actions column (for staff/admin)
-            const isStaffOrAdmin = {{ auth()->user()->isAdmin() || auth()->user()->isStaff() ? 'true' : 'false' }};
+            const isStaffOrAdmin = {{ auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isStaff()) ? 'true' : 'false' }};
             if (isStaffOrAdmin) {
                 const actionsCell = document.createElement('td');
                 actionsCell.className = 'px-6 py-4 whitespace-nowrap text-sm font-medium';
