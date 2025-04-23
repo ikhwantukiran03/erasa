@@ -92,6 +92,7 @@
                 <a href="#about" class="text-dark hover:text-primary transition">About</a>
                 <a href="#gallery" class="text-dark hover:text-primary transition">Gallery</a>
                 <a href="{{ route('public.venues') }}" class="text-dark hover:text-primary transition">Packages</a>
+                <a href="{{ route('booking.calendar') }}" class="text-dark hover:text-primary transition">Calendar</a>
                 @guest
                     <a href="{{ route('login') }}" class="text-dark hover:text-primary transition">Login</a>
                     <a href="{{ route('register') }}" class="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90 transition">Register</a>

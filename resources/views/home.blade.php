@@ -11,8 +11,10 @@
                     <a href="#home">Home</a>
                     <a href="#about">About</a>
                     <a href="#gallery">Gallery</a>
+                    <a href="{{ route('booking.calendar') }}" class="text-dark hover:text-primary transition">Calendar</a>
                     <a href="{{ route('public.venues') }}">Packages</a>
                     <a href="booking" class="cta-btn">Book Now</a>
+                    
                 </nav>
                 <button class="mobile-menu-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">

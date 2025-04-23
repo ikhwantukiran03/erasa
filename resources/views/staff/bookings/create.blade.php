@@ -90,9 +90,10 @@
                         <div>
                             <label for="type" class="block text-dark font-medium mb-1">Booking Type <span class="text-red-500">*</span></label>
                             <select id="type" name="type" required class="form-input @error('type') border-red-500 @enderror">
-                                <option value="wedding" {{ old('type') == 'wedding' ? 'selected' : '' }}>Wedding</option>
+                                <option value="booking" {{ old('type') == 'booking' ? 'selected' : '' }}>Booking</option>
                                 <option value="viewing" {{ old('type') == 'viewing' ? 'selected' : '' }}>Venue Viewing</option>
                                 <option value="reservation" {{ old('type') == 'reservation' ? 'selected' : '' }}>Reservation</option>
+                                <option value="appointment" {{ old('type') == 'appointment' ? 'selected' : '' }}>Appointment</option>
                             </select>
                         </div>
                         
@@ -101,6 +102,7 @@
                             <label for="status" class="block text-dark font-medium mb-1">Status <span class="text-red-500">*</span></label>
                             <select id="status" name="status" required class="form-input @error('status') border-red-500 @enderror">
                                 <option value="ongoing" {{ old('status') == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
+                                <option value="confirmed" {{ old('status') == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
                                 <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completed</option>
                                 <option value="cancelled" {{ old('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                             </select>

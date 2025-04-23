@@ -15,6 +15,8 @@ use App\Http\Controllers\PublicController;
 use App\Http\Controllers\Staff\StaffBookingRequestController;
 use App\Http\Controllers\BookingRequestController;
 use App\Http\Controllers\Staff\BookingController;
+use App\Http\Controllers\Api\BookingCalendarApiController;
+use App\Http\Controllers\BoookingController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -29,6 +31,8 @@ Route::post('/booking-request', [BookingRequestController::class, 'store'])->nam
 Route::get('/booking-request/confirmation', [BookingRequestController::class, 'confirmation'])->name('booking-requests.confirmation');
 Route::get('/my-requests', [BookingRequestController::class, 'myRequests'])->name('booking-requests.my-requests');
 
+// Booking Calendar Route 
+Route::get('/booking-calendar', [App\Http\Controllers\BookingCalendarController::class, 'index'])->name('booking.calendar');
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
