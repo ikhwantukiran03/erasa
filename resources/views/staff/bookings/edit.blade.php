@@ -94,6 +94,7 @@
                                 <option value="wedding" {{ old('type', $booking->type) == 'wedding' ? 'selected' : '' }}>Wedding</option>
                                 <option value="viewing" {{ old('type', $booking->type) == 'viewing' ? 'selected' : '' }}>Venue Viewing</option>
                                 <option value="reservation" {{ old('type', $booking->type) == 'reservation' ? 'selected' : '' }}>Reservation</option>
+                                <option value="other" {{ old('type', $booking->type) == 'appointment' ? 'selected' : '' }}>Appointment</option>
                             </select>
                         </div>
                         

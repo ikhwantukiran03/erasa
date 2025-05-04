@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('package_id')->nullable()->constrained()->nullOnDelete();
             $table->date('booking_date');
             $table->enum('session', ['morning', 'evening']);
-            $table->enum('type', ['wedding', 'viewing', 'reservation']);
+            $table->enum('type', ['wedding', 'viewing', 'reservation', 'appointment','waiting for deposit']);
             $table->enum('status', ['ongoing', 'completed', 'cancelled'])->default('reserved');
             $table->date('expiry_date')->nullable();
             $table->foreignId('handled_by')->nullable()->references('id')->on('users')->nullOnDelete();

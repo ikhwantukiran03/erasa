@@ -1,4 +1,4 @@
-```php
+
 @extends('layouts.app')
 
 @section('title', 'Booking Details - Enak Rasa Wedding Hall')
@@ -285,4 +285,4 @@
         </div>
     </div>
 </div>
-@endsectionbooo
+@endsection
