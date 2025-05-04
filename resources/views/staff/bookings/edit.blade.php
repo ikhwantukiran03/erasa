@@ -100,14 +100,14 @@
                         
                         <!-- Booking Status -->
                         <div>
-                            <label for="status" class="block text-dark font-medium mb-1">Status <span class="text-red-500">*</span></label>
-                            <select id="status" name="status" required class="form-input @error('status') border-red-500 @enderror">
-                                <option value="ongoing" {{ old('status', $booking->status) == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
-                                <option value="ongoing" {{ old('status', $booking->status) == '!deposit' ? 'selected' : '' }}>Waiting for deposit</option>
-                                <option value="completed" {{ old('status', $booking->status) == 'completed' ? 'selected' : '' }}>Completed</option>
-                                <option value="cancelled" {{ old('status', $booking->status) == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                            </select>
-                        </div>
+    <label for="status" class="block text-dark font-medium mb-1">Status <span class="text-red-500">*</span></label>
+    <select id="status" name="status" required class="form-input @error('status') border-red-500 @enderror">
+        <option value="waiting for deposit" {{ old('status', $booking->status) == 'waiting for deposit' ? 'selected' : '' }}>Waiting for Deposit</option>
+        <option value="ongoing" {{ old('status', $booking->status) == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
+        <option value="completed" {{ old('status', $booking->status) == 'completed' ? 'selected' : '' }}>Completed</option>
+        <option value="cancelled" {{ old('status', $booking->status) == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+    </select>
+</div>
                         
                         <!-- Expiry Date (Optional) -->
                         <div>

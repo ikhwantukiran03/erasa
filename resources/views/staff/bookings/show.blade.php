@@ -17,27 +17,31 @@
         <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Booking Details -->
             <div class="lg:col-span-2 bg-white rounded-lg shadow overflow-hidden">
-                <div class="p-1 {{ $booking->status === 'ongoing' ? 'bg-yellow-400' : ($booking->status === 'completed' ? 'bg-green-500' : 'bg-red-500') }}"></div>
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-xl font-semibold text-gray-800">Booking Details</h2>
-                        <div>
-                            @if($booking->status === 'ongoing')
-                                <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                    Ongoing
-                                </span>
-                            @elseif($booking->status === 'completed')
-                                <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-green-100 text-green-800">
-                                    Completed
-                                </span>
-                            @else
-                                <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-red-100 text-red-800">
-                                    Cancelled
-                                </span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
+            <div class="p-1 {{ $booking->status === 'ongoing' ? 'bg-yellow-400' : ($booking->status === 'waiting for deposit' ? 'bg-blue-400' : ($booking->status === 'completed' ? 'bg-green-500' : 'bg-red-500')) }}"></div>
+<div class="px-6 py-4 border-b border-gray-200">
+    <div class="flex justify-between items-center">
+        <h2 class="text-xl font-semibold text-gray-800">Booking Details</h2>
+        <div>
+            @if($booking->status === 'ongoing')
+                <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                    Ongoing
+                </span>
+            @elseif($booking->status === 'waiting for deposit')
+                <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
+                    Waiting for Deposit
+                </span>
+            @elseif($booking->status === 'completed')
+                <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-green-100 text-green-800">
+                    Completed
+                </span>
+            @else
+                <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-red-100 text-red-800">
+                    Cancelled
+                </span>
+            @endif
+        </div>
+    </div>
+</div>
                 
                 <div class="p-6">
                     <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
@@ -185,6 +189,23 @@
                                 </button>
                             </form>
                         @endif
+
+                        @if($booking->status === 'waiting for deposit')
+    <form action="{{ route('staff.bookings.update', $booking) }}" method="POST" class="inline">
+        @csrf
+        @method('PUT')
+        <input type="hidden" name="status" value="ongoing">
+        <input type="hidden" name="user_id" value="{{ $booking->user_id }}">
+        <input type="hidden" name="venue_id" value="{{ $booking->venue_id }}">
+        <input type="hidden" name="package_id" value="{{ $booking->package_id }}">
+        <input type="hidden" name="booking_date" value="{{ $booking->booking_date->format('Y-m-d') }}">
+        <input type="hidden" name="session" value="{{ $booking->session }}">
+        <input type="hidden" name="type" value="{{ $booking->type }}">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-opacity-90 transition" onclick="return confirm('Are you sure you want to mark this as deposit received?')">
+            Mark Deposit Received
+        </button>
+    </form>
+@endif
                     </div>
                 </div>
             </div>

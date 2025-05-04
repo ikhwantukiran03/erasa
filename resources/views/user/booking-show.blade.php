@@ -14,33 +14,37 @@
         </div>
         
         <div class="mt-8 bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="p-1 {{ $booking->status === 'ongoing' ? 'bg-yellow-400' : ($booking->status === 'completed' ? 'bg-green-500' : 'bg-red-500') }}"></div>
-            <div class="p-6">
-                <!-- Booking Status -->
-                <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-                    <div>
-                        <span class="text-sm text-gray-500">Booking Status</span>
-                        <div class="mt-1">
-                            @if($booking->status === 'ongoing')
-                                <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                    Ongoing
-                                </span>
-                            @elseif($booking->status === 'completed')
-                                <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-green-100 text-green-800">
-                                    Completed
-                                </span>
-                            @else
-                                <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-red-100 text-red-800">
-                                    Cancelled
-                                </span>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-sm text-gray-500">Booking Reference</span>
-                        <p class="text-lg font-semibold text-gray-800">B-{{ $booking->id }}</p>
-                    </div>
-                </div>
+        <div class="p-1 {{ $booking->status === 'ongoing' ? 'bg-yellow-400' : ($booking->status === 'waiting for deposit' ? 'bg-blue-400' : ($booking->status === 'completed' ? 'bg-green-500' : 'bg-red-500')) }}"></div>
+<div class="p-6">
+    <!-- Booking Status -->
+    <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+        <div>
+            <span class="text-sm text-gray-500">Booking Status</span>
+            <div class="mt-1">
+                @if($booking->status === 'ongoing')
+                    <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                        Ongoing
+                    </span>
+                @elseif($booking->status === 'waiting for deposit')
+                    <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
+                        Waiting for Deposit
+                    </span>
+                @elseif($booking->status === 'completed')
+                    <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-green-100 text-green-800">
+                        Completed
+                    </span>
+                @else
+                    <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-red-100 text-red-800">
+                        Cancelled
+                    </span>
+                @endif
+            </div>
+        </div>
+        <div class="text-right">
+            <span class="text-sm text-gray-500">Booking Reference</span>
+            <p class="text-lg font-semibold text-gray-800">B-{{ $booking->id }}</p>
+        </div>
+    </div>
                 
                 <!-- Booking Details -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
