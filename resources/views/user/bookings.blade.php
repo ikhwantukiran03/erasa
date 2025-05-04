@@ -32,24 +32,26 @@
 <div class="mb-6 flex flex-wrap gap-4">
     <a href="{{ route('user.bookings', ['status' => 'all']) }}" class="px-4 py-2 {{ !request('status') || request('status') == 'all' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-opacity-90 transition">All</a>
     <a href="{{ route('user.bookings', ['status' => 'upcoming']) }}" class="px-4 py-2 {{ request('status') == 'upcoming' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-opacity-90 transition">Upcoming</a>
-    <a href="{{ route('user.bookings', ['status' => 'waiting for deposit']) }}" class="px-4 py-2 {{ request('status') == 'waiting for deposit' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-opacity-90 transition">Waiting for Deposit</a>
+    <a href="{{ route('user.bookings', ['status' => 'waiting_for_deposit']) }}" class="px-4 py-2 {{ request('status') == 'waiting_for_deposit' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-opacity-90 transition">Waiting for Deposit</a>
     <a href="{{ route('user.bookings', ['status' => 'ongoing']) }}" class="px-4 py-2 {{ request('status') == 'ongoing' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-opacity-90 transition">Ongoing</a>
     <a href="{{ route('user.bookings', ['status' => 'completed']) }}" class="px-4 py-2 {{ request('status') == 'completed' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-opacity-90 transition">Completed</a>
     <a href="{{ route('user.bookings', ['status' => 'cancelled']) }}" class="px-4 py-2 {{ request('status') == 'cancelled' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-opacity-90 transition">Cancelled</a>
 </div>
 
-                @php
-                    $query = \App\Models\Booking::where('user_id', Auth::id());
-                    
-                    if(request('status') == 'upcoming') {
-                        $query->where('booking_date', '>=', date('Y-m-d'))
-                             ->where('status', 'ongoing');
-                    } elseif(request('status') && request('status') != 'all') {
-                        $query->where('status', request('status'));
-                    }
-                    
-                    $bookings = $query->orderBy('booking_date', 'desc')->get();
-                @endphp
+@php
+    $query = \App\Models\Booking::where('user_id', Auth::id());
+    
+    if(request('status') == 'upcoming') {
+        $query->where('booking_date', '>=', date('Y-m-d'))
+             ->where('status', 'ongoing');
+    } elseif(request('status') == 'waiting_for_deposit') {
+        $query->where('status', 'waiting for deposit');
+    } elseif(request('status') && request('status') != 'all') {
+        $query->where('status', request('status'));
+    }
+    
+    $bookings = $query->orderBy('booking_date', 'desc')->get();
+@endphp
                 
                 @if($bookings->count() > 0)
                 <div class="overflow-x-auto">

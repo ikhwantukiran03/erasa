@@ -79,7 +79,7 @@ class BookingController extends Controller
             'booking_date' => ['required', 'date', 'after:today'],
             'session' => ['required', 'in:morning,evening'],
             'type' => ['required', 'in:wedding,viewing,reservation'],
-            'status' => ['required', 'in:ongoing,completed,cancelled'],
+            'status' => ['required', 'in:ongoing,completed,cancelled,waiting for deposit'],
             'expiry_date' => ['nullable', 'date', 'after:booking_date'],
         ]);
 
