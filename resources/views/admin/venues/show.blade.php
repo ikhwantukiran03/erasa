@@ -1,4 +1,3 @@
-<!-- resources/views/venues/show.blade.php -->
 @extends('layouts.app')
 
 @section('title', $venue->name . ' - Enak Rasa Wedding Hall')
@@ -33,135 +32,96 @@
 <div class="bg-white py-12">
     <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto">
-            <h2 class="text-3xl font-display font-bold text-primary mb-6">Venue Information</h2>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-display font-bold text-primary">Venue Information</h2>
+                <a href="{{ route('admin.venues.index') }}" class="text-primary hover:underline">Back to Venues</a>
+            </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Location</h3>
-                    <p class="text-gray-600">{{ $venue->full_address }}</p>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Location Details</h3>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="text-gray-700 mb-2"><span class="font-medium">Address:</span> {{ $venue->address_line_1 }}</p>
+                        @if($venue->address_line_2)
+                            <p class="text-gray-700 mb-2"><span class="font-medium">Address Line 2:</span> {{ $venue->address_line_2 }}</p>
+                        @endif
+                        <p class="text-gray-700 mb-2"><span class="font-medium">City:</span> {{ $venue->city }}</p>
+                        <p class="text-gray-700 mb-2"><span class="font-medium">State/Province:</span> {{ $venue->state }}</p>
+                        <p class="text-gray-700 mb-2"><span class="font-medium">Postal Code:</span> {{ $venue->postal_code }}</p>
+                    </div>
                     
                     <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-3">Contact</h3>
-                        <p class="text-gray-600">Email: info@enakrasa.com</p>
-                        <p class="text-gray-600">Phone: +62 812 3456 7890</p>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-3">Contact Information</h3>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-gray-700 mb-2"><span class="font-medium">Email:</span> info@enakrasa.com</p>
+                            <p class="text-gray-700 mb-2"><span class="font-medium">Phone:</span> +62 812 3456 7890</p>
+                        </div>
                     </div>
                 </div>
                 
                 <div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Features</h3>
-                    <ul class="text-gray-600 space-y-2">
-                        <li class="flex items-start">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span>Spacious venue with elegant interiors</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span>Capacity for up to 500 guests</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span>Modern audio-visual equipment</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span>Ample parking available</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span>Dedicated bridal suite</span>
-                        </li>
-                    </ul>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Venue Features</h3>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <ul class="text-gray-700 space-y-2">
+                            <li class="flex items-start">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Spacious venue with elegant interiors</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Capacity for up to 500 guests</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Modern audio-visual equipment</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Ample parking available</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Dedicated bridal suite</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-3">Management Options</h3>
+                        <div class="bg-gray-50 p-4 rounded-lg flex items-center justify-between">
+                            <a href="{{ route('admin.venues.edit', $venue) }}" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">
+                                Edit Venue
+                            </a>
+                            
+                            <form action="{{ route('admin.venues.destroy', $venue) }}" method="POST" class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition" onclick="return confirm('Are you sure you want to delete this venue?')">
+                                    Delete Venue
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="mt-8 text-center">
-                <a href="#" class="inline-block bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-opacity-90 transition">
-                    Book This Venue
-                </a>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Gallery Section -->
-@include('components.venue-gallery', ['galleries' => $venue->galleries()->orderBy('display_order')->get()])
 
-<!-- Packages Available at this Venue -->
-<div class="bg-gray-50 py-12">
-    <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-display font-bold text-center text-primary mb-2">Available Packages</h2>
-        <p class="text-gray-600 text-center mb-10">Choose from our selection of wedding packages for this venue</p>
-        
-        @php
-            $packages = \App\Models\Package::where('venue_id', $venue->id)->get();
-        @endphp
-        
-        @if($packages->count() > 0)
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach($packages as $package)
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300">
-                        <div class="p-6">
-                            <h3 class="text-xl font-display font-bold text-dark mb-2">{{ $package->name }}</h3>
-                            
-                            @if($package->description)
-                                <p class="text-gray-600 mb-4">{{ Str::limit($package->description, 100) }}</p>
-                            @endif
-                            
-                            <div class="mb-4 pt-4 border-t border-gray-100">
-                                <div class="flex justify-between">
-                                    <div>
-                                        <p class="text-sm text-gray-500">Price Range</p>
-                                        <p class="text-primary font-bold">
-                                            @if($package->prices->count() > 0)
-                                                RM {{ number_format($package->min_price, 0, ',', '.') }}
-                                                @if($package->min_price != $package->max_price)
-                                                    - {{ number_format($package->max_price, 0, ',', '.') }}
-                                                @endif
-                                            @else
-                                                Contact for pricing
-                                            @endif
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500">Capacity</p>
-                                        <p class="text-gray-700">
-                                            @if($package->prices->count() > 0)
-                                                {{ $package->prices->min('pax') }} - {{ $package->prices->max('pax') }} guests
-                                            @else
-                                                -
-                                            @endif
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <a href="#" class="block text-center bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90 transition">
-                                View Details
-                            </a>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        @else
-            <div class="text-center text-gray-500 py-10">
-                <p>No packages available for this venue yet.</p>
-            </div>
-        @endif
-    </div>
-</div>
 
 <!-- Location Map -->
-<div class="py-12 bg-white">
+<div class="py-12 bg-gray-50">
     <div class="container mx-auto px-4">
         <h2 class="text-3xl font-display font-bold text-center text-primary mb-2">Location</h2>
         <p class="text-gray-600 text-center mb-10">Find us at this address</p>
@@ -175,24 +135,7 @@
         
         <div class="mt-6 text-center">
             <p class="text-gray-600 mb-2">{{ $venue->full_address }}</p>
-            <a href="#" class="text-primary hover:underline">Get Directions</a>
-        </div>
-    </div>
-</div>
-
-<!-- Call to Action -->
-<div class="bg-primary py-16">
-    <div class="container mx-auto px-4 text-center">
-        <h2 class="text-3xl font-display font-bold text-white mb-4">Ready to Book This Venue?</h2>
-        <p class="text-white/80 mb-8 max-w-2xl mx-auto">Contact us today to check availability and start planning your perfect wedding day at {{ $venue->name }}.</p>
-        
-        <div class="flex flex-wrap justify-center gap-4">
-            <a href="#" class="bg-white text-primary px-6 py-3 rounded-md font-semibold hover:bg-gray-100 transition">
-                Book Now
-            </a>
-            <a href="#" class="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md font-semibold hover:bg-white/10 transition">
-                Contact Us
-            </a>
+            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($venue->full_address) }}" class="text-primary hover:underline" target="_blank">Get Directions</a>
         </div>
     </div>
 </div>
