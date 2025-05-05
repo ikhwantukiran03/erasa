@@ -17,6 +17,7 @@ use App\Http\Controllers\BookingRequestController;
 use App\Http\Controllers\Staff\BookingController;
 use App\Http\Controllers\Api\BookingCalendarApiController;
 use App\Http\Controllers\BoookingController;
+use App\Http\Controllers\InvoiceController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -185,6 +186,11 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
     Route::put('/bookings/{booking}', [App\Http\Controllers\Staff\BookingController::class, 'update'])->name('bookings.update');
     Route::delete('/bookings/{booking}', [App\Http\Controllers\Staff\BookingController::class, 'destroy'])->name('bookings.destroy');
     Route::patch('/bookings/{booking}/cancel', [App\Http\Controllers\Staff\BookingController::class, 'cancel'])->name('bookings.cancel');
+
+    // Invoice verification routes
+    Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/{booking}', [InvoiceController::class, 'showVerificationForm'])->name('invoices.show');
+    Route::post('/invoices/{booking}/verify', [InvoiceController::class, 'verify'])->name('invoices.verify');
 });
 
 // User Routes for Bookings and Booking Requests
@@ -201,6 +207,9 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
         $booking = \App\Models\Booking::findOrFail($booking);
         return view('user.booking-show', compact('booking'));
     })->name('bookings.show');
+
+    Route::get('/bookings/{booking}/invoice', [InvoiceController::class, 'showSubmitForm'])->name('invoices.create');
+    Route::post('/bookings/{booking}/invoice', [InvoiceController::class, 'submit'])->name('invoices.store');
 }
 
 
