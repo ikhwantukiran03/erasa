@@ -161,4 +161,24 @@ class Booking extends Model
     {
         return ucfirst($this->type);
     }
+
+    // Add this method to your existing App\Models\Booking class
+
+/**
+ * Get the invoice associated with the booking.
+ */
+public function invoice()
+{
+    return $this->hasOne(Invoice::class);
+}
+
+/**
+ * Check if the booking has an invoice.
+ *
+ * @return bool
+ */
+public function hasInvoice()
+{
+    return $this->invoice()->exists();
+}
 }

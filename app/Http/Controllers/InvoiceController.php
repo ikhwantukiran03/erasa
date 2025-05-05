@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -67,19 +68,22 @@ class InvoiceController extends Controller
         }
         
         try {
-            // Delete old invoice if exists
-            if ($booking->invoice_path) {
-                Storage::disk('public')->delete($booking->invoice_path);
+            // Get or create the invoice
+            $invoice = $booking->invoice ?? new Invoice(['booking_id' => $booking->id]);
+            
+            // Delete old invoice file if exists
+            if ($invoice->invoice_path) {
+                Storage::disk('public')->delete($invoice->invoice_path);
             }
             
             // Store the new invoice
             $path = $request->file('invoice')->store('invoices', 'public');
             
-            // Update the booking
-            $booking->invoice_path = $path;
-            $booking->invoice_submitted_at = now();
-            $booking->invoice_notes = $request->notes;
-            $booking->save();
+            // Update the invoice
+            $invoice->invoice_path = $path;
+            $invoice->invoice_submitted_at = now();
+            $invoice->invoice_notes = $request->notes;
+            $invoice->save();
             
             return redirect()->route('user.bookings.show', $booking)
                 ->with('success', 'Your payment proof has been submitted successfully. Our staff will verify it shortly.');
@@ -103,11 +107,12 @@ class InvoiceController extends Controller
                 ->with('error', 'You do not have permission to access this resource.');
         }
         
-        $bookings = Booking::where('status', 'waiting for deposit')
-            ->whereNotNull('invoice_path')
-            ->whereNull('invoice_verified_at')
-            ->with(['user', 'venue', 'package'])
-            ->orderBy('invoice_submitted_at', 'desc')
+        $bookings = Booking::with('invoice')
+            ->where('status', 'waiting for deposit')
+            ->whereHas('invoice', function($query) {
+                $query->whereNotNull('invoice_path')
+                      ->whereNull('invoice_verified_at');
+            })
             ->get();
             
         return view('staff.invoices.index', compact('bookings'));
@@ -127,7 +132,7 @@ class InvoiceController extends Controller
         }
         
         // Check if booking has a submitted invoice
-        if (!$booking->invoice_path) {
+        if (!$booking->invoice || !$booking->invoice->invoice_path) {
             return redirect()->route('staff.invoices.index')
                 ->with('error', 'This booking does not have a submitted payment proof.');
         }
@@ -150,7 +155,7 @@ class InvoiceController extends Controller
         }
         
         // Check if booking has a submitted invoice
-        if (!$booking->invoice_path) {
+        if (!$booking->invoice || !$booking->invoice->invoice_path) {
             return redirect()->route('staff.invoices.index')
                 ->with('error', 'This booking does not have a submitted payment proof.');
         }
@@ -170,12 +175,15 @@ class InvoiceController extends Controller
             if ($request->verification_result === 'approve') {
                 // If approved, update booking status
                 $booking->status = 'ongoing';
-                $booking->invoice_verified_at = now();
-                $booking->invoice_verified_by = Auth::id();
-                $booking->invoice_notes = $request->notes ? 
-                    ($booking->invoice_notes . "\n\nStaff Notes: " . $request->notes) : 
-                    $booking->invoice_notes;
                 $booking->save();
+                
+                // Update invoice verification details
+                $booking->invoice->invoice_verified_at = now();
+                $booking->invoice->invoice_verified_by = Auth::id();
+                $booking->invoice->invoice_notes = $request->notes ? 
+                    ($booking->invoice->invoice_notes . "\n\nStaff Notes: " . $request->notes) : 
+                    $booking->invoice->invoice_notes;
+                $booking->invoice->save();
                 
                 // TODO: Send notification to user about approved payment
                 
@@ -183,10 +191,10 @@ class InvoiceController extends Controller
                     ->with('success', 'Payment proof has been verified and booking status updated to Ongoing.');
             } else {
                 // If rejected, add notes but leave status as is
-                $booking->invoice_notes = $request->notes ? 
-                    ($booking->invoice_notes . "\n\nStaff Notes: " . $request->notes . "\n[REJECTED]") : 
-                    ($booking->invoice_notes . "\n[REJECTED]");
-                $booking->save();
+                $booking->invoice->invoice_notes = $request->notes ? 
+                    ($booking->invoice->invoice_notes . "\n\nStaff Notes: " . $request->notes . "\n[REJECTED]") : 
+                    ($booking->invoice->invoice_notes . "\n[REJECTED]");
+                $booking->invoice->save();
                 
                 // TODO: Send notification to user about rejected payment
                 

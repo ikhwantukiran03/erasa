@@ -11,13 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->string('invoice_path')->nullable()->after('handled_by');
-            $table->dateTime('invoice_submitted_at')->nullable()->after('invoice_path');
-            $table->dateTime('invoice_verified_at')->nullable()->after('invoice_submitted_at');
-            $table->foreignId('invoice_verified_by')->nullable()->after('invoice_verified_at')
+        Schema::create('invoices', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('booking_id')->constrained()->onDelete('cascade');
+            $table->string('invoice_path')->nullable();
+            $table->dateTime('invoice_submitted_at')->nullable();
+            $table->dateTime('invoice_verified_at')->nullable();
+            $table->foreignId('invoice_verified_by')->nullable()
                 ->references('id')->on('users')->nullOnDelete();
-            $table->text('invoice_notes')->nullable()->after('invoice_verified_by');
+            $table->text('invoice_notes')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -26,14 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->dropColumn([
-                'invoice_path',
-                'invoice_submitted_at',
-                'invoice_verified_at',
-                'invoice_verified_by',
-                'invoice_notes'
-            ]);
-        });
+        Schema::dropIfExists('invoices');
     }
 };

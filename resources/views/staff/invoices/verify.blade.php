@@ -65,18 +65,18 @@
                         
                         <div class="border border-gray-200 rounded-lg overflow-hidden">
                             @php
-                                $extension = pathinfo(storage_path('app/public/' . $booking->invoice_path), PATHINFO_EXTENSION);
+                                $extension = pathinfo(storage_path('app/public/' . $booking->invoice->invoice_path), PATHINFO_EXTENSION);
                             @endphp
                             
                             @if(in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
-                                <img src="{{ asset('storage/' . $booking->invoice_path) }}" alt="Payment Proof" class="w-full">
+                                <img src="{{ asset('storage/' . $booking->invoice->invoice_path) }}" alt="Payment Proof" class="w-full">
                             @elseif(strtolower($extension) == 'pdf')
                                 <div class="bg-gray-100 p-4 text-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                     </svg>
                                     <p class="text-gray-600 mb-3">PDF Document</p>
-                                    <a href="{{ asset('storage/' . $booking->invoice_path) }}" target="_blank" class="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90 transition">
+                                    <a href="{{ asset('storage/' . $booking->invoice->invoice_path) }}" target="_blank" class="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90 transition">
                                         View PDF
                                     </a>
                                 </div>
@@ -86,7 +86,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                     <p class="text-gray-600 mb-3">Document</p>
-                                    <a href="{{ asset('storage/' . $booking->invoice_path) }}" target="_blank" class="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90 transition">
+                                    <a href="{{ asset('storage/' . $booking->invoice->invoice_path) }}" target="_blank" class="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90 transition">
                                         Download File
                                     </a>
                                 </div>
@@ -95,11 +95,11 @@
                     </div>
                     
                     <!-- Customer notes if any -->
-                    @if($booking->invoice_notes)
+                    @if($booking->invoice->invoice_notes)
                         <div class="mb-6">
                             <h3 class="font-semibold text-gray-800 mb-2">Customer Notes</h3>
                             <div class="bg-gray-50 p-3 rounded whitespace-pre-wrap text-sm text-gray-700">
-                                {{ $booking->invoice_notes }}
+                                {{ $booking->invoice->invoice_notes }}
                             </div>
                         </div>
                     @endif
