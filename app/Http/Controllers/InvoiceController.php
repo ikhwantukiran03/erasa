@@ -107,7 +107,7 @@ class InvoiceController extends Controller
                 ->with('error', 'You do not have permission to access this resource.');
         }
         
-        $bookings = Booking::with('invoice')
+        $bookings = Booking::with('invoice', 'user', 'venue', 'package')
             ->where('status', 'waiting for deposit')
             ->whereHas('invoice', function($query) {
                 $query->whereNotNull('invoice_path')

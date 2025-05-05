@@ -72,33 +72,35 @@
             </div>
 
             <!-- Pending Invoice Verifications -->
-<div class="bg-white rounded-lg shadow p-6">
-    <div class="flex items-center">
-        <div class="bg-blue-100 rounded-full p-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-        </div>
-        <div class="ml-4">
-            <p class="text-sm text-gray-500">Pending Payment Verifications</p>
-            <p class="text-2xl font-semibold text-gray-800">
-                {{ \App\Models\Booking::where('status', 'waiting for deposit')
-                    ->whereNotNull('invoice_path')
-                    ->whereNull('invoice_verified_at')
-                    ->count() }}
-            </p>
-        </div>
-    </div>
-    <a href="{{ route('staff.invoices.index') }}" class="mt-4 inline-block text-sm text-blue-600 hover:underline">Verify payments →</a>
-</div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="bg-blue-100 rounded-full p-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Pending Payment Verifications</p>
+                        <p class="text-2xl font-semibold text-gray-800">
+                            {{ \App\Models\Booking::where('status', 'waiting for deposit')
+                                ->whereHas('invoice', function($query) {
+                                    $query->whereNotNull('invoice_path')
+                                          ->whereNull('invoice_verified_at');
+                                })
+                                ->count() }}
+                        </p>
+                    </div>
+                </div>
+                <a href="{{ route('staff.invoices.index') }}" class="mt-4 inline-block text-sm text-blue-600 hover:underline">Verify payments →</a>
+            </div>
 
             <!-- Invoice verification -->
             <a href="{{ route('staff.invoices.index') }}" class="flex items-center p-4 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-    </svg>
-    <span>Verify Payment Proofs</span>
-</a>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Verify Payment Proofs</span>
+            </a>
             
             
         </div>
