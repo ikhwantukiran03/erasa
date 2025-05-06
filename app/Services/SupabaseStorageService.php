@@ -23,14 +23,66 @@ class SupabaseStorageService
         $this->supabaseUrl = env('SUPABASE_URL');
         $this->supabaseKey = env('SUPABASE_KEY');
         $this->defaultBucket = env('SUPABASE_DEFAULT_BUCKET', 'wedding-hall-files');
+        
+        // Ensure the bucket exists
+        $this->ensureBucketExists();
+    }
+
+    /**
+     * Ensure the bucket exists, create it if it doesn't
+     * 
+     * @return bool Whether the bucket exists or was created successfully
+     */
+    protected function ensureBucketExists()
+    {
+        try {
+            // First check if bucket exists
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->supabaseKey,
+                'Content-Type' => 'application/json',
+            ])->get("{$this->supabaseUrl}/storage/v1/bucket/{$this->defaultBucket}");
+            
+            // If bucket doesn't exist (404), create it
+            if ($response->status() === 404) {
+                Log::info('Bucket does not exist, attempting to create it: ' . $this->defaultBucket);
+                
+                $createResponse = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $this->supabaseKey,
+                    'Content-Type' => 'application/json',
+                ])->post("{$this->supabaseUrl}/storage/v1/bucket", [
+                    'id' => $this->defaultBucket,
+                    'name' => $this->defaultBucket,
+                    'public' => true,
+                ]);
+                
+                if ($createResponse->successful()) {
+                    Log::info('Successfully created bucket: ' . $this->defaultBucket);
+                    return true;
+                } else {
+                    Log::error('Failed to create bucket', [
+                        'status' => $createResponse->status(),
+                        'response' => $createResponse->body(),
+                    ]);
+                    return false;
+                }
+            }
+            
+            return $response->successful();
+        } catch (\Exception $e) {
+            Log::error('Exception in bucket check/create', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return false;
+        }
     }
 
     /**
      * Upload a file to Supabase storage.
      *
      * @param \Illuminate\Http\UploadedFile $file
-     * @param string|null $bucket
-     * @param string|null $folder
+     * @param string|null $folder Directory path inside the bucket
+     * @param string|null $bucket Override the default bucket
      * @return string|bool The file path if successful, false otherwise
      */
     public function uploadFile(UploadedFile $file, $folder = null, $bucket = null)
@@ -55,15 +107,24 @@ class SupabaseStorageService
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->supabaseKey,
                 'Content-Type' => $contentType,
+                'Cache-Control' => 'max-age=3600',
+                'x-upsert' => 'true' // Add upsert flag to prevent duplicate uploads
             ])->put(
                 "{$this->supabaseUrl}/storage/v1/object/{$bucket}/{$filePath}",
                 $fileContent
             );
             
             if ($response->successful()) {
+                Log::info('Supabase upload successful', [
+                    'bucket' => $bucket,
+                    'path' => $filePath,
+                    'status' => $response->status()
+                ]);
                 return $filePath;
             } else {
                 Log::error('Supabase upload failed', [
+                    'bucket' => $bucket,
+                    'path' => $filePath,
                     'status' => $response->status(),
                     'response' => $response->body(),
                 ]);
@@ -109,7 +170,23 @@ class SupabaseStorageService
                 "{$this->supabaseUrl}/storage/v1/object/{$bucket}/{$filePath}"
             );
             
-            return $response->successful();
+            $success = $response->successful();
+            
+            if ($success) {
+                Log::info('Supabase delete successful', [
+                    'bucket' => $bucket,
+                    'path' => $filePath,
+                ]);
+            } else {
+                Log::error('Supabase delete failed', [
+                    'bucket' => $bucket,
+                    'path' => $filePath,
+                    'status' => $response->status(),
+                    'response' => $response->body(),
+                ]);
+            }
+            
+            return $success;
         } catch (\Exception $e) {
             Log::error('Exception in Supabase delete', [
                 'message' => $e->getMessage(),
@@ -117,5 +194,15 @@ class SupabaseStorageService
             ]);
             return false;
         }
+    }
+    
+    /**
+     * Check if the service is properly configured
+     *
+     * @return bool
+     */
+    public function isConfigured()
+    {
+        return !empty($this->supabaseUrl) && !empty($this->supabaseKey);
     }
 }

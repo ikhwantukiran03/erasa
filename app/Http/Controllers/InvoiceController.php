@@ -54,71 +54,92 @@ class InvoiceController extends Controller
     }
     
     /**
-     * Process the invoice submission.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Booking  $booking
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function submit(Request $request, Booking $booking)
-    {
-        // Check if the booking belongs to the authenticated user
-        if ($booking->user_id !== Auth::id()) {
-            return redirect()->route('user.bookings')
-                ->with('error', 'You do not have permission to access this booking.');
+ * Process the invoice submission.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @param  \App\Models\Booking  $booking
+ * @return \Illuminate\Http\RedirectResponse
+ */
+public function submit(Request $request, Booking $booking)
+{
+    // Check if the booking belongs to the authenticated user
+    if ($booking->user_id !== Auth::id()) {
+        return redirect()->route('user.bookings')
+            ->with('error', 'You do not have permission to access this booking.');
+    }
+    
+    // Check if the booking type and status are appropriate for invoice submission
+    if ($booking->type !== 'wedding' || $booking->status !== 'waiting for deposit') {
+        return redirect()->route('user.bookings.show', $booking)
+            ->with('error', 'This booking does not require an invoice submission.');
+    }
+    
+    // Validate the request
+    $validator = Validator::make($request->all(), [
+        'invoice' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // 5MB max
+        'notes' => ['nullable', 'string', 'max:500'],
+    ]);
+    
+    if ($validator->fails()) {
+        return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
+    }
+    
+    // Check if Supabase is properly configured
+    if (!$this->supabaseStorage->isConfigured()) {
+        return redirect()->back()
+            ->with('error', 'Storage service is not properly configured. Please contact the administrator.')
+            ->withInput();
+    }
+    
+    try {
+        // Get or create the invoice
+        $invoice = $booking->invoice ?? new Invoice(['booking_id' => $booking->id]);
+        
+        // Delete old invoice file if exists in Supabase
+        if ($invoice->invoice_path) {
+            $this->supabaseStorage->deleteFile($invoice->invoice_path, 'invoices');
         }
         
-        // Check if the booking type and status are appropriate for invoice submission
-        if ($booking->type !== 'wedding' || $booking->status !== 'waiting for deposit') {
-            return redirect()->route('user.bookings.show', $booking)
-                ->with('error', 'This booking does not require an invoice submission.');
+        // Store the new invoice in Supabase
+        $path = $this->supabaseStorage->uploadFile($request->file('invoice'), 'invoices');
+        
+        if (!$path) {
+            Log::error('Failed to upload invoice to Supabase', [
+                'booking_id' => $booking->id,
+                'user_id' => Auth::id(),
+                'file_name' => $request->file('invoice')->getClientOriginalName(),
+                'file_size' => $request->file('invoice')->getSize()
+            ]);
+            
+            return redirect()->back()
+                ->with('error', 'Failed to upload your payment proof. There might be an issue with our storage service. Please try again later or contact support.')
+                ->withInput();
         }
         
-        // Validate the request
-        $validator = Validator::make($request->all(), [
-            'invoice' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // 5MB max
-            'notes' => ['nullable', 'string', 'max:500'],
+        // Update the invoice
+        $invoice->invoice_path = $path;
+        $invoice->invoice_submitted_at = now();
+        $invoice->invoice_notes = $request->notes;
+        $invoice->save();
+        
+        return redirect()->route('user.bookings.show', $booking)
+            ->with('success', 'Your payment proof has been submitted successfully. Our staff will verify it shortly.');
+            
+    } catch (\Exception $e) {
+        Log::error('Exception during invoice submission', [
+            'booking_id' => $booking->id,
+            'user_id' => Auth::id(),
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
         ]);
         
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-        
-        try {
-            // Get or create the invoice
-            $invoice = $booking->invoice ?? new Invoice(['booking_id' => $booking->id]);
-            
-            // Delete old invoice file if exists in Supabase
-            if ($invoice->invoice_path) {
-                $this->supabaseStorage->deleteFile($invoice->invoice_path, 'invoices');
-            }
-            
-            // Store the new invoice in Supabase
-            $path = $this->supabaseStorage->uploadFile($request->file('invoice'), 'invoices');
-            
-            if (!$path) {
-                return redirect()->back()
-                    ->with('error', 'Failed to upload your payment proof. Please try again.')
-                    ->withInput();
-            }
-            
-            // Update the invoice
-            $invoice->invoice_path = $path;
-            $invoice->invoice_submitted_at = now();
-            $invoice->invoice_notes = $request->notes;
-            $invoice->save();
-            
-            return redirect()->route('user.bookings.show', $booking)
-                ->with('success', 'Your payment proof has been submitted successfully. Our staff will verify it shortly.');
-                
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'An error occurred while submitting your payment proof: ' . $e->getMessage())
-                ->withInput();
-        }
+        return redirect()->back()
+            ->with('error', 'An error occurred while submitting your payment proof: ' . $e->getMessage())
+            ->withInput();
     }
+}
     
     /**
      * Show all bookings with submitted invoices awaiting verification (Staff/Admin only).
