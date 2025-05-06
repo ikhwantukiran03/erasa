@@ -5,12 +5,31 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Gallery;
 use App\Models\Venue;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class GalleryController extends Controller
 {
+    /**
+     * The Supabase storage service instance.
+     *
+     * @var \App\Services\SupabaseStorageService
+     */
+    protected $supabaseStorage;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @param \App\Services\SupabaseStorageService $supabaseStorage
+     * @return void
+     */
+    public function __construct(SupabaseStorageService $supabaseStorage)
+    {
+        $this->supabaseStorage = $supabaseStorage;
+    }
+
     /**
      * Display a listing of the gallery items.
      *
@@ -112,8 +131,12 @@ class GalleryController extends Controller
                     continue;
                 }
 
-                // Upload the image
-                $path = $image->store('venues/gallery', 'public');
+                // Upload the image to Supabase
+                $path = $this->supabaseStorage->uploadFile($image, 'venues/gallery');
+                
+                if (!$path) {
+                    continue; // Skip if upload failed
+                }
                 
                 // Get title and description for this image
                 $title = $request->titles[$index] ?? $default_title ?? $image->getClientOriginalName();
@@ -253,14 +276,17 @@ class GalleryController extends Controller
         // Handle file upload or source change
         if ($request->source === 'local') {
             if ($request->hasFile('image')) {
-                // Delete old image if it exists
-                if ($gallery->image_path) {
-                    Storage::disk('public')->delete($gallery->image_path);
+                // Delete old image if it exists in Supabase
+                if ($gallery->image_path && $gallery->source === 'local') {
+                    $this->supabaseStorage->deleteFile($gallery->image_path);
                 }
                 
-                // Upload new image
-                $path = $request->file('image')->store('venues/gallery', 'public');
-                $data['image_path'] = $path;
+                // Upload new image to Supabase
+                $path = $this->supabaseStorage->uploadFile($request->file('image'), 'venues/gallery');
+                
+                if ($path) {
+                    $data['image_path'] = $path;
+                }
             }
             
             // Clear image URL if switching from external to local
@@ -275,7 +301,7 @@ class GalleryController extends Controller
         } elseif ($request->source === 'external') {
             // If switching from local to external
             if ($gallery->source === 'local' && $gallery->image_path) {
-                Storage::disk('public')->delete($gallery->image_path);
+                $this->supabaseStorage->deleteFile($gallery->image_path);
                 $data['image_path'] = null;
             }
         }
@@ -298,9 +324,9 @@ class GalleryController extends Controller
                 ->with('error', 'You do not have permission to access this resource.');
         }
         
-        // Delete the image file if it's a local image
+        // Delete the image file if it's a local image from Supabase
         if ($gallery->source === 'local' && $gallery->image_path) {
-            Storage::disk('public')->delete($gallery->image_path);
+            $this->supabaseStorage->deleteFile($gallery->image_path);
         }
         
         $gallery->delete();

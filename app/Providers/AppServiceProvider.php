@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\SupabaseStorageService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +12,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Register Supabase Storage Service
+        $this->app->singleton(SupabaseStorageService::class, function ($app) {
+            return new SupabaseStorageService();
+        });
     }
 
     /**

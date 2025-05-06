@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Invoice;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -11,6 +12,24 @@ use Illuminate\Support\Facades\Validator;
 
 class InvoiceController extends Controller
 {
+    /**
+     * The Supabase storage service instance.
+     *
+     * @var \App\Services\SupabaseStorageService
+     */
+    protected $supabaseStorage;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @param \App\Services\SupabaseStorageService $supabaseStorage
+     * @return void
+     */
+    public function __construct(SupabaseStorageService $supabaseStorage)
+    {
+        $this->supabaseStorage = $supabaseStorage;
+    }
+
     /**
      * Show the form for submitting an invoice.
      *
@@ -71,13 +90,19 @@ class InvoiceController extends Controller
             // Get or create the invoice
             $invoice = $booking->invoice ?? new Invoice(['booking_id' => $booking->id]);
             
-            // Delete old invoice file if exists
+            // Delete old invoice file if exists in Supabase
             if ($invoice->invoice_path) {
-                Storage::disk('public')->delete($invoice->invoice_path);
+                $this->supabaseStorage->deleteFile($invoice->invoice_path, 'invoices');
             }
             
-            // Store the new invoice
-            $path = $request->file('invoice')->store('invoices', 'public');
+            // Store the new invoice in Supabase
+            $path = $this->supabaseStorage->uploadFile($request->file('invoice'), 'invoices');
+            
+            if (!$path) {
+                return redirect()->back()
+                    ->with('error', 'Failed to upload your payment proof. Please try again.')
+                    ->withInput();
+            }
             
             // Update the invoice
             $invoice->invoice_path = $path;
