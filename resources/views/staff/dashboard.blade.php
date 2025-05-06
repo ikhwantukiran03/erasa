@@ -71,6 +71,24 @@
                 <a href="{{ route('staff.bookings.index') }}" class="mt-4 inline-block text-sm text-green-600 hover:underline">View all bookings →</a>
             </div>
 
+            <!-- Pending Customization Requests -->
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-center">
+        <div class="bg-purple-100 rounded-full p-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+        </div>
+        <div class="ml-4">
+            <p class="text-sm text-gray-500">Pending Customizations</p>
+            <p class="text-2xl font-semibold text-gray-800">
+                {{ \App\Models\Customization::where('status', 'pending')->count() }}
+            </p>
+        </div>
+    </div>
+    <a href="{{ route('staff.customizations.index', ['status' => 'pending']) }}" class="mt-4 inline-block text-sm text-purple-600 hover:underline">Review customization requests →</a>
+</div>
+
             <!-- Pending Invoice Verifications -->
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="flex items-center">
@@ -94,13 +112,7 @@
                 <a href="{{ route('staff.invoices.index') }}" class="mt-4 inline-block text-sm text-blue-600 hover:underline">Verify payments →</a>
             </div>
 
-            <!-- Invoice verification -->
-            <a href="{{ route('staff.invoices.index') }}" class="flex items-center p-4 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span>Verify Payment Proofs</span>
-            </a>
+            
             
             
         </div>
@@ -123,6 +135,19 @@
                     </svg>
                     <span>Create New Booking</span>
                 </a>
+                <!-- Invoice verification -->
+            <a href="{{ route('staff.invoices.index') }}" class="flex items-center p-4 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Verify Payment Proofs</span>
+            </a>
+                <a href="{{ route('staff.customizations.index', ['status' => 'pending']) }}" class="flex items-center p-4 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+    </svg>
+    <span>Process Customization Requests</span>
+</a>
                 <a href="{{ route('profile.edit') }}" class="flex items-center p-4 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />

@@ -144,6 +144,73 @@
                                 </dd>
                             </div>
                             @endif
+
+                            @if($booking->type === 'wedding' && $booking->status === 'ongoing' && $booking->package && $booking->package->packageItems->count() > 0)
+<div class="md:col-span-2 border-t border-gray-200 pt-6">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Package Items Customization</h3>
+        <div>
+            <a href="{{ route('user.customizations.index', $booking) }}" class="text-sm text-primary hover:underline">
+                View All Customization Requests
+            </a>
+        </div>
+    </div>
+    
+    <p class="text-gray-600 mb-4">Click on any item below to request customization for your wedding package:</p>
+    
+    <div class="space-y-4 mt-2">
+        @php
+            $packageItemsByCategory = $booking->package->packageItems->groupBy(function($item) {
+                return $item->item->category->name;
+            });
+        @endphp
+        
+        @foreach($packageItemsByCategory as $categoryName => $packageItems)
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-medium text-gray-700 mb-2">{{ $categoryName }}</h4>
+                <ul class="space-y-2">
+                    @foreach($packageItems as $packageItem)
+                        @php
+                            $customization = $booking->customizations()
+                                ->where('package_item_id', $packageItem->id)
+                                ->first();
+                        @endphp
+                        <li class="flex justify-between items-center p-2 hover:bg-gray-100 rounded-md transition">
+                            <div>
+                                <span class="font-medium text-gray-800">{{ $packageItem->item->name }}</span>
+                                @if($packageItem->description)
+                                    <p class="text-sm text-gray-600">{{ $packageItem->description }}</p>
+                                @endif
+                            </div>
+                            <div>
+                                @if($customization)
+                                    @if($customization->status === 'pending')
+                                        <a href="{{ route('user.customizations.edit', [$booking, $customization]) }}" class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">
+                                            Pending
+                                        </a>
+                                    @elseif($customization->status === 'approved')
+                                        <a href="{{ route('user.customizations.show', [$booking, $customization]) }}" class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                                            Approved
+                                        </a>
+                                    @elseif($customization->status === 'rejected')
+                                        <a href="{{ route('user.customizations.show', [$booking, $customization]) }}" class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs">
+                                            Rejected
+                                        </a>
+                                    @endif
+                                @else
+                                    <a href="{{ route('user.customizations.create', [$booking, $packageItem]) }}" class="px-3 py-1 bg-primary text-white rounded text-xs hover:bg-opacity-90 transition">
+                                        Customize
+                                    </a>
+                                @endif
+                            </div>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endforeach
+    </div>
+</div>
+@endif
                             
                             <!-- Package Items -->
                             @if($booking->package->packageItems->count() > 0)

@@ -35,4 +35,12 @@ class PackageItem extends Model
     {
         return $this->belongsTo(Item::class);
     }
+
+    /**
+ * Get the customization requests for the package item.
+ */
+public function customizations()
+{
+    return $this->hasMany(Customization::class);
+}
 }

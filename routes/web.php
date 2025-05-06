@@ -18,6 +18,8 @@ use App\Http\Controllers\Staff\BookingController;
 use App\Http\Controllers\Api\BookingCalendarApiController;
 use App\Http\Controllers\BoookingController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\Staff\StaffCustomizationController;
+use App\Http\Controllers\CustomizationController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -191,6 +193,11 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{booking}', [InvoiceController::class, 'showVerificationForm'])->name('invoices.show');
     Route::post('/invoices/{booking}/verify', [InvoiceController::class, 'verify'])->name('invoices.verify');
+
+    // Customization Management Routes
+    Route::get('/customizations', [App\Http\Controllers\Staff\StaffCustomizationController::class, 'index'])->name('customizations.index');
+    Route::get('/customizations/{customization}', [App\Http\Controllers\Staff\StaffCustomizationController::class, 'show'])->name('customizations.show');
+    Route::post('/customizations/{customization}/process', [App\Http\Controllers\Staff\StaffCustomizationController::class, 'process'])->name('customizations.process');
 });
 
 // User Routes for Bookings and Booking Requests
@@ -210,6 +217,18 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
 
     Route::get('/bookings/{booking}/invoice', [InvoiceController::class, 'showSubmitForm'])->name('invoices.create');
     Route::post('/bookings/{booking}/invoice', [InvoiceController::class, 'submit'])->name('invoices.store');
+
+    Route::get('/bookings/{booking}/customizations', function ($booking) {
+        $booking = \App\Models\Booking::findOrFail($booking);
+        return view('user.customizations.index', compact('booking'));
+    })->name('customizations.index');
+    
+    Route::get('/bookings/{booking}/customizations/create/{packageItem}', [App\Http\Controllers\CustomizationController::class, 'create'])->name('customizations.create');
+    Route::post('/bookings/{booking}/customizations/{packageItem}', [App\Http\Controllers\CustomizationController::class, 'store'])->name('customizations.store');
+    Route::get('/bookings/{booking}/customizations/{customization}', [App\Http\Controllers\CustomizationController::class, 'show'])->name('customizations.show');
+    Route::get('/bookings/{booking}/customizations/{customization}/edit', [App\Http\Controllers\CustomizationController::class, 'edit'])->name('customizations.edit');
+    Route::put('/bookings/{booking}/customizations/{customization}', [App\Http\Controllers\CustomizationController::class, 'update'])->name('customizations.update');
+    Route::delete('/bookings/{booking}/customizations/{customization}', [App\Http\Controllers\CustomizationController::class, 'destroy'])->name('customizations.destroy');
 }
 
 

@@ -181,4 +181,12 @@ public function hasInvoice()
 {
     return $this->invoice()->exists();
 }
+
+/**
+ * Get the customization requests for the booking.
+ */
+public function customizations()
+{
+    return $this->hasMany(Customization::class);
+}
 }
