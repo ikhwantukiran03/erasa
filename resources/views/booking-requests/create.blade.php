@@ -134,6 +134,16 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        <!-- New Price Selection Field -->
+                        <div class="form-group" id="price-selection-container">
+                            <label for="price_id" class="block text-dark font-medium mb-1">Number of Guests (Pax)</label>
+                            <select id="price_id" name="price_id" class="form-input w-full">
+                                <option value="">-- Select Number of Guests --</option>
+                                <!-- Price options will be populated via JavaScript -->
+                            </select>
+                            <p class="text-sm text-gray-500 mt-1">Select the expected number of guests for your event</p>
+                        </div>
                         
                         <div class="md:col-span-2">
                             <label for="message" class="block text-dark font-medium mb-1">Your Message <span class="text-red-500">*</span></label>
@@ -162,11 +172,41 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Dynamically filter packages when venue is selected
+        // Store package prices data
+        const packagesData = @json($packages->map(function($package) {
+            return [
+                'id' => $package->id,
+                'prices' => $package->prices->map(function($price) {
+                    return [
+                        'id' => $price->id,
+                        'pax' => $price->pax,
+                        'price' => $price->price
+                    ];
+                })
+            ];
+        }));
+        
+        // Get DOM elements
         const venueSelect = document.getElementById('venue_id');
         const packageSelect = document.getElementById('package_id');
+        const priceSelect = document.getElementById('price_id');
+        const priceContainer = document.getElementById('price-selection-container');
+        
+        // Store original package options
         const originalPackages = Array.from(packageSelect.options);
         
+        // Initialize with any pre-selected values
+        const oldPackageId = "{{ old('package_id') }}";
+        const oldPriceId = "{{ old('price_id') }}";
+        
+        // Hide price selection initially if no package is selected
+        if (!oldPackageId) {
+            priceContainer.style.display = 'none';
+        } else {
+            updatePriceOptions(oldPackageId, oldPriceId);
+        }
+        
+        // When venue changes, update package options
         venueSelect.addEventListener('change', function() {
             const selectedVenueId = this.value;
             
@@ -188,7 +228,57 @@
                     }
                 });
             }
+            
+            // Reset and hide price options since package changed
+            priceSelect.innerHTML = '<option value="">-- Select Number of Guests --</option>';
+            priceContainer.style.display = 'none';
         });
+        
+        // When package changes, update price options
+        packageSelect.addEventListener('change', function() {
+            const selectedPackageId = this.value;
+            
+            if (!selectedPackageId) {
+                // If no package selected, hide price selection
+                priceSelect.innerHTML = '<option value="">-- Select Number of Guests --</option>';
+                priceContainer.style.display = 'none';
+            } else {
+                // Show price selection and update options
+                priceContainer.style.display = 'block';
+                updatePriceOptions(selectedPackageId);
+            }
+        });
+        
+        // Function to update price options based on selected package
+        function updatePriceOptions(packageId, selectedPriceId = null) {
+            // Reset price dropdown
+            priceSelect.innerHTML = '<option value="">-- Select Number of Guests --</option>';
+            
+            // Find package in packagesData
+            const packageData = packagesData.find(pkg => pkg.id == packageId);
+            
+            if (packageData && packageData.prices && packageData.prices.length > 0) {
+                // Add options for each price
+                packageData.prices.forEach(price => {
+                    const option = document.createElement('option');
+                    option.value = price.id;
+                    option.textContent = `${price.pax} pax - RM ${parseFloat(price.price).toLocaleString('en-MY', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    
+                    // Select if it matches the old value
+                    if (selectedPriceId && price.id == selectedPriceId) {
+                        option.selected = true;
+                    }
+                    
+                    priceSelect.appendChild(option);
+                });
+                
+                // Show price container
+                priceContainer.style.display = 'block';
+            } else {
+                // Hide price container if no prices available
+                priceContainer.style.display = 'none';
+            }
+        }
         
         // Add animation for form inputs
         const formInputs = document.querySelectorAll('.form-input');

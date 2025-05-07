@@ -18,6 +18,7 @@ class Booking extends Model
         'user_id',
         'venue_id',
         'package_id',
+        'price_id', // Add price_id to fillable
         'booking_date',
         'session',
         'type',
@@ -59,6 +60,14 @@ class Booking extends Model
     {
         return $this->belongsTo(Package::class);
     }
+    
+    /**
+     * Get the price associated with the booking.
+     */
+    public function price()
+    {
+        return $this->belongsTo(Price::class);
+    }
 
     /**
      * Get the staff member who handled this booking.
@@ -66,6 +75,22 @@ class Booking extends Model
     public function handler()
     {
         return $this->belongsTo(User::class, 'handled_by');
+    }
+
+    /**
+     * Get the invoice associated with the booking.
+     */
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class);
+    }
+
+    /**
+     * Get the customization requests for the booking.
+     */
+    public function customizations()
+    {
+        return $this->hasMany(Customization::class);
     }
 
     /**
@@ -162,31 +187,13 @@ class Booking extends Model
         return ucfirst($this->type);
     }
 
-    // Add this method to your existing App\Models\Booking class
-
-/**
- * Get the invoice associated with the booking.
- */
-public function invoice()
-{
-    return $this->hasOne(Invoice::class);
-}
-
-/**
- * Check if the booking has an invoice.
- *
- * @return bool
- */
-public function hasInvoice()
-{
-    return $this->invoice()->exists();
-}
-
-/**
- * Get the customization requests for the booking.
- */
-public function customizations()
-{
-    return $this->hasMany(Customization::class);
-}
+    /**
+     * Check if the booking has an invoice.
+     *
+     * @return bool
+     */
+    public function hasInvoice()
+    {
+        return $this->invoice()->exists();
+    }
 }

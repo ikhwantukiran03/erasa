@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('venue_id')->constrained()->onDelete('cascade');
             $table->foreignId('package_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('price_id')->nullable()->constrained()->nullOnDelete();
             $table->date('booking_date');
             $table->enum('session', ['morning', 'evening']);
             $table->enum('type', ['wedding', 'viewing', 'reservation', 'appointment']);

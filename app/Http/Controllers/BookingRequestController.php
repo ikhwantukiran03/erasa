@@ -39,6 +39,7 @@ class BookingRequestController extends Controller
             'type' => ['required', 'in:reservation,booking,viewing,appointment'],
             'venue_id' => ['nullable', 'exists:venues,id'],
             'package_id' => ['nullable', 'exists:packages,id'],
+            'price_id' => ['nullable', 'exists:prices,id'], // Add price_id validation
             'event_date' => ['nullable', 'date', 'after:today'],
             'message' => ['required', 'string'],
         ]);
@@ -47,6 +48,19 @@ class BookingRequestController extends Controller
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
+        }
+
+        // Validate price_id belongs to the selected package
+        if ($request->package_id && $request->price_id) {
+            $priceExists = Price::where('id', $request->price_id)
+                ->where('package_id', $request->package_id)
+                ->exists();
+                
+            if (!$priceExists) {
+                return redirect()->back()
+                    ->withErrors(['price_id' => 'The selected price does not belong to the selected package.'])
+                    ->withInput();
+            }
         }
 
         // Create the booking request

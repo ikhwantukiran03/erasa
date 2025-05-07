@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled'])->default('pending');
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('package_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('price_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('venue_id')->nullable()->constrained()->nullOnDelete();
             $table->date('event_date')->nullable();
             $table->text('message')->nullable();

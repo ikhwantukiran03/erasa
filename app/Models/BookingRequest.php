@@ -1,5 +1,5 @@
 <?php
-
+// app/Models/BookingRequest.php updates
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,6 +22,7 @@ class BookingRequest extends Model
         'status',
         'user_id',
         'package_id',
+        'price_id', // Add price_id to fillable
         'venue_id',
         'event_date',
         'message',
@@ -54,6 +55,14 @@ class BookingRequest extends Model
     public function package()
     {
         return $this->belongsTo(Package::class);
+    }
+    
+    /**
+     * Get the price associated with the booking request.
+     */
+    public function price()
+    {
+        return $this->belongsTo(Price::class);
     }
 
     /**
