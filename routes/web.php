@@ -195,9 +195,9 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
     Route::post('/invoices/{booking}/verify', [InvoiceController::class, 'verify'])->name('invoices.verify');
 
     // Customization Management Routes
-    Route::get('/customizations', [App\Http\Controllers\Staff\StaffCustomizationController::class, 'index'])->name('customizations.index');
-    Route::get('/customizations/{customization}', [App\Http\Controllers\Staff\StaffCustomizationController::class, 'show'])->name('customizations.show');
-    Route::post('/customizations/{customization}/process', [App\Http\Controllers\Staff\StaffCustomizationController::class, 'process'])->name('customizations.process');
+Route::get('/customizations', [StaffCustomizationController::class, 'index'])->name('customizations.index');
+Route::get('/customizations/{customization}', [StaffCustomizationController::class, 'show'])->name('customizations.show');
+Route::post('/customizations/{customization}/process', [StaffCustomizationController::class, 'process'])->name('customizations.process');
 });
 
 // User Routes for Bookings and Booking Requests
