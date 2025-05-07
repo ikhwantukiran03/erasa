@@ -34,12 +34,12 @@
             <div class="p-6">
                 <!-- Filter options -->
                 <div class="mb-6 flex flex-wrap gap-4">
-    <a href="{{ route('staff.bookings.index') }}" class="px-4 py-2 {{ request('status') ? 'bg-gray-200 text-gray-700' : 'bg-primary text-white' }} rounded-full text-sm hover:bg-opacity-90 transition">All</a>
-    <a href="{{ route('staff.bookings.index', ['status' => 'ongoing']) }}" class="px-4 py-2 {{ request('status') == 'ongoing' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Ongoing</a>
-    <a href="{{ route('staff.bookings.index', ['status' => 'waiting for deposit']) }}" class="px-4 py-2 {{ request('status') == 'waiting for deposit' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Waiting for Deposit</a>
-    <a href="{{ route('staff.bookings.index', ['status' => 'completed']) }}" class="px-4 py-2 {{ request('status') == 'completed' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Completed</a>
-    <a href="{{ route('staff.bookings.index', ['status' => 'cancelled']) }}" class="px-4 py-2 {{ request('status') == 'cancelled' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Cancelled</a>
-</div>
+                    <a href="{{ route('staff.bookings.index') }}" class="px-4 py-2 {{ request('status') ? 'bg-gray-200 text-gray-700' : 'bg-primary text-white' }} rounded-full text-sm hover:bg-opacity-90 transition">All</a>
+                    <a href="{{ route('staff.bookings.index', ['status' => 'ongoing']) }}" class="px-4 py-2 {{ request('status') == 'ongoing' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Ongoing</a>
+                    <a href="{{ route('staff.bookings.index', ['status' => 'waiting for deposit']) }}" class="px-4 py-2 {{ request('status') == 'waiting for deposit' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Waiting for Deposit</a>
+                    <a href="{{ route('staff.bookings.index', ['status' => 'completed']) }}" class="px-4 py-2 {{ request('status') == 'completed' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Completed</a>
+                    <a href="{{ route('staff.bookings.index', ['status' => 'cancelled']) }}" class="px-4 py-2 {{ request('status') == 'cancelled' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Cancelled</a>
+                </div>
 
                 @if($bookings->count() > 0)
                 <div class="overflow-x-auto">
@@ -50,6 +50,7 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Venue/Package</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pax</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -81,30 +82,37 @@
                                     <div class="text-sm text-gray-900">{{ $booking->booking_date->format('M d, Y') }}</div>
                                     <div class="text-xs text-gray-500">{{ $booking->session === 'morning' ? 'Morning' : 'Evening' }}</div>
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    @if($booking->price_id && $booking->price)
+                                        {{ $booking->price->pax }} pax
+                                    @else
+                                        -
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                                         {{ ucfirst($booking->type) }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-    @if($booking->status === 'ongoing')
-        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-            Ongoing
-        </span>
-    @elseif($booking->status === 'waiting for deposit')
-        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-            Waiting for Deposit
-        </span>
-    @elseif($booking->status === 'completed')
-        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-            Completed
-        </span>
-    @elseif($booking->status === 'cancelled')
-        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-            Cancelled
-        </span>
-    @endif
-</td>
+                                    @if($booking->status === 'ongoing')
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                            Ongoing
+                                        </span>
+                                    @elseif($booking->status === 'waiting for deposit')
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            Waiting for Deposit
+                                        </span>
+                                    @elseif($booking->status === 'completed')
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            Completed
+                                        </span>
+                                    @elseif($booking->status === 'cancelled')
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                            Cancelled
+                                        </span>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <a href="{{ route('staff.bookings.show', $booking) }}" class="text-blue-600 hover:text-blue-900 mr-3">View</a>
                                     <a href="{{ route('staff.bookings.edit', $booking) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>

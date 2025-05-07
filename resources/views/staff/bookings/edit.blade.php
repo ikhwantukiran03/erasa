@@ -1,4 +1,3 @@
-```php
 @extends('layouts.app')
 
 @section('title', 'Edit Booking - Enak Rasa Wedding Hall')
@@ -72,6 +71,16 @@
                             <p class="text-sm text-gray-500 mt-1">Available packages will be filtered based on selected venue</p>
                         </div>
                         
+                        <!-- Price Selection (Number of Guests) -->
+                        <div id="price-selection-container">
+                            <label for="price_id" class="block text-dark font-medium mb-1">Number of Guests (Pax)</label>
+                            <select id="price_id" name="price_id" class="form-input @error('price_id') border-red-500 @enderror">
+                                <option value="">-- Select Number of Guests --</option>
+                                <!-- Price options will be populated via JavaScript -->
+                            </select>
+                            <p class="text-sm text-gray-500 mt-1">Select the expected number of guests for this booking</p>
+                        </div>
+                        
                         <!-- Booking Date -->
                         <div>
                             <label for="booking_date" class="block text-dark font-medium mb-1">Booking Date <span class="text-red-500">*</span></label>
@@ -100,14 +109,14 @@
                         
                         <!-- Booking Status -->
                         <div>
-    <label for="status" class="block text-dark font-medium mb-1">Status <span class="text-red-500">*</span></label>
-    <select id="status" name="status" required class="form-input @error('status') border-red-500 @enderror">
-        <option value="waiting for deposit" {{ old('status', $booking->status) == 'waiting for deposit' ? 'selected' : '' }}>Waiting for Deposit</option>
-        <option value="ongoing" {{ old('status', $booking->status) == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
-        <option value="completed" {{ old('status', $booking->status) == 'completed' ? 'selected' : '' }}>Completed</option>
-        <option value="cancelled" {{ old('status', $booking->status) == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-    </select>
-</div>
+                            <label for="status" class="block text-dark font-medium mb-1">Status <span class="text-red-500">*</span></label>
+                            <select id="status" name="status" required class="form-input @error('status') border-red-500 @enderror">
+                                <option value="waiting for deposit" {{ old('status', $booking->status) == 'waiting for deposit' ? 'selected' : '' }}>Waiting for Deposit</option>
+                                <option value="ongoing" {{ old('status', $booking->status) == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
+                                <option value="completed" {{ old('status', $booking->status) == 'completed' ? 'selected' : '' }}>Completed</option>
+                                <option value="cancelled" {{ old('status', $booking->status) == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                            </select>
+                        </div>
                         
                         <!-- Expiry Date (Optional) -->
                         <div>
@@ -134,9 +143,38 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Store package data with prices
+        const packagesData = @json($packages->map(function($package) {
+            return [
+                'id' => $package->id,
+                'venue_id' => $package->venue_id,
+                'prices' => $package->prices->map(function($price) {
+                    return [
+                        'id' => $price->id,
+                        'pax' => $price->pax,
+                        'price' => $price->price
+                    ];
+                })
+            ];
+        }));
+        
         const venueSelect = document.getElementById('venue_id');
         const packageSelect = document.getElementById('package_id');
+        const priceSelect = document.getElementById('price_id');
+        const priceContainer = document.getElementById('price-selection-container');
         const packageOptions = Array.from(packageSelect.options);
+        
+        // Initialize with any pre-selected values
+        const oldPackageId = "{{ old('package_id', $booking->package_id) }}";
+        const oldPriceId = "{{ old('price_id', $booking->price_id) }}";
+        
+        // Hide price selection initially if no package is selected
+        if (!oldPackageId) {
+            priceContainer.style.display = 'none';
+        } else {
+            filterPackages();
+            updatePriceOptions(oldPackageId, oldPriceId);
+        }
         
         // Function to filter packages based on selected venue
         function filterPackages() {
@@ -162,13 +200,43 @@
             }
             
             // If the original package belongs to this venue, select it
-            const originalPackageId = '{{ $booking->package_id }}';
-            if (originalPackageId) {
+            if (oldPackageId) {
                 Array.from(packageSelect.options).forEach(option => {
-                    if (option.value === originalPackageId) {
+                    if (option.value === oldPackageId) {
                         option.selected = true;
                     }
                 });
+            }
+        }
+        
+        // Function to update price options based on selected package
+        function updatePriceOptions(packageId, selectedPriceId = null) {
+            // Reset price dropdown
+            priceSelect.innerHTML = '<option value="">-- Select Number of Guests --</option>';
+            
+            // Find package in packagesData
+            const packageData = packagesData.find(pkg => pkg.id == packageId);
+            
+            if (packageData && packageData.prices && packageData.prices.length > 0) {
+                // Add options for each price
+                packageData.prices.forEach(price => {
+                    const option = document.createElement('option');
+                    option.value = price.id;
+                    option.textContent = `${price.pax} pax - RM ${parseFloat(price.price).toLocaleString('en-MY', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    
+                    // Select if it matches the old value
+                    if (selectedPriceId && price.id == selectedPriceId) {
+                        option.selected = true;
+                    }
+                    
+                    priceSelect.appendChild(option);
+                });
+                
+                // Show price container
+                priceContainer.style.display = 'block';
+            } else {
+                // Hide price container if no prices available
+                priceContainer.style.display = 'none';
             }
         }
         
@@ -176,7 +244,26 @@
         filterPackages();
         
         // Add event listener for venue select
-        venueSelect.addEventListener('change', filterPackages);
+        venueSelect.addEventListener('change', function() {
+            filterPackages();
+            
+            // Reset and hide price options since package will be reset
+            priceSelect.innerHTML = '<option value="">-- Select Number of Guests --</option>';
+            priceContainer.style.display = 'none';
+        });
+        
+        // Add event listener for package select
+        packageSelect.addEventListener('change', function() {
+            const packageId = this.value;
+            
+            if (packageId) {
+                updatePriceOptions(packageId);
+            } else {
+                // Hide price selection if no package selected
+                priceSelect.innerHTML = '<option value="">-- Select Number of Guests --</option>';
+                priceContainer.style.display = 'none';
+            }
+        });
         
         // Validate booking date and time availability
         const bookingDateInput = document.getElementById('booking_date');
@@ -210,4 +297,3 @@
 </script>
 @endpush
 @endsection
-```
