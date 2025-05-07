@@ -128,10 +128,15 @@
                             <select id="package_id" name="package_id" class="form-input w-full">
                                 <option value="">-- Select Package --</option>
                                 @foreach($packages as $package)
-                                    <option value="{{ $package->id }}" {{ old('package_id') == $package->id ? 'selected' : '' }}>
-                                        {{ $package->name }} ({{ $package->venue->name }})
-                                    </option>
-                                @endforeach
+    <option 
+        value="{{ $package->id }}" 
+        data-venue-id="{{ $package->venue_id }}"
+        {{ old('package_id') == $package->id ? 'selected' : '' }}
+    >
+        {{ $package->name }} ({{ $package->venue->name }})
+    </option>
+@endforeach
+
                             </select>
                         </div>
 
@@ -171,127 +176,122 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Store package prices data
-        const packagesData = @json($packages->map(function($package) {
-            return [
-                'id' => $package->id,
-                'prices' => $package->prices->map(function($price) {
-                    return [
-                        'id' => $price->id,
-                        'pax' => $price->pax,
-                        'price' => $price->price
-                    ];
-                })
-            ];
-        }));
-        
-        // Get DOM elements
-        const venueSelect = document.getElementById('venue_id');
-        const packageSelect = document.getElementById('package_id');
-        const priceSelect = document.getElementById('price_id');
-        const priceContainer = document.getElementById('price-selection-container');
-        
-        // Store original package options
-        const originalPackages = Array.from(packageSelect.options);
-        
-        // Initialize with any pre-selected values
-        const oldPackageId = "{{ old('package_id') }}";
-        const oldPriceId = "{{ old('price_id') }}";
-        
-        // Hide price selection initially if no package is selected
-        if (!oldPackageId) {
-            priceContainer.style.display = 'none';
+document.addEventListener('DOMContentLoaded', function() {
+    const packagesData = {!! json_encode($packages->map(function($package) {
+        return [
+            'id' => $package->id,
+            'venue_id' => $package->venue_id,
+            'prices' => $package->prices->map(function($price) {
+                return [
+                    'id' => $price->id,
+                    'pax' => $price->pax,
+                    'price' => $price->price
+                ];
+            })
+        ];
+    })) !!};
+
+    const venueSelect = document.getElementById('venue_id');
+    const packageSelect = document.getElementById('package_id');
+    const priceSelect = document.getElementById('price_id');
+    const priceContainer = document.getElementById('price-selection-container');
+    const packageOptions = Array.from(packageSelect.options);
+
+    const oldPackageId = "{{ old('package_id') }}";
+    const oldPriceId = "{{ old('price_id') }}";
+
+    function filterPackages() {
+        const venueId = venueSelect.value;
+        packageSelect.innerHTML = '<option value="">-- Select Package (Optional) --</option>';
+
+        packageOptions.forEach(option => {
+            if (option.value && (!venueId || option.dataset.venueId === venueId)) {
+                packageSelect.appendChild(option.cloneNode(true));
+            }
+        });
+
+        if (oldPackageId) {
+            Array.from(packageSelect.options).forEach(option => {
+                if (option.value === oldPackageId) {
+                    option.selected = true;
+                }
+            });
+        }
+    }
+
+    function updatePriceOptions(packageId, selectedPriceId = null) {
+        priceSelect.innerHTML = '<option value="">-- Select Number of Guests --</option>';
+
+        const packageData = packagesData.find(pkg => pkg.id == packageId);
+
+        if (packageData && packageData.prices.length > 0) {
+            packageData.prices.forEach(price => {
+                const option = document.createElement('option');
+                option.value = price.id;
+                option.textContent = `${price.pax} pax - RM ${parseFloat(price.price).toLocaleString('en-MY', {minimumFractionDigits: 2})}`;
+
+                if (selectedPriceId && price.id == selectedPriceId) {
+                    option.selected = true;
+                }
+
+                priceSelect.appendChild(option);
+            });
+
+            priceContainer.style.display = 'block';
         } else {
-            updatePriceOptions(oldPackageId, oldPriceId);
+            priceContainer.style.display = 'none';
         }
-        
-        // When venue changes, update package options
-        venueSelect.addEventListener('change', function() {
-            const selectedVenueId = this.value;
-            
-            // Reset packages dropdown
-            packageSelect.innerHTML = '<option value="">-- Select Package --</option>';
-            
-            if (!selectedVenueId) {
-                // If no venue selected, show all packages
-                originalPackages.forEach(option => {
-                    if (option.value) { // Skip the placeholder option
-                        packageSelect.appendChild(option.cloneNode(true));
-                    }
-                });
-            } else {
-                // Filter packages for selected venue
-                originalPackages.forEach(option => {
-                    if (option.value && option.text.includes(`(${venueSelect.options[venueSelect.selectedIndex].text})`)) {
-                        packageSelect.appendChild(option.cloneNode(true));
-                    }
-                });
-            }
-            
-            // Reset and hide price options since package changed
+    }
+
+    function checkAvailability() {
+        const date = bookingDateInput.value;
+        const session = sessionSelect.value;
+        const venueId = venueSelect.value;
+
+        if (!date || !session || !venueId) return;
+
+        fetch(`/api/check-availability?date=${date}&session=${session}&venue_id=${venueId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.available) {
+                    alert('This venue is already booked for the selected date and session.');
+                }
+            })
+            .catch(error => {
+                console.error('Availability check failed:', error);
+            });
+    }
+
+    // Event Listeners
+    venueSelect.addEventListener('change', () => {
+        filterPackages();
+        priceSelect.innerHTML = '<option value="">-- Select Number of Guests --</option>';
+        priceContainer.style.display = 'none';
+        checkAvailability();
+    });
+
+    packageSelect.addEventListener('change', function() {
+        const packageId = this.value;
+        if (packageId) {
+            updatePriceOptions(packageId);
+        } else {
             priceSelect.innerHTML = '<option value="">-- Select Number of Guests --</option>';
             priceContainer.style.display = 'none';
-        });
-        
-        // When package changes, update price options
-        packageSelect.addEventListener('change', function() {
-            const selectedPackageId = this.value;
-            
-            if (!selectedPackageId) {
-                // If no package selected, hide price selection
-                priceSelect.innerHTML = '<option value="">-- Select Number of Guests --</option>';
-                priceContainer.style.display = 'none';
-            } else {
-                // Show price selection and update options
-                priceContainer.style.display = 'block';
-                updatePriceOptions(selectedPackageId);
-            }
-        });
-        
-        // Function to update price options based on selected package
-        function updatePriceOptions(packageId, selectedPriceId = null) {
-            // Reset price dropdown
-            priceSelect.innerHTML = '<option value="">-- Select Number of Guests --</option>';
-            
-            // Find package in packagesData
-            const packageData = packagesData.find(pkg => pkg.id == packageId);
-            
-            if (packageData && packageData.prices && packageData.prices.length > 0) {
-                // Add options for each price
-                packageData.prices.forEach(price => {
-                    const option = document.createElement('option');
-                    option.value = price.id;
-                    option.textContent = `${price.pax} pax - RM ${parseFloat(price.price).toLocaleString('en-MY', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                    
-                    // Select if it matches the old value
-                    if (selectedPriceId && price.id == selectedPriceId) {
-                        option.selected = true;
-                    }
-                    
-                    priceSelect.appendChild(option);
-                });
-                
-                // Show price container
-                priceContainer.style.display = 'block';
-            } else {
-                // Hide price container if no prices available
-                priceContainer.style.display = 'none';
-            }
         }
-        
-        // Add animation for form inputs
-        const formInputs = document.querySelectorAll('.form-input');
-        formInputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.closest('.form-group').classList.add('input-focused');
-            });
-            
-            input.addEventListener('blur', function() {
-                this.closest('.form-group').classList.remove('input-focused');
-            });
-        });
     });
+
+    const bookingDateInput = document.getElementById('booking_date');
+    const sessionSelect = document.getElementById('session');
+
+    bookingDateInput.addEventListener('change', checkAvailability);
+    sessionSelect.addEventListener('change', checkAvailability);
+
+    // On load
+    filterPackages();
+    if (oldPackageId) {
+        updatePriceOptions(oldPackageId, oldPriceId);
+    }
+});
 </script>
 @endpush
 @endsection
