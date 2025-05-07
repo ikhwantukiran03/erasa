@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('booking_id')->constrained()->onDelete('cascade');
+            $table->enum('type', ['deposit', 'payment_1', 'payment_2', 'final_payment','other']);
             $table->string('invoice_path')->nullable();
             $table->dateTime('invoice_submitted_at')->nullable();
             $table->dateTime('invoice_verified_at')->nullable();
