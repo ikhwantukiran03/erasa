@@ -37,9 +37,10 @@
                             <div class="flex items-center justify-center bg-white border border-gray-200 rounded-lg p-4">
                                 @if($gallery->source === 'local' && $gallery->image_path)
                                     <img 
-                                        src="{{ asset('storage/' . $gallery->image_path) }}" 
+                                        src="{{ $gallery->image_path }}" 
                                         alt="{{ $gallery->title }}" 
                                         class="max-h-60 rounded"
+                                        onerror="this.src='{{ asset('img/placeholder.jpg') }}'; this.onerror=null;"
                                     >
                                 @elseif($gallery->source === 'external' && $gallery->image_url)
                                     <img 

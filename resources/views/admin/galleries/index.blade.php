@@ -55,9 +55,10 @@
                             <div class="relative h-64 overflow-hidden bg-gray-200">
                                 @if($gallery->source === 'local' && $gallery->image_path)
                                     <img 
-                                        src="{{ asset('storage/' . $gallery->image_path) }}" 
+                                        src="{{ $gallery->image_path }}" 
                                         alt="{{ $gallery->title }}" 
                                         class="w-full h-full object-cover"
+                                        onerror="this.src='{{ asset('img/placeholder.jpg') }}'; this.onerror=null;"
                                     >
                                 @elseif($gallery->source === 'external' && $gallery->image_url)
                                     <img 

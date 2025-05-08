@@ -21,9 +21,10 @@
                         <div class="bg-gray-100 rounded-lg flex items-center justify-center p-4 h-full">
                             @if($gallery->source === 'local' && $gallery->image_path)
                                 <img 
-                                    src="{{ asset('storage/' . $gallery->image_path) }}" 
+                                    src="{{ $gallery->image_path }}" 
                                     alt="{{ $gallery->title }}" 
                                     class="max-w-full max-h-96 rounded shadow"
+                                    onerror="this.src='{{ asset('img/placeholder.jpg') }}'; this.onerror=null;"
                                 >
                             @elseif($gallery->source === 'external' && $gallery->image_url)
                                 <img 
@@ -76,7 +77,7 @@
                             
                             @if($gallery->source === 'local' && $gallery->image_path)
                                 <div class="grid grid-cols-3 gap-2">
-                                    <dt class="text-sm font-medium text-gray-500">File Path</dt>
+                                    <dt class="text-sm font-medium text-gray-500">Image URL</dt>
                                     <dd class="text-sm text-gray-900 col-span-2 break-all">{{ $gallery->image_path }}</dd>
                                 </div>
                             @endif

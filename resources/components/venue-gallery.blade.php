@@ -8,10 +8,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 gallery-container" id="gallery-grid">
             @foreach($galleries as $gallery)
                 <div class="gallery-item rounded-lg overflow-hidden shadow-lg transition transform hover:scale-105 cursor-pointer" 
-                     data-src="{{ $gallery->source === 'local' ? asset('storage/' . $gallery->image_path) : $gallery->image_url }}">
+                     data-src="{{ $gallery->source === 'local' ? $gallery->image_path : $gallery->image_url }}">
                     <div class="aspect-w-16 aspect-h-12 bg-gray-200">
                         <img 
-                            src="{{ $gallery->source === 'local' ? asset('storage/' . $gallery->image_path) : $gallery->image_url }}" 
+                            src="{{ $gallery->source === 'local' ? $gallery->image_path : $gallery->image_url }}" 
                             alt="{{ $gallery->title }}" 
                             class="object-cover w-full h-full"
                             onerror="this.src='{{ asset('img/placeholder.jpg') }}'; this.onerror=null;"
@@ -148,12 +148,18 @@
         function updateLightbox() {
             const gallery = galleries[currentIndex];
             const imgSrc = gallery.source === 'local' 
-                ? '/storage/' + gallery.image_path 
+                ? gallery.image_path 
                 : gallery.image_url;
             
             lightboxImage.src = imgSrc;
             lightboxTitle.textContent = gallery.title;
             lightboxDescription.textContent = gallery.description || '';
+            
+            // Add error handling for images
+            lightboxImage.onerror = function() {
+                this.src = '{{ asset('img/placeholder.jpg') }}';
+                this.onerror = null;
+            };
             
             // Handle navigation button visibility
             if (galleries.length <= 1) {
