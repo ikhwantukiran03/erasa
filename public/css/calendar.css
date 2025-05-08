@@ -1,0 +1,72 @@
+.calendar-day {
+    border: 1px solid #eee;
+    min-height: 100px;
+    padding: 10px;
+    position: relative;
+}
+
+.calendar-day.outside-month {
+    background-color: #f9f9f9;
+    color: #aaa;
+}
+
+.calendar-day.today {
+    background-color: #FEFAE0;
+}
+
+.day-number {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.booking-status {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.session {
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.session.available {
+    background-color: #CCD5AE;
+    color: #333;
+}
+
+.session.booked {
+    background-color: #E9EDC9;
+    color: #333;
+    text-decoration: line-through;
+}
+
+.tooltip {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    width: 200px;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+}
+
+.calendar-day:hover .tooltip {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .tooltip {
+        left: 50%;
+        top: 100%;
+        transform: translateX(-50%);
+    }
+}
