@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Gallery;
 use App\Models\Venue;
-use App\Services\SupabaseStorageService;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -14,21 +14,21 @@ use Illuminate\Support\Facades\Log;
 class GalleryController extends Controller
 {
     /**
-     * The Supabase storage service instance.
+     * The Cloudinary storage service instance.
      *
-     * @var \App\Services\SupabaseStorageService
+     * @var \App\Services\CloudinaryService
      */
-    protected $supabaseStorage;
+    protected $cloudinaryService;
 
     /**
      * Create a new controller instance.
      *
-     * @param \App\Services\SupabaseStorageService $supabaseStorage
+     * @param \App\Services\CloudinaryService $cloudinaryService
      * @return void
      */
-    public function __construct(SupabaseStorageService $supabaseStorage)
+    public function __construct(CloudinaryService $cloudinaryService)
     {
-        $this->supabaseStorage = $supabaseStorage;
+        $this->cloudinaryService = $cloudinaryService;
     }
 
     /**
@@ -89,136 +89,129 @@ class GalleryController extends Controller
     }
 
     /**
- * Store newly created gallery items in storage.
- *
- * @param \Illuminate\Http\Request $request
- * @return \Illuminate\Http\RedirectResponse
- */
-public function store(Request $request)
-{
-    if (!auth()->user()->isAdmin()) {
-        return redirect()->route('dashboard')
-            ->with('error', 'You do not have permission to access this resource.');
-    }
+     * Store newly created gallery items in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function store(Request $request)
+    {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.');
+        }
 
-    // Validate basic fields first
-    $validator = Validator::make($request->all(), [
-        'venue_id' => ['required', 'exists:venues,id'],
-    ]);
+        // Validate basic fields first
+        $validator = Validator::make($request->all(), [
+            'venue_id' => ['required', 'exists:venues,id'],
+        ]);
 
-    if ($validator->fails()) {
-        return redirect()->back()
-            ->withErrors($validator)
-            ->withInput();
-    }
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
 
-    // Check if Supabase is properly configured
-    if (!$this->supabaseStorage->isConfigured()) {
-        return redirect()->back()
-            ->with('error', 'Storage service is not properly configured. Please contact the administrator.')
-            ->withInput();
-    }
+        $venue_id = $request->venue_id;
+        $source_type = $request->source_type ?? 'local'; // Default to local
+        $default_title = $request->default_title;
+        $default_description = $request->default_description;
+        $is_featured = $request->has('is_featured');
+        $display_order = $request->display_order ?? 0;
+        $count = 0;
 
-    $venue_id = $request->venue_id;
-    $source_type = $request->source_type ?? 'local'; // Default to local
-    $default_title = $request->default_title;
-    $default_description = $request->default_description;
-    $is_featured = $request->has('is_featured');
-    $display_order = $request->display_order ?? 0;
-    $count = 0;
-
-    // Process local uploads
-    if ($source_type === 'local' && $request->hasFile('images')) {
-        foreach ($request->file('images') as $index => $image) {
-            // Validate image
-            $validator = Validator::make(['image' => $image], [
-                'image' => ['required', 'image', 'max:5120'], // 5MB max
-            ]);
-
-            if ($validator->fails()) {
-                continue;
-            }
-
-            // Upload the image to Supabase
-            $path = $this->supabaseStorage->uploadFile($image, 'venues/gallery');
-            
-            if (!$path) {
-                Log::error('Failed to upload image to Supabase', [
-                    'venue_id' => $venue_id,
-                    'file_name' => $image->getClientOriginalName(),
-                    'file_size' => $image->getSize()
+        // Process local uploads
+        if ($source_type === 'local' && $request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                // Validate image
+                $validator = Validator::make(['image' => $image], [
+                    'image' => ['required', 'image', 'max:5120'], // 5MB max
                 ]);
-                continue; // Skip if upload failed
+
+                if ($validator->fails()) {
+                    continue;
+                }
+
+                // Upload the image to Cloudinary
+                $result = $this->cloudinaryService->uploadFile($image, 'venues/gallery');
+                
+                if (!$result) {
+                    Log::error('Failed to upload image to Cloudinary', [
+                        'venue_id' => $venue_id,
+                        'file_name' => $image->getClientOriginalName(),
+                        'file_size' => $image->getSize()
+                    ]);
+                    continue; // Skip if upload failed
+                }
+                
+                // Get title and description for this image
+                $title = $request->titles[$index] ?? $default_title ?? $image->getClientOriginalName();
+                $description = $request->descriptions[$index] ?? $default_description;
+                
+                // Mark first image as featured if requested
+                $is_image_featured = ($count === 0 && $is_featured) ? true : false;
+                
+                // Create gallery item
+                Gallery::create([
+                    'venue_id' => $venue_id,
+                    'title' => $title,
+                    'description' => $description,
+                    'image_path' => $result['url'], // Store the URL from Cloudinary
+                    'image_url' => null,
+                    'is_featured' => $is_image_featured,
+                    'display_order' => $display_order + $count,
+                    'source' => 'local',
+                ]);
+                
+                $count++;
             }
-            
-            // Get title and description for this image
-            $title = $request->titles[$index] ?? $default_title ?? $image->getClientOriginalName();
-            $description = $request->descriptions[$index] ?? $default_description;
-            
-            // Mark first image as featured if requested
-            $is_image_featured = ($count === 0 && $is_featured) ? true : false;
-            
-            // Create gallery item
-            Gallery::create([
-                'venue_id' => $venue_id,
-                'title' => $title,
-                'description' => $description,
-                'image_path' => $path,
-                'image_url' => null,
-                'is_featured' => $is_image_featured,
-                'display_order' => $display_order + $count,
-                'source' => 'local',
-            ]);
-            
-            $count++;
+        }
+        // Process external URLs
+        elseif ($source_type === 'external' && !empty($request->image_urls)) {
+            foreach ($request->image_urls as $index => $url) {
+                if (empty($url)) continue;
+                
+                // Validate URL
+                $validator = Validator::make(['url' => $url], [
+                    'url' => ['required', 'url'],
+                ]);
+
+                if ($validator->fails()) {
+                    continue;
+                }
+                
+                // Get title and description for this URL
+                $title = $request->url_titles[$index] ?? $default_title ?? 'Gallery Image';
+                $description = $request->url_descriptions[$index] ?? $default_description;
+                
+                // Mark first image as featured if requested
+                $is_image_featured = ($count === 0 && $is_featured) ? true : false;
+                
+                // Create gallery item
+                Gallery::create([
+                    'venue_id' => $venue_id,
+                    'title' => $title,
+                    'description' => $description,
+                    'image_path' => null,
+                    'image_url' => $url,
+                    'is_featured' => $is_image_featured,
+                    'display_order' => $display_order + $count,
+                    'source' => 'external',
+                ]);
+                
+                $count++;
+            }
+        }
+
+        if ($count > 0) {
+            return redirect()->route('admin.galleries.index')
+                ->with('success', $count . ' image(s) added successfully.');
+        } else {
+            return redirect()->back()
+                ->with('error', 'No images were uploaded. Please select at least one image or check the storage configuration.')
+                ->withInput();
         }
     }
-    // Process external URLs
-    elseif ($source_type === 'external' && !empty($request->image_urls)) {
-        foreach ($request->image_urls as $index => $url) {
-            if (empty($url)) continue;
-            
-            // Validate URL
-            $validator = Validator::make(['url' => $url], [
-                'url' => ['required', 'url'],
-            ]);
-
-            if ($validator->fails()) {
-                continue;
-            }
-            
-            // Get title and description for this URL
-            $title = $request->url_titles[$index] ?? $default_title ?? 'Gallery Image';
-            $description = $request->url_descriptions[$index] ?? $default_description;
-            
-            // Mark first image as featured if requested
-            $is_image_featured = ($count === 0 && $is_featured) ? true : false;
-            
-            // Create gallery item
-            Gallery::create([
-                'venue_id' => $venue_id,
-                'title' => $title,
-                'description' => $description,
-                'image_path' => null,
-                'image_url' => $url,
-                'is_featured' => $is_image_featured,
-                'display_order' => $display_order + $count,
-                'source' => 'external',
-            ]);
-            
-            $count++;
-        }
-    }
-
-    if ($count > 0) {
-        return redirect()->route('admin.galleries.index')
-            ->with('success', $count . ' image(s) added successfully.');
-    } else {
-        return redirect()->back()
-            ->with('error', 'No images were uploaded. Please select at least one image or check the storage configuration.')
-            ->withInput();
-    }
-}
 
     /**
      * Display the specified gallery item.
@@ -289,16 +282,20 @@ public function store(Request $request)
         // Handle file upload or source change
         if ($request->source === 'local') {
             if ($request->hasFile('image')) {
-                // Delete old image if it exists in Supabase
+                // Delete old image if it exists in Cloudinary
                 if ($gallery->image_path && $gallery->source === 'local') {
-                    $this->supabaseStorage->deleteFile($gallery->image_path);
+                    // Extract public_id from Cloudinary URL
+                    $public_id = $this->extractPublicIdFromUrl($gallery->image_path);
+                    if ($public_id) {
+                        $this->cloudinaryService->deleteFile($public_id);
+                    }
                 }
                 
-                // Upload new image to Supabase
-                $path = $this->supabaseStorage->uploadFile($request->file('image'), 'gallery');
+                // Upload new image to Cloudinary
+                $result = $this->cloudinaryService->uploadFile($request->file('image'), 'gallery');
                 
-                if ($path) {
-                    $data['image_path'] = $path;
+                if ($result) {
+                    $data['image_path'] = $result['url'];
                 }
             }
             
@@ -314,7 +311,11 @@ public function store(Request $request)
         } elseif ($request->source === 'external') {
             // If switching from local to external
             if ($gallery->source === 'local' && $gallery->image_path) {
-                $this->supabaseStorage->deleteFile($gallery->image_path);
+                // Extract public_id from Cloudinary URL
+                $public_id = $this->extractPublicIdFromUrl($gallery->image_path);
+                if ($public_id) {
+                    $this->cloudinaryService->deleteFile($public_id);
+                }
                 $data['image_path'] = null;
             }
         }
@@ -337,9 +338,13 @@ public function store(Request $request)
                 ->with('error', 'You do not have permission to access this resource.');
         }
         
-        // Delete the image file if it's a local image from Supabase
+        // Delete the image file if it's a local image from Cloudinary
         if ($gallery->source === 'local' && $gallery->image_path) {
-            $this->supabaseStorage->deleteFile($gallery->image_path);
+            // Extract public_id from Cloudinary URL
+            $public_id = $this->extractPublicIdFromUrl($gallery->image_path);
+            if ($public_id) {
+                $this->cloudinaryService->deleteFile($public_id);
+            }
         }
         
         $gallery->delete();
@@ -394,5 +399,21 @@ public function store(Request $request)
         ]);
 
         return redirect()->route('admin.galleries.index')->with('success', 'Gallery item updated successfully.');
+    }
+
+    /**
+     * Extract public_id from Cloudinary URL.
+     *
+     * @param string $url
+     * @return string|null
+     */
+    private function extractPublicIdFromUrl($url)
+    {
+        // Example Cloudinary URL: https://res.cloudinary.com/cloud_name/image/upload/v1234567890/folder/public_id.jpg
+        if (preg_match('/\/v\d+\/(.+)\.\w+$/', $url, $matches)) {
+            return $matches[1];
+        }
+        
+        return null;
     }
 }
