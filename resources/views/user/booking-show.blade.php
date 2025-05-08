@@ -271,29 +271,114 @@
                 </div>
                 
                 <!-- Action Buttons -->
-                <div class="mt-8 pt-6 border-t border-gray-200 flex flex-wrap justify-end gap-4">
-                    <a href="{{ route('booking-requests.create') }}" class="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90 transition">
-                        Create New Booking
-                    </a>
-                    
-                    @if($booking->status === 'waiting for deposit')
-                        <a href="{{ route('user.invoices.create', $booking) }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-opacity-90 transition flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Submit Payment Proof
-                        </a>
-                    @endif
-                    
-                    @if($booking->status === 'ongoing' && $booking->booking_date->isAfter(now()))
-                        <a href="https://wa.me/60123456789" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-opacity-90 transition flex items-center" target="_blank">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                            </svg>
-                            Request Changes via WhatsApp
-                        </a>
+                <!-- Add this section to the user booking-show.blade.php -->
+@if($booking->type === 'wedding' && in_array($booking->status, ['waiting for deposit', 'ongoing']))
+    <!-- Payment Information Section -->
+    <div class="md:col-span-2 border-t border-gray-200 pt-6 mt-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">Payment Information</h3>
+            <a href="{{ route('user.invoices.create', $booking) }}" class="bg-primary text-white px-4 py-2 rounded text-sm hover:bg-opacity-90 transition">
+                Submit Payment Proof
+            </a>
+        </div>
+        
+        @php
+            $totalAmount = 0;
+            $paidAmount = 0;
+            
+            // Calculate total amount
+            if ($booking->price_id) {
+                $price = \App\Models\Price::find($booking->price_id);
+                if ($price) {
+                    $totalAmount = $price->price;
+                }
+            } elseif ($booking->package) {
+                $totalAmount = $booking->package->min_price;
+            }
+            
+            // Calculate paid amount
+            $paidAmount = $booking->total_paid;
+            
+            // Calculate percentage
+            $percentage = $totalAmount > 0 ? ($paidAmount / $totalAmount) * 100 : 0;
+            
+            // Get invoices
+            $invoices = $booking->invoice()->get();
+        @endphp
+        
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm text-gray-600">Payment Progress</span>
+                <span class="text-sm font-medium">{{ number_format($percentage, 0) }}%</span>
+            </div>
+            
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                <div class="bg-primary h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
+            </div>
+            
+            <div class="flex justify-between text-sm mb-6">
+                <span class="text-gray-600">Paid: RM {{ number_format($paidAmount, 2) }}</span>
+                <span class="text-gray-600">Total: RM {{ number_format($totalAmount, 2) }}</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h4 class="text-md font-medium text-gray-800 mb-2">Payment History</h4>
+                    @if($invoices->count() > 0)
+                        <div class="space-y-2">
+                            @foreach($invoices as $invoice)
+                                <div class="flex justify-between items-center p-2 bg-white rounded border border-gray-200 text-sm">
+                                    <div>
+                                        <span class="font-medium">
+                                            @if($invoice->type === 'deposit')
+                                                Deposit
+                                            @elseif($invoice->type === 'payment_1')
+                                                First Installment
+                                            @elseif($invoice->type === 'payment_2')
+                                                Second Installment
+                                            @elseif($invoice->type === 'final_payment')
+                                                Final Payment
+                                            @else
+                                                {{ ucfirst(str_replace('_', ' ', $invoice->type)) }}
+                                            @endif
+                                        </span>
+                                        <span class="text-gray-500 ml-2">RM {{ number_format($invoice->amount, 2) }}</span>
+                                    </div>
+                                    @if($invoice->status === 'verified')
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            Verified
+                                        </span>
+                                    @elseif($invoice->status === 'pending')
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                            Pending
+                                        </span>
+                                    @else
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                            Rejected
+                                        </span>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-gray-500 text-sm">No payment records found.</p>
                     @endif
                 </div>
+                
+                <div>
+                    <h4 class="text-md font-medium text-gray-800 mb-2">Payment Details</h4>
+                    <div class="text-sm">
+                        <p><span class="font-medium">Bank Name:</span> Bank Negara Malaysia</p>
+                        <p><span class="font-medium">Account Name:</span> Enak Rasa Wedding Hall Sdn Bhd</p>
+                        <p><span class="font-medium">Account Number:</span> 1234-5678-9012</p>
+                        <p><span class="font-medium">Reference:</span> BOOKING-{{ $booking->id }}</p>
+                        <p class="mt-2 text-xs text-red-600">Please include your booking reference in the payment description</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endif
             </div>
         </div>
     </div>

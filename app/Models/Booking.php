@@ -86,6 +86,39 @@ class Booking extends Model
     }
 
     /**
+ * Get the total amount paid for this booking.
+ *
+ * @return float
+ */
+public function getTotalPaidAttribute()
+{
+    return $this->invoice()
+        ->where('status', 'verified')
+        ->sum('amount');
+}
+
+/**
+ * Check if all payments have been completed.
+ *
+ * @return bool
+ */
+public function isFullyPaid()
+{
+    $totalPrice = 0;
+    
+    if ($this->price_id) {
+        $price = \App\Models\Price::find($this->price_id);
+        if ($price) {
+            $totalPrice = $price->price;
+        }
+    } elseif ($this->package) {
+        $totalPrice = $this->package->min_price;
+    }
+    
+    return $this->getTotalPaidAttribute() >= $totalPrice;
+}
+
+    /**
      * Get the customization requests for the booking.
      */
     public function customizations()

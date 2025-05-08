@@ -189,6 +189,7 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
     Route::delete('/bookings/{booking}', [App\Http\Controllers\Staff\BookingController::class, 'destroy'])->name('bookings.destroy');
     Route::patch('/bookings/{booking}/cancel', [App\Http\Controllers\Staff\BookingController::class, 'cancel'])->name('bookings.cancel');
 
+    
     // Invoice verification routes
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{booking}', [InvoiceController::class, 'showVerificationForm'])->name('invoices.show');
@@ -215,6 +216,7 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
         return view('user.booking-show', compact('booking'));
     })->name('bookings.show');
 
+    // Invoice management
     Route::get('/bookings/{booking}/invoice', [InvoiceController::class, 'showSubmitForm'])->name('invoices.create');
     Route::post('/bookings/{booking}/invoice', [InvoiceController::class, 'submit'])->name('invoices.store');
 

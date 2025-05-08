@@ -60,6 +60,23 @@ return [
             'report' => false,
         ],
 
+        'cloudinary' => [
+    'driver'  => 'cloudinary',
+    'key'     => env('CLOUDINARY_KEY'),
+    'secret'  => env('CLOUDINARY_SECRET'),
+    'cloud'   => env('CLOUDINARY_CLOUD_NAME'),
+    'url'     => env('CLOUDINARY_URL'),
+    'secure'  => (bool) env('CLOUDINARY_SECURE', true),
+    'prefix'  => env('CLOUDINARY_PREFIX'),
+
+    'supabase' => [
+        'url' => env('SUPABASE_URL'),
+        'key' => env('SUPABASE_KEY'),
+        'bucket' => env('SUPABASE_BUCKET'),
+    ],
+],
+
+
     ],
 
     /*
