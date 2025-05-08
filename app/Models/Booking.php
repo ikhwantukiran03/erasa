@@ -18,7 +18,7 @@ class Booking extends Model
         'user_id',
         'venue_id',
         'package_id',
-        'price_id', // Add price_id to fillable
+        'price_id',
         'booking_date',
         'session',
         'type',
@@ -78,45 +78,46 @@ class Booking extends Model
     }
 
     /**
-     * Get the invoice associated with the booking.
+     * Get the invoices associated with the booking.
      */
     public function invoice()
     {
-        return $this->hasOne(Invoice::class);
+        return $this->hasMany(Invoice::class);
     }
 
     /**
- * Get the total amount paid for this booking.
- *
- * @return float
- */
-public function getTotalPaidAttribute()
-{
-    return $this->invoice()
-        ->where('status', 'verified')
-        ->sum('amount');
-}
-
-/**
- * Check if all payments have been completed.
- *
- * @return bool
- */
-public function isFullyPaid()
-{
-    $totalPrice = 0;
-    
-    if ($this->price_id) {
-        $price = \App\Models\Price::find($this->price_id);
-        if ($price) {
-            $totalPrice = $price->price;
-        }
-    } elseif ($this->package) {
-        $totalPrice = $this->package->min_price;
+     * Get the total amount paid for this booking.
+     *
+     * @return float
+     */
+    public function getTotalPaidAttribute()
+    {
+        // This is the corrected method that will work with your database structure
+        return $this->invoice()
+            ->where('status', 'verified')
+            ->sum('amount') ?? 0;
     }
-    
-    return $this->getTotalPaidAttribute() >= $totalPrice;
-}
+
+    /**
+     * Check if all payments have been completed.
+     *
+     * @return bool
+     */
+    public function isFullyPaid()
+    {
+        $totalPrice = 0;
+        
+        if ($this->price_id) {
+            $price = Price::find($this->price_id);
+            if ($price) {
+                $totalPrice = $price->price;
+            }
+        } elseif ($this->package) {
+            $totalPrice = $this->package->min_price;
+        }
+        
+        return $this->getTotalPaidAttribute() >= $totalPrice;
+    }
 
     /**
      * Get the customization requests for the booking.
