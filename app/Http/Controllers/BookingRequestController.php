@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BookingRequest;
 use App\Models\Package;
 use App\Models\Venue;
+use App\Models\Price;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;

@@ -1,273 +1,562 @@
-
-</style>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Enak Rasa Wedding Hall - Memorable Celebrations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#D4A373',
+                        secondary: '#FAEDCD',
+                        dark: '#333333',
+                        light: '#FEFAE0',
+                        accent: '#CCD5AE',
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        display: ['Playfair Display', 'serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #333333;
+            background-color: #FFFDF7;
+        }
+        
+        /* Custom Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        /* Hero Image with Overlay */
+        .hero-bg {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+                url('https://scontent.fkul8-3.fna.fbcdn.net/v/t39.30808-6/476350610_468705386313427_3344429432169983636_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeHm8_RZ-ThOy3uAa7CEoebdOUMqw389l1g5QyrDfz2XWAvhKAwGhW1Jrq9DIOOaCOBjYxJTyVu4KPgeff7p2in0&_nc_ohc=p1C2qEJKv90Q7kNvgHiVKXW&_nc_oc=AdnU4cq_1P4w5s95ePs7mDurBnYuO6gDg3UOUnBfvup7o4VhYa9cKSDQzNYnEAyNmgM&_nc_zt=23&_nc_ht=scontent.fkul8-3.fna&_nc_gid=WD9DVxSPjdf0w98eszH7mw&oh=00_AYFSbqzZ13OeyohJeiP--nLCirIE5kHhESjMzm5lgJy40A&oe=67E0271D');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        /* Responsive adjustments for mobile */
+        @media (max-width: 768px) {
+            .hero-bg {
+                background-attachment: scroll;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
-    <header id="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">Enak Rasa</div>
-                <nav class="nav-links">
-                    <a href="#home">Home</a>
-                    <a href="#about">About</a>
-                    <a href="#gallery">Gallery</a>
-                    <a href="{{ route('booking.calendar') }}" class="text-dark hover:text-primary transition">Calendar</a>
-                    <a href="{{ route('public.venues') }}">Packages</a>
-                    <a href="booking" class="cta-btn">Book Now</a>
+    <header class="fixed w-full z-50 transition-all duration-300" id="header">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <a href="/" class="flex items-center">
+                    <span class="text-2xl font-display font-bold text-primary transition-colors duration-300">Enak Rasa</span>
+                </a>
+                
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Home</a>
+                    <a href="#about" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">About</a>
+                    <a href="#services" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Services</a>
+                    <a href="#gallery" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Gallery</a>
+                    <a href="{{ route('booking.calendar') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Calendar</a>
+                    <a href="{{ route('public.venues') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Packages</a>
                     
+                    @guest
+                        <div class="flex items-center space-x-3 ml-2">
+                            <a href="{{ route('login') }}" class="text-white hover:text-primary transition-colors duration-300 font-medium text-sm">Login</a>
+                            <a href="{{ route('register') }}" class="bg-primary hover:bg-opacity-90 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 hover:shadow-lg">Register</a>
+                        </div>
+                    @else
+                        <div class="relative group ml-2">
+                            <button class="flex items-center text-white hover:text-primary transition-colors duration-300 bg-opacity-20 bg-white px-4 py-2 rounded-full">
+                                <span class="text-sm font-medium">{{ Auth::user()->name }}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5 transition-transform duration-300 group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 invisible opacity-0 transform translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-in-out">
+                                <a href="{{ route('dashboard') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary">Dashboard</a>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                        Logout
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endguest
                 </nav>
-                <button class="mobile-menu-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-white p-2 focus:outline-none rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors" id="mobile-menu-button" aria-label="Toggle menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
             </div>
         </div>
+        
+        <!-- Mobile Menu (Hidden by default) -->
+        <div class="md:hidden hidden bg-white rounded-lg shadow-xl mt-2 mx-4 overflow-hidden transition-all duration-300 transform origin-top scale-95 opacity-0" id="mobile-menu">
+            <nav class="flex flex-col divide-y divide-gray-100">
+                <a href="#home" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Home</a>
+                <a href="#about" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">About</a>
+                <a href="#services" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Services</a>
+                <a href="#gallery" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Gallery</a>
+                <a href="{{ route('booking.calendar') }}" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Calendar</a>
+                <a href="{{ route('public.venues') }}" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Packages</a>
+                
+                @guest
+                    <div class="flex flex-col space-y-2 p-4">
+                        <a href="{{ route('login') }}" class="text-dark hover:text-primary transition-colors py-2 font-medium text-center border border-gray-200 rounded-lg">Login</a>
+                        <a href="{{ route('register') }}" class="bg-primary text-white py-2.5 rounded-lg text-center transition-colors font-medium">Register</a>
+                    </div>
+                @else
+                    <a href="{{ route('dashboard') }}" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Dashboard</a>
+                    <form method="POST" action="{{ route('logout') }}" class="px-4 py-3">
+                        @csrf
+                        <button type="submit" class="w-full text-left text-dark hover:text-primary font-medium">
+                            Logout
+                        </button>
+                    </form>
+                @endguest
+            </nav>
+        </div>
     </header>
 
-<!-- Hero Section -->
-<section class="hero" id="home">
-    <div class="container">
-        <div class="hero-content" data-aos="fade-up" data-aos-duration="1000">
-            <h1>Create Unforgettable Wedding Memories</h1>
-            <p>Enak Rasa Wedding Hall offers an elegant setting for your perfect day. Our dedicated team will transform your dreams into a celebration to remember.</p>
-            <div class="mt-6 flex flex-wrap gap-4 justify-center">
-            <a href="{{ route('booking-requests.create') }}" class="cta-btn">Book Your Date</a>
-                
-                    <a href="{{ route('login') }}" class="cta-btn bg-transparent border-white text-white hover:bg-white hover:text-primary">Login</a>
-                    <a href="{{ route('register') }}" class="cta-btn bg-white text-primary border-white hover:bg-transparent hover:text-white">Register</a>
-                
+    <!-- Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center justify-center text-white" id="home">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center" data-aos="fade-up" data-aos-duration="1000">
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-6 leading-tight">Create Unforgettable Wedding Memories</h1>
+                <p class="text-lg md:text-xl mb-8 mx-auto max-w-2xl">Enak Rasa Wedding Hall offers an elegant setting for your perfect day. Our dedicated team will transform your dreams into a celebration to remember.</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="{{ route('booking-requests.create') }}" class="bg-primary hover:bg-opacity-90 text-white px-6 py-3 rounded-full font-medium transition-colors duration-300">Book Your Date</a>
+                    
+                    @guest
+                        <a href="{{ route('login') }}" class="bg-transparent border-2 border-white hover:bg-white hover:text-primary text-white px-6 py-3 rounded-full font-medium transition-colors duration-300">Login</a>
+                        <a href="{{ route('register') }}" class="bg-white hover:bg-gray-100 text-primary px-6 py-3 rounded-full font-medium transition-colors duration-300">Register</a>
+                    @endguest
+                </div>
             </div>
         </div>
-    </div>
-</section>
+        
+        <!-- Scroll Down Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <a href="#about" class="text-white flex flex-col items-center">
+                <span class="text-sm mb-2">Scroll Down</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+            </a>
+        </div>
+    </section>
 
     <!-- About Section -->
-    <section class="about" id="about">
-        <div class="container">
-            <div class="section-title" data-aos="fade-up">
-                <h2>About Our Venue</h2>
+    <section class="py-20 bg-white" id="about">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-dark mb-4">About Our Venue</h2>
+                <div class="w-24 h-1 bg-primary mx-auto"></div>
             </div>
-            <div class="about-content">
-                <div class="about-image" data-aos="fade-right" data-aos-duration="1000">
-                    <img src="https://scontent.fkul8-2.fna.fbcdn.net/v/t39.30808-6/477277295_471515166032449_6589999265876936820_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEyi4LM_FIQ3jxeHJwFDPuuEpMpTz5j_DUSkylPPmP8NR88oAt4ljhfJ4s_-gFpPI3pJXDP1K8ZcX6jMgyjVp9f&_nc_ohc=X7j4VqL4lMcQ7kNvgFoNnjd&_nc_oc=AdlPIDpWZiK9mwye0jzGX9Mn_7ojN5H9k-CDY-jSjHWe0DlTL7holE0Jblt5PMyjlvQ&_nc_zt=23&_nc_ht=scontent.fkul8-2.fna&_nc_gid=e0FVTbDIhDREkjNUPq9kjQ&oh=00_AYEydLSibMtvCh4hjO4rg0Dy9JiZ60TpedBmssY4VDkbdg&oe=67E03D76" alt="Enak Rasa Wedding Hall">
+            
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2" data-aos="fade-right" data-aos-duration="1000">
+                    <div class="rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300">
+                        <img src="https://scontent.fkul8-2.fna.fbcdn.net/v/t39.30808-6/477277295_471515166032449_6589999265876936820_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEyi4LM_FIQ3jxeHJwFDPuuEpMpTz5j_DUSkylPPmP8NR88oAt4ljhfJ4s_-gFpPI3pJXDP1K8ZcX6jMgyjVp9f&_nc_ohc=X7j4VqL4lMcQ7kNvgFoNnjd&_nc_oc=AdlPIDpWZiK9mwye0jzGX9Mn_7ojN5H9k-CDY-jSjHWe0DlTL7holE0Jblt5PMyjlvQ&_nc_zt=23&_nc_ht=scontent.fkul8-2.fna&_nc_gid=e0FVTbDIhDREkjNUPq9kjQ&oh=00_AYEydLSibMtvCh4hjO4rg0Dy9JiZ60TpedBmssY4VDkbdg&oe=67E03D76" 
+                             alt="Enak Rasa Wedding Hall" 
+                             class="w-full h-auto object-cover">
+                    </div>
                 </div>
-                <div class="about-text" data-aos="fade-left" data-aos-duration="1000">
-                    <h3>The Perfect Setting for Your Special Day</h3>
-                    <p>Enak Rasa Wedding Hall is a premier wedding venue located in the heart of the city. With our exquisite architecture, stunning gardens, and versatile spaces, we provide the perfect backdrop for your celebration.</p>
-                    <p>Our experienced team of event planners, chefs, and service staff work tirelessly to ensure that your wedding day exceeds all expectations. From intimate ceremonies to grand receptions, we can accommodate events of all sizes with our customizable packages.</p>
-                    <p>At Enak Rasa, we believe that your wedding day should be as unique as your love story. Let us help you create the wedding of your dreams.</p>
+                
+                <div class="lg:w-1/2" data-aos="fade-left" data-aos-duration="1000">
+                    <h3 class="text-2xl md:text-3xl font-display font-semibold text-primary mb-6">The Perfect Setting for Your Special Day</h3>
+                    <div class="space-y-4 text-gray-700">
+                        <p class="leading-relaxed">Enak Rasa Wedding Hall is a premier wedding venue located in the heart of the city. With our exquisite architecture, stunning gardens, and versatile spaces, we provide the perfect backdrop for your celebration.</p>
+                        <p class="leading-relaxed">Our experienced team of event planners, chefs, and service staff work tirelessly to ensure that your wedding day exceeds all expectations. From intimate ceremonies to grand receptions, we can accommodate events of all sizes with our customizable packages.</p>
+                        <p class="leading-relaxed">At Enak Rasa, we believe that your wedding day should be as unique as your love story. Let us help you create the wedding of your dreams.</p>
+                    </div>
+                    <div class="mt-6">
+                        <a href="#gallery" class="inline-flex items-center text-primary font-medium hover:underline">
+                            Explore our gallery
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features">
-        <div class="container">
-            <div class="section-title" data-aos="fade-up">
-                <h2>Our Services</h2>
+    <!-- Services Section -->
+    <section class="py-20 bg-light" id="services">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-dark mb-4">Our Services</h2>
+                <div class="w-24 h-1 bg-primary mx-auto"></div>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Experience excellence with our comprehensive wedding services designed to make your special day truly memorable.</p>
             </div>
-            <div class="features-grid">
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
-                    <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="32" height="32">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z" />
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Service Card 1 -->
+                <div class="bg-white rounded-lg shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z" />
                         </svg>
                     </div>
-                    <h3>Exquisite Catering</h3>
-                    <p>Our culinary team creates delicious, customized menus featuring both traditional and international cuisines to delight your guests.</p>
+                    <h3 class="text-xl font-display font-semibold text-center mb-3">Exquisite Catering</h3>
+                    <p class="text-gray-600 text-center">Our culinary team creates delicious, customized menus featuring both traditional and international cuisines to delight your guests.</p>
                 </div>
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="32" height="32">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                
+                <!-- Service Card 2 -->
+                <div class="bg-white rounded-lg shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                     </div>
-                    <h3>Versatile Venues</h3>
-                    <p>Choose from our elegant ballroom, intimate garden setting, or stunning rooftop terrace for your ceremony and reception.</p>
+                    <h3 class="text-xl font-display font-semibold text-center mb-3">Versatile Venues</h3>
+                    <p class="text-gray-600 text-center">Choose from our elegant ballroom, intimate garden setting, or stunning rooftop terrace for your ceremony and reception.</p>
                 </div>
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
-                    <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="32" height="32">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                
+                <!-- Service Card 3 -->
+                <div class="bg-white rounded-lg shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
                     </div>
-                    <h3>Customizable Packages</h3>
-                    <p>We offer flexible wedding packages that can be tailored to match your vision, style, and budget requirements.</p>
+                    <h3 class="text-xl font-display font-semibold text-center mb-3">Customizable Packages</h3>
+                    <p class="text-gray-600 text-center">We offer flexible wedding packages that can be tailored to match your vision, style, and budget requirements.</p>
                 </div>
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
-                    <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="32" height="32">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                
+                <!-- Service Card 4 -->
+                <div class="bg-white rounded-lg shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="400">
+                    <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <h3>Event Planning</h3>
-                    <p>Our experienced event planners will guide you through every step of the planning process to ensure a flawless event.</p>
+                    <h3 class="text-xl font-display font-semibold text-center mb-3">Event Planning</h3>
+                    <p class="text-gray-600 text-center">Our experienced event planners will guide you through every step of the planning process to ensure a flawless event.</p>
                 </div>
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
-                    <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="32" height="32">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                
+                <!-- Service Card 5 -->
+                <div class="bg-white rounded-lg shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="500">
+                    <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                         </svg>
                     </div>
-                    <h3>Decoration Services</h3>
-                    <p>From elegant floral arrangements to custom lighting designs, we'll transform our venue to match your wedding theme.</p>
+                    <h3 class="text-xl font-display font-semibold text-center mb-3">Decoration Services</h3>
+                    <p class="text-gray-600 text-center">From elegant floral arrangements to custom lighting designs, we'll transform our venue to match your wedding theme.</p>
                 </div>
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="600">
-                    <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="32" height="32">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                
+                <!-- Service Card 6 -->
+                <div class="bg-white rounded-lg shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="600">
+                    <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                     </div>
-                    <h3>Photography & Videography</h3>
-                    <p>We partner with top photographers and videographers to capture every beautiful moment of your special day.</p>
+                    <h3 class="text-xl font-display font-semibold text-center mb-3">Photography & Videography</h3>
+                    <p class="text-gray-600 text-center">We partner with top photographers and videographers to capture every beautiful moment of your special day.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Gallery Section -->
-    <section class="gallery" id="gallery">
-        <div class="container">
-            <div class="section-title" data-aos="fade-up">
-                <h2>Our Wedding Gallery</h2>
+    <section class="py-20 bg-white" id="gallery">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-dark mb-4">Our Wedding Gallery</h2>
+                <div class="w-24 h-1 bg-primary mx-auto"></div>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Browse through our gallery showcasing beautiful weddings hosted at our venues.</p>
             </div>
-            <div class="gallery-container">
-                <div class="gallery-item wide" data-aos="fade-up" data-aos-delay="100">
-                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2669&auto=format&fit=crop" alt="Wedding Reception">
-                    <div class="gallery-overlay">
-                        <div class="gallery-overlay-content">
-                            <h3>Elegant Receptions</h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Gallery Item 1 (Wide on larger screens) -->
+                <div class="sm:col-span-2 lg:col-span-2 overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="100">
+                    <div class="relative h-80 w-full">
+                        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2669&auto=format&fit=crop" 
+                             alt="Wedding Reception" 
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="text-white text-center p-4">
+                                <h3 class="text-xl font-display font-semibold">Elegant Receptions</h3>
+                                <p class="text-sm mt-2">Spacious and beautifully decorated reception venues</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="gallery-item" data-aos="fade-up" data-aos-delay="200">
-                    <img src="https://images.unsplash.com/photo-1507504031003-b417219a0fde?q=80&w=2670&auto=format&fit=crop" alt="Wedding Ceremony">
-                    <div class="gallery-overlay">
-                        <div class="gallery-overlay-content">
-                            <h3>Beautiful Ceremonies</h3>
+                
+                <!-- Gallery Item 2 -->
+                <div class="overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="200">
+                    <div class="relative h-80 w-full">
+                        <img src="https://images.unsplash.com/photo-1507504031003-b417219a0fde?q=80&w=2670&auto=format&fit=crop" 
+                             alt="Wedding Ceremony" 
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="text-white text-center p-4">
+                                <h3 class="text-xl font-display font-semibold">Beautiful Ceremonies</h3>
+                                <p class="text-sm mt-2">Intimate and romantic ceremony settings</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="gallery-item tall" data-aos="fade-up" data-aos-delay="300">
-                    <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2728&auto=format&fit=crop" alt="Wedding Dinner">
-                    <div class="gallery-overlay">
-                        <div class="gallery-overlay-content">
-                            <h3>Exquisite Dining</h3>
+                
+                <!-- Gallery Item 3 (Tall on larger screens) -->
+                <div class="row-span-2 overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="300">
+                    <div class="relative h-80 lg:h-full w-full">
+                        <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2728&auto=format&fit=crop" 
+                             alt="Wedding Dinner" 
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="text-white text-center p-4">
+                                <h3 class="text-xl font-display font-semibold">Exquisite Dining</h3>
+                                <p class="text-sm mt-2">Delicious catering for your special occasion</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="gallery-item" data-aos="fade-up" data-aos-delay="400">
-                    <img src="https://images.unsplash.com/photo-1506836467174-27f1042aa48c?q=80&w=2787&auto=format&fit=crop" alt="Wedding Decorations">
-                    <div class="gallery-overlay">
-                        <div class="gallery-overlay-content">
-                            <h3>Stunning Decorations</h3>
+                
+                <!-- Gallery Item 4 -->
+                <div class="overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="400">
+                    <div class="relative h-80 w-full">
+                        <img src="https://images.unsplash.com/photo-1506836467174-27f1042aa48c?q=80&w=2787&auto=format&fit=crop" 
+                             alt="Wedding Decorations" 
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="text-white text-center p-4">
+                                <h3 class="text-xl font-display font-semibold">Stunning Decorations</h3>
+                                <p class="text-sm mt-2">Beautiful floral and decor arrangements</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="gallery-item" data-aos="fade-up" data-aos-delay="500">
-                    <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=2670&auto=format&fit=crop" alt="Wedding Hall">
-                    <div class="gallery-overlay">
-                        <div class="gallery-overlay-content">
-                            <h3>Spacious Venues</h3>
+                
+                <!-- Gallery Item 5 -->
+                <div class="overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="500">
+                    <div class="relative h-80 w-full">
+                        <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=2670&auto=format&fit=crop" 
+                             alt="Wedding Hall" 
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="text-white text-center p-4">
+                                <h3 class="text-xl font-display font-semibold">Spacious Venues</h3>
+                                <p class="text-sm mt-2">Versatile spaces for events of all sizes</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="gallery-item" data-aos="fade-up" data-aos-delay="600">
-                    <img src="https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=2670&auto=format&fit=crop" alt="Wedding Cake">
-                    <div class="gallery-overlay">
-                        <div class="gallery-overlay-content">
-                            <h3>Delicious Catering</h3>
-                        </div>
-                    </div>
-                </div>
+            </div>
+            
+            <div class="text-center mt-10">
+                <a href="#" class="inline-flex items-center bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-opacity-90 transition-colors duration-300">
+                    <span>View Full Gallery</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Testimonials Section -->
-    <section class="testimonials">
-        <div class="container">
-            <div class="section-title" data-aos="fade-up">
-                <h2>Happy Couples</h2>
+    <section class="py-20 bg-secondary" id="testimonials">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-dark mb-4">Happy Couples</h2>
+                <div class="w-24 h-1 bg-primary mx-auto"></div>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Read what our couples have to say about their experience with us.</p>
             </div>
-            <div class="testimonial-slider" data-aos="fade-up" data-aos-delay="200">
-                <div class="testimonial-item">
-                    <div class="testimonial-text">
-                        "Our wedding day at Enak Rasa was absolutely perfect! The venue was stunning, the food was incredible, and the staff made sure everything ran smoothly. We couldn't have asked for a better experience. Our guests are still talking about how beautiful everything was!"
+            
+            <div class="max-w-4xl mx-auto" data-aos="fade-up" data-aos-delay="200">
+                <div class="bg-white rounded-lg shadow-lg p-8 md:p-10 relative">
+                    <!-- Decorative Quotes -->
+                    <div class="absolute top-6 left-6 opacity-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                        </svg>
                     </div>
-                    <div class="testimonial-author">
-                        <div class="author-image">
-                            <img src="https://images.unsplash.com/photo-1520423465871-0866049020b7?q=80&w=2787&auto=format&fit=crop" alt="Sarah & Michael">
+                    
+                    <div class="text-center">
+                        <p class="text-lg md:text-xl text-gray-700 mb-8 leading-relaxed">
+                            "Our wedding day at Enak Rasa was absolutely perfect! The venue was stunning, the food was incredible, and the staff made sure everything ran smoothly. We couldn't have asked for a better experience. Our guests are still talking about how beautiful everything was!"
+                        </p>
+                        
+                        <div class="flex flex-col items-center">
+                            <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-primary mb-4">
+                                <img src="https://images.unsplash.com/photo-1520423465871-0866049020b7?q=80&w=2787&auto=format&fit=crop" 
+                                     alt="Sarah & Michael" 
+                                     class="w-full h-full object-cover">
+                            </div>
+                            <div class="font-display font-semibold text-lg text-gray-800">Sarah & Michael</div>
+                            <div class="text-primary text-sm">June 12, 2024</div>
                         </div>
-                        <div class="author-name">Sarah & Michael</div>
-                        <div class="wedding-date">June 12, 2024</div>
                     </div>
+                </div>
+                
+                <!-- Testimonial Navigation Dots (for when you have multiple testimonials) -->
+                <div class="flex justify-center mt-8 space-x-2">
+                    <button class="w-3 h-3 rounded-full bg-primary"></button>
+                    <button class="w-3 h-3 rounded-full bg-gray-300"></button>
+                    <button class="w-3 h-3 rounded-full bg-gray-300"></button>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Booking CTA Section -->
-    <section class="booking" id="booking">
-        <div class="container">
-            <div class="section-title" data-aos="fade-up">
-                <h2>Book Your Special Day</h2>
+    <section class="py-20 bg-cover bg-center bg-no-repeat text-white" id="booking" 
+             style="background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?q=80&w=2670&auto=format&fit=crop');">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-display font-bold mb-6">Book Your Special Day</h2>
+                <p class="text-lg mb-8">Ready to start planning your dream wedding? Check availability for your preferred date and learn more about our customizable wedding packages.</p>
+                
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="{{ route('booking-requests.create') }}" class="bg-primary hover:bg-opacity-90 text-white px-8 py-4 rounded-full font-medium transition-colors duration-300 flex items-center justify-center">
+                        <span>Book Now</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </a>
+                    <a href="{{ route('booking.calendar') }}" class="bg-transparent border-2 border-white hover:bg-white hover:text-primary text-white px-8 py-4 rounded-full font-medium transition-colors duration-300 flex items-center justify-center">
+                        <span>View Calendar</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                </div>
             </div>
-            <p data-aos="fade-up" data-aos-delay="100">
-                Ready to start planning your dream wedding? Check availability for your preferred date and learn more about our customizable wedding packages.
-            </p>
-            <a href="{{ route('booking-requests.create') }}" class="cta-btn" data-aos="fade-up" data-aos-delay="200">Book Now</a>
         </div>
     </section>
 
-
-
-</section>
-
-
     <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>Enak Rasa</h3>
-                    <p>Making your wedding dreams come true with our exquisite venue, exceptional catering, and dedicated service.</p>
+    <footer class="bg-dark text-white pt-16 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <!-- Company Info -->
+                <div>
+                    <h3 class="text-xl font-display font-semibold mb-6 relative pb-3">
+                        <span class="text-primary">Enak Rasa</span>
+                        <span class="absolute bottom-0 left-0 h-1 w-12 bg-primary"></span>
+                    </h3>
+                    <p class="text-gray-400 mb-6 leading-relaxed">Making your wedding dreams come true with our exquisite venue, exceptional catering, and dedicated service.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-white hover:text-primary transition-colors">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-white hover:text-primary transition-colors">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-white hover:text-primary transition-colors">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+                            </svg>
+                        </a>
+                    </div>
                 </div>
-                <div class="footer-column">
-                    <h3>Quick Links</h3>
-                    <ul class="footer-links">
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#gallery">Gallery</a></li>
-                        <li><a href="#pricing">Packages</a></li>
-
+                
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-xl font-display font-semibold mb-6 relative pb-3">
+                        <span>Quick Links</span>
+                        <span class="absolute bottom-0 left-0 h-1 w-12 bg-primary"></span>
+                    </h3>
+                    <ul class="space-y-3">
+                        <li><a href="#home" class="text-gray-400 hover:text-primary transition-colors">Home</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-primary transition-colors">About</a></li>
+                        <li><a href="#gallery" class="text-gray-400 hover:text-primary transition-colors">Gallery</a></li>
+                        <li><a href="{{ route('public.venues') }}" class="text-gray-400 hover:text-primary transition-colors">Packages</a></li>
+                        <li><a href="{{ route('booking.calendar') }}" class="text-gray-400 hover:text-primary transition-colors">Calendar</a></li>
                     </ul>
                 </div>
-                <div class="footer-column">
-                    <h3>Services</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Wedding Venue</a></li>
-                        <li><a href="#">Catering</a></li>
-                        <li><a href="#">Event Planning</a></li>
-                        <li><a href="#">Decoration</a></li>
-                        <li><a href="#">Photography</a></li>
+                
+                <!-- Services -->
+                <div>
+                    <h3 class="text-xl font-display font-semibold mb-6 relative pb-3">
+                        <span>Services</span>
+                        <span class="absolute bottom-0 left-0 h-1 w-12 bg-primary"></span>
+                    </h3>
+                    <ul class="space-y-3">
+                        <li><a href="#services" class="text-gray-400 hover:text-primary transition-colors">Wedding Venue</a></li>
+                        <li><a href="#services" class="text-gray-400 hover:text-primary transition-colors">Catering</a></li>
+                        <li><a href="#services" class="text-gray-400 hover:text-primary transition-colors">Event Planning</a></li>
+                        <li><a href="#services" class="text-gray-400 hover:text-primary transition-colors">Decoration</a></li>
+                        <li><a href="#services" class="text-gray-400 hover:text-primary transition-colors">Photography</a></li>
                     </ul>
                 </div>
-                <div class="footer-column">
-                    <h3>Operating Hours</h3>
-                    <ul class="footer-links">
-                        <li>Monday - Friday: 9AM - 6PM</li>
-                        <li>Saturday: 9AM - 4PM</li>
-                        <li>Sunday: By Appointment</li>
+                
+                <!-- Operating Hours -->
+                <div>
+                    <h3 class="text-xl font-display font-semibold mb-6 relative pb-3">
+                        <span>Operating Hours</span>
+                        <span class="absolute bottom-0 left-0 h-1 w-12 bg-primary"></span>
+                    </h3>
+                    <ul class="space-y-3 text-gray-400">
+                        <li class="flex items-center">
+                            <svg class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Monday - Friday: 9AM - 6PM
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Saturday: 9AM - 4PM
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Sunday: By Appointment
+                        </li>
+                        <li class="mt-6 flex items-center">
+                            <svg class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            <a href="tel:+60123456789" class="hover:text-primary transition-colors">+60 12-345 6789</a>
+                        </li>
                     </ul>
                 </div>
             </div>
-            <div class="copyright">
-                &copy; {{ date('Y') }} Enak Rasa Wedding Hall. All Rights Reserved.
+            
+            <div class="border-t border-gray-800 pt-8 text-center text-gray-400">
+                <p>&copy; {{ date('Y') }} Enak Rasa Wedding Hall. All Rights Reserved.</p>
             </div>
         </div>
     </footer>
@@ -275,24 +564,88 @@
     <script>
         // Initialize AOS (Animate on Scroll)
         document.addEventListener('DOMContentLoaded', function() {
-            AOS.init();
+            AOS.init({
+                duration: 800,
+                easing: 'ease-out',
+                once: true,
+                offset: 50,
+            });
             
             // Header Scroll Effect
             const header = document.getElementById('header');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
             window.addEventListener('scroll', function() {
                 if (window.scrollY > 100) {
-                    header.classList.add('scrolled');
+                    header.classList.add('bg-white', 'shadow-md');
+                    header.classList.remove('bg-transparent');
+                    
+                    // Change nav link colors after scroll
+                    const navLinks = header.querySelectorAll('nav a:not(.bg-primary)');
+                    navLinks.forEach(link => {
+                        if (link.parentElement.tagName !== 'DIV' || !link.parentElement.classList.contains('bg-white')) {
+                            link.classList.remove('text-white');
+                            link.classList.add('text-dark');
+                        }
+                    });
+                    
+                    // Change dropdown button text color
+                    const dropdownButtons = header.querySelectorAll('button:not(#mobile-menu-button)');
+                    dropdownButtons.forEach(button => {
+                        button.classList.remove('text-white');
+                        button.classList.add('text-dark');
+                    });
                 } else {
-                    header.classList.remove('scrolled');
+                    header.classList.remove('bg-white', 'shadow-md');
+                    header.classList.add('bg-transparent');
+                    
+                    // Restore nav link colors
+                    const desktopNavLinks = header.querySelector('.md\\:flex').querySelectorAll('a:not(.bg-primary):not([href="#"])');
+                    desktopNavLinks.forEach(link => {
+                        if (link.parentElement.tagName !== 'DIV' || !link.parentElement.classList.contains('bg-white')) {
+                            link.classList.remove('text-dark');
+                            link.classList.add('text-white');
+                        }
+                    });
+                    
+                    // Restore dropdown button text color
+                    const dropdownButtons = header.querySelectorAll('button:not(#mobile-menu-button)');
+                    dropdownButtons.forEach(button => {
+                        button.classList.remove('text-dark');
+                        button.classList.add('text-white');
+                    });
                 }
             });
             
             // Mobile Menu Toggle
-            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-            const navLinks = document.querySelector('.nav-links');
+            const mobileMenuBtn = document.getElementById('mobile-menu-button');
             
             mobileMenuBtn.addEventListener('click', function() {
-                navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+                if (mobileMenu.classList.contains('hidden')) {
+                    // Open menu
+                    mobileMenu.classList.remove('hidden', 'scale-95', 'opacity-0');
+                    mobileMenu.classList.add('scale-100', 'opacity-100');
+                    setTimeout(() => {
+                        mobileMenu.classList.remove('scale-100');
+                    }, 300);
+                } else {
+                    // Close menu
+                    mobileMenu.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => {
+                        mobileMenu.classList.add('hidden');
+                    }, 300);
+                }
+            });
+            
+            // Close mobile menu when clicking a menu item
+            const mobileMenuItems = mobileMenu.querySelectorAll('a[href^="#"]');
+            mobileMenuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    mobileMenu.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => {
+                        mobileMenu.classList.add('hidden');
+                    }, 300);
+                });
             });
             
             // Smooth Scrolling for Anchor Links
@@ -308,744 +661,10 @@
                             top: targetElement.offsetTop - 80,
                             behavior: 'smooth'
                         });
-                        
-                        // Close mobile menu if open
-                        if (window.innerWidth < 768) {
-                            navLinks.style.display = 'none';
-                        }
                     }
                 });
             });
         });
     </script>
 </body>
-</html><!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Enak Rasa Wedding Hall - Memorable Celebrations</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #D4A373;
-            --secondary: #FAEDCD;
-            --dark: #333333;
-            --light: #FEFAE0;
-            --accent: #CCD5AE;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-            color: var(--dark);
-            background-color: #FFFDF7;
-        }
-        
-        h1, h2, h3, h4, h5 {
-            font-family: 'Playfair Display', serif;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-        
-        /* Header Styles */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            transition: background-color 0.3s ease;
-            padding: 1rem 0;
-        }
-        
-        header.scrolled {
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-        
-        .nav-links a {
-            color: var(--dark);
-            text-decoration: none;
-            font-weight: 500;
-            position: relative;
-        }
-        
-        .nav-links a:after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -4px;
-            left: 0;
-            background-color: var(--primary);
-            transition: width 0.3s ease;
-        }
-        
-        .nav-links a:hover:after {
-            width: 100%;
-        }
-        
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        
-        /* Hero Section */
-        .hero {
-            height: 100vh;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://scontent.fkul8-3.fna.fbcdn.net/v/t39.30808-6/476350610_468705386313427_3344429432169983636_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeHm8_RZ-ThOy3uAa7CEoebdOUMqw389l1g5QyrDfz2XWAvhKAwGhW1Jrq9DIOOaCOBjYxJTyVu4KPgeff7p2in0&_nc_ohc=p1C2qEJKv90Q7kNvgHiVKXW&_nc_oc=AdnU4cq_1P4w5s95ePs7mDurBnYuO6gDg3UOUnBfvup7o4VhYa9cKSDQzNYnEAyNmgM&_nc_zt=23&_nc_ht=scontent.fkul8-3.fna&_nc_gid=WD9DVxSPjdf0w98eszH7mw&oh=00_AYFSbqzZ13OeyohJeiP--nLCirIE5kHhESjMzm5lgJy40A&oe=67E0271D&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: white;
-            position: relative;
-        }
-        
-        .hero-content {
-            max-width: 800px;
-            z-index: 2;
-        }
-        
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1.5rem;
-            letter-spacing: 1px;
-        }
-        
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-        
-        .cta-btn {
-            display: inline-block;
-            background-color: var(--primary);
-            color: white;
-            padding: 0.8rem 2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: 2px solid var(--primary);
-        }
-        
-        .cta-btn:hover {
-            background-color: transparent;
-            color: white;
-        }
-        
-        /* About Section */
-        .about {
-            padding: 6rem 0;
-            background-color: white;
-        }
-        
-        .section-title {
-            text-align: center;
-            margin-bottom: 3rem;
-            position: relative;
-        }
-        
-        .section-title h2 {
-            font-size: 2.5rem;
-            display: inline-block;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .section-title h2:after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
-            background-color: var(--primary);
-        }
-        
-        .about-content {
-            display: flex;
-            gap: 4rem;
-            align-items: center;
-        }
-        
-        .about-image {
-            flex: 1;
-            border-radius: 10px;
-            overflow: hidden;
-            height: 400px;
-        }
-        
-        .about-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .about-text {
-            flex: 1;
-        }
-        
-        .about-text h3 {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-        }
-        
-        .about-text p {
-            margin-bottom: 1.5rem;
-            line-height: 1.8;
-        }
-        
-        /* Features Section */
-        .features {
-            padding: 6rem 0;
-            background-color: var(--light);
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-        }
-        
-        .feature-card {
-            background-color: white;
-            padding: 2.5rem 2rem;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-10px);
-        }
-        
-        .feature-icon {
-            width: 70px;
-            height: 70px;
-            background-color: var(--secondary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 1.8rem;
-            color: var(--primary);
-        }
-        
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .feature-card p {
-            line-height: 1.6;
-            color: #666;
-        }
-        
-        /* Gallery Section */
-        .gallery {
-            padding: 6rem 0;
-            background-color: white;
-        }
-        
-        .gallery-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-auto-rows: 250px;
-            gap: 1.5rem;
-        }
-        
-        .gallery-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: 10px;
-        }
-        
-        .gallery-item.wide {
-            grid-column: span 2;
-        }
-        
-        .gallery-item.tall {
-            grid-row: span 2;
-        }
-        
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-        
-        .gallery-item:hover img {
-            transform: scale(1.1);
-        }
-        
-        .gallery-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .gallery-item:hover .gallery-overlay {
-            opacity: 1;
-        }
-        
-        .gallery-overlay-content {
-            color: white;
-            text-align: center;
-        }
-        
-        .gallery-overlay-content h3 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        /* Testimonials Section */
-        .testimonials {
-            padding: 6rem 0;
-            background-color: var(--secondary);
-        }
-        
-        .testimonial-slider {
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .testimonial-item {
-            text-align: center;
-            padding: 0 2rem;
-        }
-        
-        .testimonial-text {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            margin-bottom: 2rem;
-            font-style: italic;
-            position: relative;
-        }
-        
-        .testimonial-text::before,
-        .testimonial-text::after {
-            content: '"';
-            font-size: 3rem;
-            color: var(--primary);
-            position: absolute;
-            opacity: 0.3;
-        }
-        
-        .testimonial-text::before {
-            top: -20px;
-            left: -20px;
-        }
-        
-        .testimonial-text::after {
-            bottom: -40px;
-            right: -20px;
-        }
-        
-        .testimonial-author {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .author-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin-bottom: 1rem;
-            border: 3px solid var(--primary);
-        }
-        
-        .author-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .author-name {
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 0.3rem;
-        }
-        
-        .wedding-date {
-            font-size: 0.9rem;
-            color: #777;
-        }
-        
-        /* Booking Section */
-        .booking {
-            padding: 6rem 0;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?q=80&w=2670&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: white;
-            text-align: center;
-        }
-        
-        .booking h2 {
-            color: white;
-        }
-        
-        .booking p {
-            max-width: 700px;
-            margin: 0 auto 2rem;
-            line-height: 1.8;
-        }
-        
-        /* Pricing Section */
-        .pricing {
-            padding: 6rem 0;
-            background-color: white;
-        }
-        
-        .pricing-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-        }
-        
-        .pricing-card {
-            background-color: white;
-            border-radius: 10px;
-            padding: 3rem 2rem;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .pricing-card.featured {
-            transform: scale(1.05);
-            border: 2px solid var(--primary);
-        }
-        
-        .featured-label {
-            position: absolute;
-            top: 20px;
-            right: -30px;
-            background-color: var(--primary);
-            color: white;
-            padding: 0.3rem 2rem;
-            transform: rotate(45deg);
-        }
-        
-        .pricing-card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .pricing-description {
-            color: #777;
-            margin-bottom: 1.5rem;
-        }
-        
-        .pricing-price {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-        }
-        
-        .pricing-price span {
-            font-size: 1rem;
-            color: #777;
-        }
-        
-        .pricing-features {
-            list-style: none;
-            margin-bottom: 2rem;
-        }
-        
-        .pricing-features li {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        /* Contact Section */
-        .contact {
-            padding: 6rem 0;
-            background-color: var(--light);
-        }
-        
-        .contact-container {
-            display: flex;
-            gap: 4rem;
-        }
-        
-        .contact-info {
-            flex: 1;
-        }
-        
-        .contact-info h3 {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-        }
-        
-        .contact-details {
-            margin-bottom: 2rem;
-        }
-        
-        .contact-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-        
-        .contact-icon {
-            margin-right: 1rem;
-            color: var(--primary);
-        }
-        
-        .contact-text {
-            line-height: 1.6;
-        }
-        
-        .social-links {
-            display: flex;
-            gap: 1rem;
-        }
-        
-        .social-link {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-        
-        .social-link:hover {
-            background-color: var(--dark);
-        }
-        
-        .contact-form {
-            flex: 1;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        
-        textarea.form-control {
-            height: 150px;
-            resize: none;
-        }
-        
-        .submit-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
-        
-        .submit-btn:hover {
-            background-color: var(--dark);
-        }
-        
-        /* Footer */
-        footer {
-            background-color: var(--dark);
-            color: white;
-            padding: 4rem 0 2rem;
-        }
-        
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-        
-        .footer-column h3 {
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            position: relative;
-            padding-bottom: 0.5rem;
-        }
-        
-        .footer-column h3:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 50px;
-            height: 2px;
-            background-color: var(--primary);
-        }
-        
-        .footer-column p {
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-        
-        .footer-links {
-            list-style: none;
-        }
-        
-        .footer-links li {
-            margin-bottom: 0.5rem;
-        }
-        
-        .footer-links a {
-            color: #ddd;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        
-        .footer-links a:hover {
-            color: var(--primary);
-        }
-        
-        .copyright {
-            text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.9rem;
-            color: #aaa;
-        }
-        
-        /* Responsive Styles */
-        @media (max-width: 992px) {
-            .about-content {
-                flex-direction: column;
-                gap: 2rem;
-            }
-            
-            .features-grid,
-            .pricing-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .gallery-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .contact-container {
-                flex-direction: column;
-            }
-            
-            .footer-content {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .nav-links {
-                display: none;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            .features-grid,
-            .pricing-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .gallery-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .gallery-item.wide,
-            .gallery-item.tall {
-                grid-column: auto;
-                grid-row: auto;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .section-title h2 {
-                font-size: 2rem;
-            }
-            
-            .footer-content {
-                grid-template-columns: 1fr;
-            }
-        }
+</html>
