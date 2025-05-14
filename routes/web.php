@@ -20,6 +20,7 @@ use App\Http\Controllers\BoookingController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Staff\StaffCustomizationController;
 use App\Http\Controllers\CustomizationController;
+use App\Http\Controllers\PackageRecommendationController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -27,6 +28,10 @@ Route::get('/', [HomeController::class, 'index']);
 //Public Routes
 Route::get('/wedding-venues', [PublicController::class, 'showVenues'])->name('public.venues');
 Route::get('/wedding-package/{package}', [PublicController::class, 'showPackage'])->name('public.package');
+
+// Package Recommendation Routes
+Route::get('/package-recommendation', [PackageRecommendationController::class, 'index'])->name('package-recommendation.index');
+Route::post('/package-recommendation/recommend', [PackageRecommendationController::class, 'recommend'])->name('package-recommendation.recommend');
 
 // Booking Request Routes - Public
 Route::get('/booking-request', [BookingRequestController::class, 'create'])->name('booking-requests.create');
