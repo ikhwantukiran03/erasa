@@ -71,6 +71,25 @@ class BookingRequestController extends Controller
                     ->withInput();
             }
         }
+        
+        // Check availability for booking and reservation types
+        if (in_array($request->type, ['booking', 'reservation']) && $request->venue_id && $request->event_date) {
+            // Check if there's already a booking (wedding or reservation) for this venue, date and session
+            $session = $request->session ?? 'evening'; // Default to evening if not specified
+            
+            $existingBooking = \App\Models\Booking::where('booking_date', $request->event_date)
+                ->where('venue_id', $request->venue_id)
+                ->where('session', $session)
+                ->whereIn('type', ['wedding', 'reservation']) // Only check wedding and reservation bookings
+                ->where('status', '!=', 'cancelled')
+                ->exists();
+                
+            if ($existingBooking) {
+                return redirect()->back()
+                    ->withErrors(['event_date' => 'The selected venue is already booked for this date and session. Please choose a different date, session, or venue.'])
+                    ->withInput();
+            }
+        }
 
         // Create the booking request
         $bookingRequest = new BookingRequest($request->all());

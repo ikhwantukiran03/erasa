@@ -72,9 +72,6 @@
                     
                     <div class="text-gray-600 font-medium">Type:</div>
                     <div id="eventType" class="text-gray-800"></div>
-                    
-                    <div class="text-gray-600 font-medium">Status:</div>
-                    <div id="eventStatus" class="text-gray-800"></div>
                 </div>
             </div>
         </div>
@@ -208,7 +205,6 @@
             document.getElementById('eventSession').textContent = event.extendedProps.session;
             document.getElementById('eventVenue').textContent = event.extendedProps.venue;
             document.getElementById('eventType').textContent = event.extendedProps.type;
-            document.getElementById('eventStatus').textContent = event.extendedProps.status;
             
             modal.classList.remove('hidden');
         }

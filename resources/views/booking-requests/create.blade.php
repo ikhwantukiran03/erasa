@@ -516,6 +516,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Reset background
                 venueSelect.classList.remove('bg-yellow-50');
                 
+                // Remove any existing warnings or confirmations
+                const existingWarning = venueSelect.parentElement.querySelector('.text-amber-600');
+                if (existingWarning) {
+                    existingWarning.remove();
+                }
+                
+                const existingConfirmation = venueSelect.parentElement.querySelector('.text-green-600');
+                if (existingConfirmation) {
+                    existingConfirmation.remove();
+                }
+                
+                // Get all type options
+                const typeOptions = requestTypeSelect.querySelectorAll('option');
+                
                 if (!data.available) {
                     // Show availability warning
                     const warning = document.createElement('div');
@@ -524,24 +538,24 @@ document.addEventListener('DOMContentLoaded', function() {
                         <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                         </svg>
-                        This venue may have limited availability on the selected date${session ? ' and session' : ''}.
+                        This venue is already booked for the selected date and session. You can still make a viewing or appointment request.
                     `;
                     
-                    // Remove any existing warnings
-                    const existingWarning = venueSelect.parentElement.querySelector('.text-amber-600');
-                    if (existingWarning) {
-                        existingWarning.remove();
-                    }
-                    
-                    // Add the new warning
                     venueSelect.parentElement.appendChild(warning);
-                } else {
-                    // Remove any existing warnings
-                    const existingWarning = venueSelect.parentElement.querySelector('.text-amber-600');
-                    if (existingWarning) {
-                        existingWarning.remove();
-                    }
                     
+                    // Disable booking and reservation options
+                    typeOptions.forEach(option => {
+                        if (option.value === 'booking' || option.value === 'reservation') {
+                            option.disabled = true;
+                        }
+                    });
+                    
+                    // If current selection is booking or reservation, switch to viewing
+                    if (requestTypeSelect.value === 'booking' || requestTypeSelect.value === 'reservation') {
+                        requestTypeSelect.value = 'viewing';
+                        togglePackageFields();
+                    }
+                } else {
                     // Show availability confirmation
                     const confirmation = document.createElement('div');
                     confirmation.className = 'mt-2 text-green-600 text-sm flex items-center';
@@ -549,7 +563,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
-                        Venue is available on this date${session ? ' and session' : ''}!
+                        Venue is available on this date and session!
                     `;
                     
                     venueSelect.parentElement.appendChild(confirmation);
@@ -558,6 +572,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(() => {
                         confirmation.remove();
                     }, 5000);
+                    
+                    // Enable all type options
+                    typeOptions.forEach(option => {
+                        option.disabled = false;
+                    });
                 }
             })
             .catch(error => {

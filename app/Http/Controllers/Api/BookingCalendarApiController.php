@@ -45,7 +45,6 @@ class BookingCalendarApiController extends Controller
                 'extendedProps' => [
                     'session' => $booking->session,
                     'venue' => $booking->venue->name,
-                    'status' => $booking->status,
                     'type' => $booking->type,
                     'user' => $booking->user->name,
                     'package' => $booking->package ? $booking->package->name : '-'
@@ -82,6 +81,33 @@ class BookingCalendarApiController extends Controller
     {
         $venues = Venue::all();
         return response()->json($venues);
+    }
+
+    /**
+     * Check if a venue is available on a specific date and session.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkAvailability(Request $request)
+    {
+        $date = $request->query('date');
+        $session = $request->query('session', 'evening');
+        $venueId = $request->query('venue_id');
+        
+        if (!$date || !$venueId) {
+            return response()->json(['available' => true]);
+        }
+        
+        // Check if there's already a booking (wedding or reservation) for this venue, date and session
+        $existingBooking = Booking::where('booking_date', $date)
+            ->where('venue_id', $venueId)
+            ->where('session', $session)
+            ->whereIn('type', ['wedding', 'reservation']) // Only check wedding and reservation bookings
+            ->where('status', '!=', 'cancelled')
+            ->exists();
+        
+        return response()->json(['available' => !$existingBooking]);
     }
 
     /**
