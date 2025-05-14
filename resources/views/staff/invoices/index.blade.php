@@ -102,6 +102,13 @@
                         <p class="mt-4">No pending payment verifications found.</p>
                     </div>
                 @endif
+                
+                {{-- Pagination Links for Pending Invoices --}}
+                @if(method_exists($pendingInvoices, 'links'))
+                <div class="mt-4">
+                    {{ $pendingInvoices->links() }}
+                </div>
+                @endif
             </div>
         </div>
         
@@ -174,6 +181,13 @@
                     <div class="text-center text-gray-500 py-10">
                         <p>No verified payments found.</p>
                     </div>
+                @endif
+                
+                {{-- Pagination Links for Verified Invoices --}}
+                @if(method_exists($verifiedInvoices, 'links'))
+                <div class="mt-4">
+                    {{ $verifiedInvoices->links() }}
+                </div>
                 @endif
             </div>
         </div>

@@ -152,6 +152,13 @@
                         <p class="mt-4">No booking requests found.</p>
                     </div>
                 @endif
+                
+                {{-- Pagination Links --}}
+                @if(method_exists($bookingRequests, 'links'))
+                <div class="mt-4">
+                    {{ $bookingRequests->links() }}
+                </div>
+                @endif
             </div>
         </div>
     </div>

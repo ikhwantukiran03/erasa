@@ -40,13 +40,12 @@ class InvoiceController extends Controller
         $pendingInvoices = Invoice::with(['booking.user', 'booking.venue'])
             ->pending()
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         $verifiedInvoices = Invoice::with(['booking.user', 'booking.venue'])
             ->verified()
             ->orderBy('invoice_verified_at', 'desc')
-            ->take(10)
-            ->get();
+            ->paginate(10);
 
         return view('staff.invoices.index', compact('pendingInvoices', 'verifiedInvoices'));
     }

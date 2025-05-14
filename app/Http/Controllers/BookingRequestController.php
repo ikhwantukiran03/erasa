@@ -140,7 +140,7 @@ class BookingRequestController extends Controller
 
         $bookingRequests = BookingRequest::where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         return view('booking-requests.my-requests', compact('bookingRequests'));
     }

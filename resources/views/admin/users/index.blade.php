@@ -185,7 +185,12 @@
                 </table>
             </div>
             
-            
+            {{-- Pagination Links --}}
+            @if(method_exists($users, 'links'))
+            <div class="px-6 py-4">
+                {{ $users->links() }}
+            </div>
+            @endif
         </div>
     </div>
 </div>

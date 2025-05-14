@@ -21,7 +21,7 @@ class CategoryController extends Controller
                 ->with('error', 'You do not have permission to access this resource.');
         }
         
-        $categories = Category::all();
+        $categories = Category::withCount('items')->paginate(10);
         return view('admin.categories.index', compact('categories'));
     }
 

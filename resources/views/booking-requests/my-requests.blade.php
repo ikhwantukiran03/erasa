@@ -105,6 +105,13 @@
                         <a href="{{ route('booking-requests.create') }}" class="mt-4 inline-block text-primary hover:underline">Create your first booking request</a>
                     </div>
                 @endif
+                
+                {{-- Pagination Links --}}
+                @if(method_exists($bookingRequests, 'links'))
+                <div class="mt-4">
+                    {{ $bookingRequests->links() }}
+                </div>
+                @endif
             </div>
         </div>
     </div>

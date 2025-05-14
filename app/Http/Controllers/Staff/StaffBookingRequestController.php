@@ -61,7 +61,7 @@ class StaffBookingRequestController extends Controller
                 // No filter, show all
         }
         
-        $bookingRequests = $query->orderBy('created_at', 'desc')->get();
+        $bookingRequests = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('staff.requests.index', compact('bookingRequests', 'status'));
     }

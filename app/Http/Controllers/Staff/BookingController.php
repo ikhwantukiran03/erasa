@@ -35,7 +35,7 @@ class BookingController extends Controller
             $query->where('status', $status);
         }
         
-        $bookings = $query->orderBy('created_at', 'desc')->get();
+        $bookings = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('staff.bookings.index', compact('bookings', 'status'));
     }

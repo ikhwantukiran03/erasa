@@ -22,7 +22,7 @@ class ItemController extends Controller
                 ->with('error', 'You do not have permission to access this resource.');
         }
         
-        $items = Item::with('category')->get();
+        $items = Item::with('category')->paginate(10);
         return view('admin.items.index', compact('items'));
     }
 
