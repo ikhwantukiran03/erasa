@@ -77,9 +77,8 @@
                 <!-- Desktop Navigation -->
                 <nav class="hidden md:flex items-center space-x-8">
                     <a href="#home" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Home</a>
-                    <a href="#about" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">About</a>
-                    <a href="#services" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Services</a>
                     <a href="#gallery" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Gallery</a>
+                    <a href="#calendar" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Calendar</a>
                     <a href="{{ route('booking.calendar') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Calendar</a>
                     <a href="{{ route('public.venues') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Packages</a>
                     
@@ -122,9 +121,8 @@
         <div class="md:hidden hidden bg-white rounded-lg shadow-xl mt-2 mx-4 overflow-hidden transition-all duration-300 transform origin-top scale-95 opacity-0" id="mobile-menu">
             <nav class="flex flex-col divide-y divide-gray-100">
                 <a href="#home" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Home</a>
-                <a href="#about" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">About</a>
-                <a href="#services" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Services</a>
                 <a href="#gallery" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Gallery</a>
+                <a href="#calendar" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Calendar</a>
                 <a href="{{ route('booking.calendar') }}" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Calendar</a>
                 <a href="{{ route('public.venues') }}" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Packages</a>
                 
@@ -166,7 +164,7 @@
         
         <!-- Scroll Down Indicator -->
         <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
-            <a href="#about" class="text-white flex flex-col items-center">
+            <a href="#gallery" class="text-white flex flex-col items-center">
                 <span class="text-sm mb-2">Scroll Down</span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -175,211 +173,105 @@
         </div>
     </section>
 
-    <!-- About Section -->
-    <section class="py-20 bg-white" id="about">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-display font-bold text-dark mb-4">About Our Venue</h2>
-                <div class="w-24 h-1 bg-primary mx-auto"></div>
-            </div>
-            
-            <div class="flex flex-col lg:flex-row items-center gap-12">
-                <div class="lg:w-1/2" data-aos="fade-right" data-aos-duration="1000">
-                    <div class="rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300">
-                        <img src="https://scontent.fkul8-2.fna.fbcdn.net/v/t39.30808-6/477277295_471515166032449_6589999265876936820_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEyi4LM_FIQ3jxeHJwFDPuuEpMpTz5j_DUSkylPPmP8NR88oAt4ljhfJ4s_-gFpPI3pJXDP1K8ZcX6jMgyjVp9f&_nc_ohc=X7j4VqL4lMcQ7kNvgFoNnjd&_nc_oc=AdlPIDpWZiK9mwye0jzGX9Mn_7ojN5H9k-CDY-jSjHWe0DlTL7holE0Jblt5PMyjlvQ&_nc_zt=23&_nc_ht=scontent.fkul8-2.fna&_nc_gid=e0FVTbDIhDREkjNUPq9kjQ&oh=00_AYEydLSibMtvCh4hjO4rg0Dy9JiZ60TpedBmssY4VDkbdg&oe=67E03D76" 
-                             alt="Enak Rasa Wedding Hall" 
-                             class="w-full h-auto object-cover">
-                    </div>
-                </div>
-                
-                <div class="lg:w-1/2" data-aos="fade-left" data-aos-duration="1000">
-                    <h3 class="text-2xl md:text-3xl font-display font-semibold text-primary mb-6">The Perfect Setting for Your Special Day</h3>
-                    <div class="space-y-4 text-gray-700">
-                        <p class="leading-relaxed">Enak Rasa Wedding Hall is a premier wedding venue located in the heart of the city. With our exquisite architecture, stunning gardens, and versatile spaces, we provide the perfect backdrop for your celebration.</p>
-                        <p class="leading-relaxed">Our experienced team of event planners, chefs, and service staff work tirelessly to ensure that your wedding day exceeds all expectations. From intimate ceremonies to grand receptions, we can accommodate events of all sizes with our customizable packages.</p>
-                        <p class="leading-relaxed">At Enak Rasa, we believe that your wedding day should be as unique as your love story. Let us help you create the wedding of your dreams.</p>
-                    </div>
-                    <div class="mt-6">
-                        <a href="#gallery" class="inline-flex items-center text-primary font-medium hover:underline">
-                            Explore our gallery
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Services Section -->
-    <section class="py-20 bg-light" id="services">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-display font-bold text-dark mb-4">Our Services</h2>
-                <div class="w-24 h-1 bg-primary mx-auto"></div>
-                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Experience excellence with our comprehensive wedding services designed to make your special day truly memorable.</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Service Card 1 -->
-                <div class="bg-white rounded-lg shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="100">
-                    <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-display font-semibold text-center mb-3">Exquisite Catering</h3>
-                    <p class="text-gray-600 text-center">Our culinary team creates delicious, customized menus featuring both traditional and international cuisines to delight your guests.</p>
-                </div>
-                
-                <!-- Service Card 2 -->
-                <div class="bg-white rounded-lg shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="200">
-                    <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-display font-semibold text-center mb-3">Versatile Venues</h3>
-                    <p class="text-gray-600 text-center">Choose from our elegant ballroom, intimate garden setting, or stunning rooftop terrace for your ceremony and reception.</p>
-                </div>
-                
-                <!-- Service Card 3 -->
-                <div class="bg-white rounded-lg shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="300">
-                    <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-display font-semibold text-center mb-3">Customizable Packages</h3>
-                    <p class="text-gray-600 text-center">We offer flexible wedding packages that can be tailored to match your vision, style, and budget requirements.</p>
-                </div>
-                
-                <!-- Service Card 4 -->
-                <div class="bg-white rounded-lg shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="400">
-                    <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-display font-semibold text-center mb-3">Event Planning</h3>
-                    <p class="text-gray-600 text-center">Our experienced event planners will guide you through every step of the planning process to ensure a flawless event.</p>
-                </div>
-                
-                <!-- Service Card 5 -->
-                <div class="bg-white rounded-lg shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="500">
-                    <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-display font-semibold text-center mb-3">Decoration Services</h3>
-                    <p class="text-gray-600 text-center">From elegant floral arrangements to custom lighting designs, we'll transform our venue to match your wedding theme.</p>
-                </div>
-                
-                <!-- Service Card 6 -->
-                <div class="bg-white rounded-lg shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="600">
-                    <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-display font-semibold text-center mb-3">Photography & Videography</h3>
-                    <p class="text-gray-600 text-center">We partner with top photographers and videographers to capture every beautiful moment of your special day.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Gallery Section -->
+    <!-- Featured Gallery Section -->
     <section class="py-20 bg-white" id="gallery">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12" data-aos="fade-up">
                 <h2 class="text-3xl md:text-4xl font-display font-bold text-dark mb-4">Our Wedding Gallery</h2>
                 <div class="w-24 h-1 bg-primary mx-auto"></div>
-                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Browse through our gallery showcasing beautiful weddings hosted at our venues.</p>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Browse through stunning highlights from weddings and events hosted at our exquisite venues.</p>
             </div>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                <!-- Gallery Item 1 (Wide on larger screens) -->
-                <div class="sm:col-span-2 lg:col-span-2 overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="100">
-                    <div class="relative h-80 w-full">
-                        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2669&auto=format&fit=crop" 
-                             alt="Wedding Reception" 
-                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <div class="text-white text-center p-4">
-                                <h3 class="text-xl font-display font-semibold">Elegant Receptions</h3>
-                                <p class="text-sm mt-2">Spacious and beautifully decorated reception venues</p>
+            @if($galleryImages->isNotEmpty())
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Featured Gallery Items - First Row (Large Images) -->
+                    <div class="lg:col-span-2 overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="100">
+                        <div class="relative h-96 w-full">
+                            <img src="{{ isset($galleryImages[0]) ? ($galleryImages[0]->image_path ?? $galleryImages[0]->image_url) : 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=3270&auto=format&fit=crop' }}" 
+                                alt="{{ isset($galleryImages[0]) ? $galleryImages[0]->title : 'Wedding Venue' }}" 
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                <div class="text-white text-center p-6 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    <h3 class="text-2xl font-display font-semibold mb-2">{{ isset($galleryImages[0]) ? $galleryImages[0]->title : 'Elegant Wedding Venue' }}</h3>
+                                    @if(isset($galleryImages[0]) && $galleryImages[0]->description)
+                                        <p class="text-sm md:text-base">{{ $galleryImages[0]->description }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="200">
+                        <div class="relative h-96 w-full">
+                            <img src="{{ isset($galleryImages[1]) ? ($galleryImages[1]->image_path ?? $galleryImages[1]->image_url) : 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=3269&auto=format&fit=crop' }}" 
+                                alt="{{ isset($galleryImages[1]) ? $galleryImages[1]->title : 'Wedding Ceremony' }}" 
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                <div class="text-white text-center p-6 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    <h3 class="text-2xl font-display font-semibold mb-2">{{ isset($galleryImages[1]) ? $galleryImages[1]->title : 'Beautiful Ceremonies' }}</h3>
+                                    @if(isset($galleryImages[1]) && $galleryImages[1]->description)
+                                        <p class="text-sm md:text-base">{{ $galleryImages[1]->description }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Second Row -->
+                    <div class="overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="300">
+                        <div class="relative h-80 w-full">
+                            <img src="{{ isset($galleryImages[2]) ? ($galleryImages[2]->image_path ?? $galleryImages[2]->image_url) : 'https://images.unsplash.com/photo-1529636798458-92182e662485?q=80&w=3269&auto=format&fit=crop' }}" 
+                                alt="{{ isset($galleryImages[2]) ? $galleryImages[2]->title : 'Wedding Decorations' }}" 
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                <div class="text-white text-center p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    <h3 class="text-xl font-display font-semibold mb-1">{{ isset($galleryImages[2]) ? $galleryImages[2]->title : 'Stunning Decorations' }}</h3>
+                                    @if(isset($galleryImages[2]) && $galleryImages[2]->description)
+                                        <p class="text-sm">{{ $galleryImages[2]->description }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="400">
+                        <div class="relative h-80 w-full">
+                            <img src="{{ isset($galleryImages[3]) ? ($galleryImages[3]->image_path ?? $galleryImages[3]->image_url) : 'https://images.unsplash.com/photo-1470204639138-9b335f10beec?q=80&w=3270&auto=format&fit=crop' }}" 
+                                alt="{{ isset($galleryImages[3]) ? $galleryImages[3]->title : 'Wedding Cake' }}" 
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                <div class="text-white text-center p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    <h3 class="text-xl font-display font-semibold mb-1">{{ isset($galleryImages[3]) ? $galleryImages[3]->title : 'Catering Excellence' }}</h3>
+                                    @if(isset($galleryImages[3]) && $galleryImages[3]->description)
+                                        <p class="text-sm">{{ $galleryImages[3]->description }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="lg:col-span-3 overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="500">
+                        <div class="relative h-96 w-full">
+                            <img src="{{ isset($galleryImages[4]) ? ($galleryImages[4]->image_path ?? $galleryImages[4]->image_url) : 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=2940&auto=format&fit=crop' }}" 
+                                alt="{{ isset($galleryImages[4]) ? $galleryImages[4]->title : 'Happy Couples' }}" 
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-primary bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                <div class="text-white text-center p-6 max-w-xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    <h3 class="text-3xl font-display font-semibold mb-3">Make Your Wedding Dreams Come True</h3>
+                                    <p class="text-base md:text-lg mb-4">Enak Rasa Wedding Hall offers the perfect backdrop for your special day. Contact us today to schedule a viewing.</p>
+                                    <a href="{{ route('booking-requests.create') }}" class="inline-block bg-white text-primary hover:bg-gray-100 px-6 py-3 rounded-full font-medium transition-colors">Book Your Event</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Gallery Item 2 -->
-                <div class="overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="200">
-                    <div class="relative h-80 w-full">
-                        <img src="https://images.unsplash.com/photo-1507504031003-b417219a0fde?q=80&w=2670&auto=format&fit=crop" 
-                             alt="Wedding Ceremony" 
-                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <div class="text-white text-center p-4">
-                                <h3 class="text-xl font-display font-semibold">Beautiful Ceremonies</h3>
-                                <p class="text-sm mt-2">Intimate and romantic ceremony settings</p>
-                            </div>
-                        </div>
-                    </div>
+            @else
+                <div class="text-center py-10 bg-gray-100 rounded-lg" data-aos="fade-up">
+                    <p class="text-gray-600">Gallery images will be displayed here. Please check back soon!</p>
                 </div>
-                
-                <!-- Gallery Item 3 (Tall on larger screens) -->
-                <div class="row-span-2 overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="300">
-                    <div class="relative h-80 lg:h-full w-full">
-                        <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2728&auto=format&fit=crop" 
-                             alt="Wedding Dinner" 
-                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <div class="text-white text-center p-4">
-                                <h3 class="text-xl font-display font-semibold">Exquisite Dining</h3>
-                                <p class="text-sm mt-2">Delicious catering for your special occasion</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Gallery Item 4 -->
-                <div class="overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="400">
-                    <div class="relative h-80 w-full">
-                        <img src="https://images.unsplash.com/photo-1506836467174-27f1042aa48c?q=80&w=2787&auto=format&fit=crop" 
-                             alt="Wedding Decorations" 
-                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <div class="text-white text-center p-4">
-                                <h3 class="text-xl font-display font-semibold">Stunning Decorations</h3>
-                                <p class="text-sm mt-2">Beautiful floral and decor arrangements</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Gallery Item 5 -->
-                <div class="overflow-hidden rounded-lg shadow-lg group" data-aos="fade-up" data-aos-delay="500">
-                    <div class="relative h-80 w-full">
-                        <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=2670&auto=format&fit=crop" 
-                             alt="Wedding Hall" 
-                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <div class="text-white text-center p-4">
-                                <h3 class="text-xl font-display font-semibold">Spacious Venues</h3>
-                                <p class="text-sm mt-2">Versatile spaces for events of all sizes</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endif
             
-            <div class="text-center mt-10">
+            <div class="text-center mt-8">
                 <a href="#" class="inline-flex items-center bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-opacity-90 transition-colors duration-300">
                     <span>View Full Gallery</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -441,51 +333,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="py-20 bg-secondary" id="testimonials">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-display font-bold text-dark mb-4">Happy Couples</h2>
-                <div class="w-24 h-1 bg-primary mx-auto"></div>
-                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Read what our couples have to say about their experience with us.</p>
-            </div>
-            
-            <div class="max-w-4xl mx-auto" data-aos="fade-up" data-aos-delay="200">
-                <div class="bg-white rounded-lg shadow-lg p-8 md:p-10 relative">
-                    <!-- Decorative Quotes -->
-                    <div class="absolute top-6 left-6 opacity-10">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-primary" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                        </svg>
-                    </div>
-                    
-                    <div class="text-center">
-                        <p class="text-lg md:text-xl text-gray-700 mb-8 leading-relaxed">
-                            "Our wedding day at Enak Rasa was absolutely perfect! The venue was stunning, the food was incredible, and the staff made sure everything ran smoothly. We couldn't have asked for a better experience. Our guests are still talking about how beautiful everything was!"
-                        </p>
-                        
-                        <div class="flex flex-col items-center">
-                            <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-primary mb-4">
-                                <img src="https://images.unsplash.com/photo-1520423465871-0866049020b7?q=80&w=2787&auto=format&fit=crop" 
-                                     alt="Sarah & Michael" 
-                                     class="w-full h-full object-cover">
-                            </div>
-                            <div class="font-display font-semibold text-lg text-gray-800">Sarah & Michael</div>
-                            <div class="text-primary text-sm">June 12, 2024</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Testimonial Navigation Dots (for when you have multiple testimonials) -->
-                <div class="flex justify-center mt-8 space-x-2">
-                    <button class="w-3 h-3 rounded-full bg-primary"></button>
-                    <button class="w-3 h-3 rounded-full bg-gray-300"></button>
-                    <button class="w-3 h-3 rounded-full bg-gray-300"></button>
                 </div>
             </div>
         </div>
@@ -555,8 +402,8 @@
                     </h3>
                     <ul class="space-y-3">
                         <li><a href="#home" class="text-gray-400 hover:text-primary transition-colors">Home</a></li>
-                        <li><a href="#about" class="text-gray-400 hover:text-primary transition-colors">About</a></li>
                         <li><a href="#gallery" class="text-gray-400 hover:text-primary transition-colors">Gallery</a></li>
+                        <li><a href="#calendar" class="text-gray-400 hover:text-primary transition-colors">Calendar</a></li>
                         <li><a href="{{ route('public.venues') }}" class="text-gray-400 hover:text-primary transition-colors">Packages</a></li>
                         <li><a href="{{ route('booking.calendar') }}" class="text-gray-400 hover:text-primary transition-colors">Calendar</a></li>
                     </ul>
@@ -565,15 +412,15 @@
                 <!-- Services -->
                 <div>
                     <h3 class="text-xl font-display font-semibold mb-6 relative pb-3">
-                        <span>Services</span>
+                        <span>Our Wedding Services</span>
                         <span class="absolute bottom-0 left-0 h-1 w-12 bg-primary"></span>
                     </h3>
                     <ul class="space-y-3">
-                        <li><a href="#services" class="text-gray-400 hover:text-primary transition-colors">Wedding Venue</a></li>
-                        <li><a href="#services" class="text-gray-400 hover:text-primary transition-colors">Catering</a></li>
-                        <li><a href="#services" class="text-gray-400 hover:text-primary transition-colors">Event Planning</a></li>
-                        <li><a href="#services" class="text-gray-400 hover:text-primary transition-colors">Decoration</a></li>
-                        <li><a href="#services" class="text-gray-400 hover:text-primary transition-colors">Photography</a></li>
+                        <li><a href="{{ route('booking-requests.create') }}" class="text-gray-400 hover:text-primary transition-colors">Book a Venue</a></li>
+                        <li><a href="{{ route('booking.calendar') }}" class="text-gray-400 hover:text-primary transition-colors">Check Availability</a></li>
+                        <li><a href="{{ route('public.venues') }}" class="text-gray-400 hover:text-primary transition-colors">View Packages</a></li>
+                        <li><a href="#gallery" class="text-gray-400 hover:text-primary transition-colors">Browse Gallery</a></li>
+                        <li><a href="#booking" class="text-gray-400 hover:text-primary transition-colors">Make a Reservation</a></li>
                     </ul>
                 </div>
                 
