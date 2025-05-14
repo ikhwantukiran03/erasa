@@ -33,17 +33,25 @@ class BookingRequestController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        // Base validation rules for all request types
+        $validationRules = [
             'name' => ['required', 'string', 'max:255'],
             'whatsapp_no' => ['required', 'string', 'max:20'],
             'email' => ['required', 'string', 'email', 'max:255'],
             'type' => ['required', 'in:reservation,booking,viewing,appointment'],
             'venue_id' => ['nullable', 'exists:venues,id'],
-            'package_id' => ['nullable', 'exists:packages,id'],
-            'price_id' => ['nullable', 'exists:prices,id'], // Add price_id validation
+            'session' => ['nullable', 'in:morning,evening'],
             'event_date' => ['nullable', 'date', 'after:today'],
             'message' => ['required', 'string'],
-        ]);
+        ];
+        
+        // Add package and price validation only for non-reservation types
+        if ($request->type !== 'reservation' && $request->type !== 'appointment') {
+            $validationRules['package_id'] = ['nullable', 'exists:packages,id'];
+            $validationRules['price_id'] = ['nullable', 'exists:prices,id'];
+        }
+        
+        $validator = Validator::make($request->all(), $validationRules);
 
         if ($validator->fails()) {
             return redirect()->back()
@@ -51,8 +59,8 @@ class BookingRequestController extends Controller
                 ->withInput();
         }
 
-        // Validate price_id belongs to the selected package
-        if ($request->package_id && $request->price_id) {
+        // Validate price_id belongs to the selected package (only for non-reservation types)
+        if ($request->type !== 'reservation' && $request->type !== 'appointment' && $request->package_id && $request->price_id) {
             $priceExists = Price::where('id', $request->price_id)
                 ->where('package_id', $request->package_id)
                 ->exists();
@@ -70,6 +78,17 @@ class BookingRequestController extends Controller
         // If user is logged in, associate the request with the user
         if (Auth::check()) {
             $bookingRequest->user_id = Auth::id();
+        }
+        
+        // Set default session if not provided
+        if (empty($bookingRequest->session)) {
+            $bookingRequest->session = 'evening'; // Default to evening
+        }
+        
+        // For reservation requests, clear package and price
+        if ($request->type === 'reservation' || $request->type === 'appointment') {
+            $bookingRequest->package_id = null;
+            $bookingRequest->price_id = null;
         }
         
         $bookingRequest->save();

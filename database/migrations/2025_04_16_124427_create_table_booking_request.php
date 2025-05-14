@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreignId('price_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('venue_id')->nullable()->constrained()->nullOnDelete();
             $table->date('event_date')->nullable();
+            $table->enum('session', ['morning', 'evening']);
             $table->text('message')->nullable();
             $table->text('admin_notes')->nullable(); 
             $table->foreignId('handled_by')->nullable()->references('id')->on('users')->nullOnDelete();

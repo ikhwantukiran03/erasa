@@ -25,6 +25,7 @@ class BookingRequest extends Model
         'price_id', // Add price_id to fillable
         'venue_id',
         'event_date',
+        'session', // Added the session field
         'message',
         'admin_notes',
         'handled_by',

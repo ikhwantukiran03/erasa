@@ -154,23 +154,22 @@ class StaffBookingRequestController extends Controller
             $bookingRequest->save();
 
             // Create a new booking record
-$booking = new Booking();
-$booking->user_id = $user->id;
-$booking->venue_id = $bookingRequest->venue_id;
-$booking->package_id = $bookingRequest->package_id;
-$booking->booking_date = $bookingRequest->event_date;
-$booking->session = $bookingRequest->type === 'viewing' ? 'morning' : 'evening'; // Default to evening for weddings
-$booking->type = $this->mapRequestTypeToBookingType($bookingRequest->type);
-
-// Set status based on booking type
-if ($booking->type === 'wedding') {
-    $booking->status = 'waiting for deposit';
-} else {
-    $booking->status = 'ongoing';
-}
-
-$booking->handled_by = Auth::id();
-$booking->save();
+            $booking = new Booking();
+            $booking->user_id = $user->id;
+            $booking->venue_id = $bookingRequest->venue_id;
+            
+            // Only set package and price for non-reservation types
+            if (!in_array($bookingRequest->type, ['reservation', 'appointment'])) {
+                $booking->package_id = $bookingRequest->package_id;
+                $booking->price_id = $bookingRequest->price_id;
+            }
+            
+            $booking->booking_date = $bookingRequest->event_date;
+            $booking->session = $bookingRequest->session ? $bookingRequest->session : 'evening'; // Use session from request or default
+            $booking->type = $this->mapRequestTypeToBookingType($bookingRequest->type);
+            $booking->status = $booking->type === 'wedding' ? 'waiting for deposit' : 'ongoing';
+            $booking->handled_by = Auth::id();
+            $booking->save();
 
             // Commit transaction
             \DB::commit();
@@ -179,7 +178,8 @@ $booking->save();
             $message = "Hello {$bookingRequest->name},\n\n";
             $message .= "🎉 *Your booking request has been APPROVED!* 🎉\n\n";
             
-            if ($bookingRequest->package) {
+            // Only include package information for non-reservation types
+            if ($bookingRequest->type !== 'reservation' && $bookingRequest->type !== 'appointment' && $bookingRequest->package) {
                 $message .= "*Package:* {$bookingRequest->package->name}\n";
             }
             
@@ -189,6 +189,7 @@ $booking->save();
             
             if ($bookingRequest->event_date) {
                 $message .= "*Event Date:* {$bookingRequest->event_date->format('d M Y')}\n";
+                $message .= "*Session:* " . ucfirst($booking->session) . "\n";
             }
             
             if ($request->admin_notes) {
@@ -196,21 +197,21 @@ $booking->save();
             }
             
             // Add booking confirmation
-$message .= "\n*🎫 BOOKING CONFIRMATION:*\n";
-$message .= "Your booking has been confirmed with reference number: B-{$booking->id}\n";
+            $message .= "\n*🎫 BOOKING CONFIRMATION:*\n";
+            $message .= "Your booking has been confirmed with reference number: B-{$booking->id}\n";
 
-// Add deposit information for wedding bookings
-if ($booking->type === 'wedding') {
-    $message .= "*⚠️ IMPORTANT: Your booking requires a deposit payment.*\n";
-    $message .= "Your booking status is 'Waiting for Deposit'. Please complete your payment to confirm your reservation.\n\n";
-    $message .= "*Payment Details:*\n";
-    $message .= "Bank Transfer to: Bank Negara Malaysia\n";
-    $message .= "Account Number: 1234-5678-9012\n";
-    $message .= "Reference: BOOKING-{$booking->id}\n\n";
-    $message .= "Please reply to this message with your payment proof once completed.\n";
-}
+            // Add deposit information for wedding bookings
+            if ($booking->type === 'wedding') {
+                $message .= "*⚠️ IMPORTANT: Your booking requires a deposit payment.*\n";
+                $message .= "Your booking status is 'Waiting for Deposit'. Please complete your payment to confirm your reservation.\n\n";
+                $message .= "*Payment Details:*\n";
+                $message .= "Bank Transfer to: Bank Negara Malaysia\n";
+                $message .= "Account Number: 1234-5678-9012\n";
+                $message .= "Reference: BOOKING-{$booking->id}\n\n";
+                $message .= "Please reply to this message with your payment proof once completed.\n";
+            }
 
-$message .= "You can view your booking details in your account.\n";
+            $message .= "You can view your booking details in your account.\n";
             
             // Add account information if a new account was created
             if ($accountCreated) {
