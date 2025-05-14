@@ -139,6 +139,15 @@
                     <a href="/" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->is('/') ? 'active' : '' }}">Home</a>
                     <a href="{{ route('public.venues') }}" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->routeIs('public.venues') ? 'active' : '' }}">Venues</a>
                     <a href="{{ route('booking.calendar') }}" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->routeIs('booking.calendar') ? 'active' : '' }}">Calendar</a>
+                    <a href="{{ route('chatbot.index') }}" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->routeIs('chatbot.index') ? 'active' : '' }}">
+                        <span class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
+                                <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
+                            </svg>
+                            Chat Assistant
+                        </span>
+                    </a>
                     
                     @guest
                         <div class="flex items-center space-x-4 ml-4">
@@ -188,9 +197,16 @@
             <!-- Mobile Navigation -->
             <div class="md:hidden" id="mobile-menu">
                 <nav class="mt-4 border-t border-gray-100 pt-4 pb-2 space-y-1">
-                    <a href="/" class="block px-4 py-3 text-base font-medium text-dark hover:bg-gray-50 hover:text-primary rounded-lg">Home</a>
-                    <a href="{{ route('public.venues') }}" class="block px-4 py-3 text-base font-medium text-dark hover:bg-gray-50 hover:text-primary rounded-lg">Venues</a>
-                    <a href="{{ route('booking.calendar') }}" class="block px-4 py-3 text-base font-medium text-dark hover:bg-gray-50 hover:text-primary rounded-lg">Calendar</a>
+                    <a href="/" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->is('/') ? 'text-primary' : 'text-dark' }}">Home</a>
+                    <a href="{{ route('public.venues') }}" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->routeIs('public.venues') ? 'text-primary' : 'text-dark' }}">Venues</a>
+                    <a href="{{ route('booking.calendar') }}" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->routeIs('booking.calendar') ? 'text-primary' : 'text-dark' }}">Calendar</a>
+                    <a href="{{ route('chatbot.index') }}" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->routeIs('chatbot.index') ? 'text-primary' : 'text-dark' }} flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
+                            <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
+                        </svg>
+                        Chat Assistant
+                    </a>
                     
                     @guest
                         <div class="border-t border-gray-100 mt-2 pt-2">
@@ -386,5 +402,118 @@
         });
     </script>
     @stack('scripts')
+    
+    <!-- Floating Chatbot Button -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <div id="chatbot-widget" class="chatbot-collapsed">
+            <!-- Collapsed State (Button) -->
+            <button id="chat-toggle-btn" class="bg-primary hover:bg-primary-dark text-white rounded-full p-4 shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+            </button>
+            
+            <!-- Expanded State (Chat Window) -->
+            <div id="chat-window" class="hidden bg-white rounded-lg shadow-xl overflow-hidden w-80 md:w-96 absolute bottom-16 right-0 transition-all duration-300 transform scale-95 opacity-0">
+                <div class="bg-primary text-white p-4 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
+                            <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
+                        </svg>
+                        <h3 class="font-medium text-lg">Wedding Assistant</h3>
+                    </div>
+                    <button id="close-chat" class="text-white hover:text-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div id="mini-chatbot-container" class="h-80 overflow-y-auto p-4 flex flex-col space-y-4">
+                    <!-- Initial Message -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
+                                    <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-3 bg-gray-100 rounded-lg py-2 px-3 max-w-[85%]">
+                            <p class="text-gray-800 text-sm">Hello! I can help with questions about our venues and packages. What would you like to know?</p>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                <button class="mini-quick-q text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300">
+                                    How to book?
+                                </button>
+                                <button class="mini-quick-q text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300">
+                                    Available packages
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-200 p-3">
+                    <a href="{{ route('chatbot.index') }}" class="block w-full text-center py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
+                        Full Chat Assistant
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Chatbot Widget Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatToggleBtn = document.getElementById('chat-toggle-btn');
+            const chatWindow = document.getElementById('chat-window');
+            const closeChat = document.getElementById('close-chat');
+            const miniQuickQuestions = document.querySelectorAll('.mini-quick-q');
+            
+            // Toggle chat window
+            chatToggleBtn.addEventListener('click', () => {
+                if (chatWindow.classList.contains('hidden')) {
+                    // Open chat
+                    chatWindow.classList.remove('hidden', 'scale-95', 'opacity-0');
+                    chatWindow.classList.add('scale-100', 'opacity-100');
+                } else {
+                    // Close chat
+                    chatWindow.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => {
+                        chatWindow.classList.add('hidden');
+                    }, 300);
+                }
+            });
+            
+            // Close chat
+            closeChat.addEventListener('click', () => {
+                chatWindow.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    chatWindow.classList.add('hidden');
+                }, 300);
+            });
+            
+            // Quick questions redirect to full chatbot
+            miniQuickQuestions.forEach(question => {
+                question.addEventListener('click', () => {
+                    window.location.href = "{{ route('chatbot.index') }}?q=" + encodeURIComponent(question.textContent.trim());
+                });
+            });
+            
+            // Add a small text to show AI capability
+            const miniChatContainer = document.getElementById('mini-chatbot-container');
+            const aiLabel = document.createElement('div');
+            aiLabel.className = 'text-xxs text-center text-gray-400 mt-4';
+            aiLabel.innerHTML = `<div class="flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812a3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Powered by DeepSeek AI
+            </div>`;
+            miniChatContainer.appendChild(aiLabel);
+        });
+    </script>
 </body>
 </html>
