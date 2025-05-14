@@ -21,6 +21,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Staff\StaffCustomizationController;
 use App\Http\Controllers\CustomizationController;
 use App\Http\Controllers\PackageRecommendationController;
+use App\Http\Controllers\WeddingCardController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -85,7 +86,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/bookings', function () {
         return view('bookings.index');
     })->name('bookings.index');
+
+    // Wedding Card Routes
+    Route::get('/wedding-cards', [WeddingCardController::class, 'index'])->name('wedding-cards.index');
+    Route::get('/wedding-cards/create', [WeddingCardController::class, 'create'])->name('wedding-cards.create');
+    Route::post('/wedding-cards', [WeddingCardController::class, 'store'])->name('wedding-cards.store');
+    Route::get('/wedding-cards/{uuid}/edit', [WeddingCardController::class, 'edit'])->name('wedding-cards.edit');
+    Route::put('/wedding-cards/{uuid}', [WeddingCardController::class, 'update'])->name('wedding-cards.update');
+    Route::delete('/wedding-cards/{uuid}', [WeddingCardController::class, 'destroy'])->name('wedding-cards.destroy');
 });
+
+// Public wedding card route
+Route::get('/wedding-cards/{uuid}', [WeddingCardController::class, 'show'])->name('wedding-cards.show');
+Route::post('/wedding-cards/{uuid}/comment', [WeddingCardController::class, 'addComment'])->name('wedding-cards.comment');
 
 // Admin Routes - temporarily remove the role middleware
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {

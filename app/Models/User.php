@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -58,14 +59,21 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    // app/Models/User.php - add this method
-/**
- * Check if the user has staff role.
- *
- * @return bool
- */
-public function isStaff(): bool
-{
-    return $this->role === 'staff';
-}
+    /**
+     * Check if the user has staff role.
+     *
+     * @return bool
+     */
+    public function isStaff(): bool
+    {
+        return $this->role === 'staff';
+    }
+
+    /**
+     * Get the wedding cards for the user.
+     */
+    public function weddingCards(): HasMany
+    {
+        return $this->hasMany(WeddingCard::class);
+    }
 }
