@@ -132,6 +132,7 @@
         <div class="container mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
                 <a href="/" class="flex items-center">
+                    <img src="{{ asset('assets/logo.jpg') }}" class="h-10 w-auto" alt="Logo">
                     <span class="text-2xl font-display font-bold text-primary">Enak Rasa</span>
                 </a>
                 
@@ -241,6 +242,7 @@
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div>
+
                     <h3 class="text-xl font-display font-semibold mb-6 relative inline-block pb-2">
                         Enak Rasa
                         <span class="absolute bottom-0 left-0 w-16 h-0.5 bg-primary"></span>
