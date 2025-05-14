@@ -154,6 +154,7 @@
                 <p class="text-lg md:text-xl mb-8 mx-auto max-w-2xl">Enak Rasa Wedding Hall offers an elegant setting for your perfect day. Our dedicated team will transform your dreams into a celebration to remember.</p>
                 <div class="flex flex-wrap justify-center gap-4">
                     <a href="{{ route('booking-requests.create') }}" class="bg-primary hover:bg-opacity-90 text-white px-6 py-3 rounded-full font-medium transition-colors duration-300">Book Your Date</a>
+                    <a href="{{ route('booking.calendar') }}" class="bg-white text-primary hover:bg-gray-100 px-6 py-3 rounded-full font-medium transition-colors duration-300">View Calendar</a>
                     
                     @guest
                         <a href="{{ route('login') }}" class="bg-transparent border-2 border-white hover:bg-white hover:text-primary text-white px-6 py-3 rounded-full font-medium transition-colors duration-300">Login</a>
@@ -385,6 +386,62 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                 </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calendar Section -->
+    <section class="py-20 bg-gray-50" id="calendar">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-dark mb-4">Booking Calendar</h2>
+                <div class="w-24 h-1 bg-primary mx-auto"></div>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Check our availability calendar to see open dates for your wedding, viewing, or reservation.</p>
+            </div>
+            
+            <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden" data-aos="fade-up">
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-1/2 bg-primary p-10 text-white flex items-center">
+                        <div>
+                            <h3 class="text-2xl font-display font-bold mb-4">Plan Your Special Day</h3>
+                            <p class="mb-6">Our interactive calendar helps you view all bookings and available dates to plan your event effectively.</p>
+                            <ul class="space-y-3 mb-8">
+                                <li class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    See all upcoming bookings
+                                </li>
+                                <li class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Filter by venue location
+                                </li>
+                                <li class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Find the perfect date for your event
+                                </li>
+                            </ul>
+                            <a href="{{ route('booking.calendar') }}" class="inline-flex items-center bg-white text-primary px-6 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors duration-300">
+                                <span>View Calendar</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="md:w-1/2 p-6 flex items-center justify-center">
+                        <div class="w-full">
+                            <img src="https://images.unsplash.com/photo-1557596421-31f6419be91d?q=80&w=2864&auto=format&fit=crop" alt="Calendar" class="rounded-lg shadow-md w-full h-auto max-w-md mx-auto">
+                            <div class="text-center mt-4">
+                                <p class="text-gray-600 font-medium">Stay organized with our interactive booking calendar</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
