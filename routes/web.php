@@ -22,6 +22,7 @@ use App\Http\Controllers\Staff\StaffCustomizationController;
 use App\Http\Controllers\CustomizationController;
 use App\Http\Controllers\PackageRecommendationController;
 use App\Http\Controllers\WeddingCardController;
+use App\Http\Controllers\User\UserBookingController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -237,6 +238,11 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
         $booking = \App\Models\Booking::findOrFail($booking);
         return view('user.booking-show', compact('booking'));
     })->name('bookings.show');
+    
+    // Booking Actions
+    Route::get('/bookings/{booking}/confirm', [UserBookingController::class, 'showConfirmForm'])->name('bookings.confirm.form');
+    Route::post('/bookings/{booking}/confirm', [UserBookingController::class, 'confirmReservation'])->name('bookings.confirm');
+    Route::post('/bookings/{booking}/cancel', [UserBookingController::class, 'cancelBooking'])->name('bookings.cancel');
 
     // Invoice management
     Route::get('/bookings/{booking}/invoice', [InvoiceController::class, 'showSubmitForm'])->name('invoices.create');

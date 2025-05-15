@@ -48,6 +48,7 @@
                     <div class="flex flex-wrap gap-2">
                         <a href="{{ route('user.bookings', ['status' => 'all']) }}" class="px-4 py-2 {{ !request('status') || request('status') == 'all' ? 'bg-primary text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} rounded-full text-sm transition-colors">All</a>
                         <a href="{{ route('user.bookings', ['status' => 'upcoming']) }}" class="px-4 py-2 {{ request('status') == 'upcoming' ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} rounded-full text-sm transition-colors">Upcoming</a>
+                        <a href="{{ route('user.bookings', ['type' => 'reservation']) }}" class="px-4 py-2 {{ request('type') == 'reservation' ? 'bg-purple-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} rounded-full text-sm transition-colors">Reservations</a>
                         <a href="{{ route('user.bookings', ['status' => 'waiting_for_deposit']) }}" class="px-4 py-2 {{ request('status') == 'waiting_for_deposit' ? 'bg-blue-500 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} rounded-full text-sm transition-colors">Waiting for Deposit</a>
                         <a href="{{ route('user.bookings', ['status' => 'ongoing']) }}" class="px-4 py-2 {{ request('status') == 'ongoing' ? 'bg-yellow-500 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} rounded-full text-sm transition-colors">Ongoing</a>
                         <a href="{{ route('user.bookings', ['status' => 'completed']) }}" class="px-4 py-2 {{ request('status') == 'completed' ? 'bg-green-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} rounded-full text-sm transition-colors">Completed</a>
@@ -58,7 +59,9 @@
 @php
     $query = \App\Models\Booking::where('user_id', Auth::id());
     
-    if(request('status') == 'upcoming') {
+    if(request('type') == 'reservation') {
+        $query->where('type', 'reservation');
+    } elseif(request('status') == 'upcoming') {
         $query->where('booking_date', '>=', date('Y-m-d'))
              ->where('status', 'ongoing');
     } elseif(request('status') == 'waiting_for_deposit') {
@@ -159,6 +162,27 @@
                                         </svg>
                                         View Details
                                     </a>
+                                    
+                                    @if($booking->type === 'reservation' && $booking->status !== 'cancelled')
+                                    <div class="mt-2 flex space-x-1">
+                                        <a href="{{ route('user.bookings.confirm.form', $booking) }}" class="inline-flex items-center px-2 py-1 text-xs bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            Confirm
+                                        </a>
+                                        
+                                        <form action="{{ route('user.bookings.cancel', $booking) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to cancel this reservation?')">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center px-2 py-1 text-xs bg-red-100 text-red-800 rounded hover:bg-red-200 transition-colors">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                                Cancel
+                                            </button>
+                                        </form>
+                                    </div>
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach

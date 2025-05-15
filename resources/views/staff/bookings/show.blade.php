@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('title', 'Booking Details - Enak Rasa Wedding Hall')
@@ -86,7 +85,7 @@
                             <dd class="mt-1 text-sm text-gray-900">
                                 RM {{ number_format($booking->package->min_price, 0, ',', '.') }}
                                 @if($booking->package->min_price != $booking->package->max_price)
-                                    - {{ number_format($booking->package->max_price, 0, ',', '.') }}
+                                    - RM {{ number_format($booking->package->max_price, 0, ',', '.') }}
                                 @endif
                             </dd>
                         </div>

@@ -29,6 +29,63 @@
             }}"></div>
             
             <div class="p-6">
+                <!-- Flash Messages -->
+                @if (session('success'))
+                <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-green-800">{{ session('success') }}</p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                
+                @if (session('error'))
+                <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-800">{{ session('error') }}</p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                
+                <!-- Reservation Explanation -->
+                @if($booking->type === 'reservation' && $booking->status !== 'cancelled')
+                <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-800 font-medium">Reservation Information</p>
+                            <p class="text-sm text-blue-700 mt-1">
+                                You have a preliminary reservation for {{ $booking->venue->name }} on {{ $booking->booking_date->format('l, F d, Y') }} 
+                                ({{ $booking->session === 'morning' ? 'Morning' : 'Evening' }} Session).
+                                To confirm this reservation, please click the "Confirm Reservation" button below.
+                                Once confirmed, you will need to proceed with a deposit payment to secure your booking.
+                                @if($booking->expiry_date)
+                                <br><br>
+                                <strong>Note:</strong> This reservation will expire on {{ $booking->expiry_date->format('F d, Y') }} if not confirmed.
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                
                 <!-- Booking Status -->
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 pb-4 border-b border-gray-200">
                     <div>
@@ -117,6 +174,49 @@
                                 </dd>
                             </div>
                             @endif
+                            
+                            <!-- Reservation Action Buttons -->
+                            @if($booking->type === 'reservation' && $booking->status !== 'cancelled')
+                            <div class="flex flex-col sm:flex-row pt-4 border-t border-gray-200 mt-2">
+                                <dt class="text-sm font-medium text-gray-500 w-full sm:w-1/3">Actions</dt>
+                                <dd class="text-sm w-full sm:w-2/3 flex flex-col xs:flex-row gap-2">
+                                    <a href="{{ route('user.bookings.confirm.form', $booking) }}" class="w-full xs:w-auto inline-flex justify-center items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Confirm Reservation
+                                    </a>
+                                    
+                                    <form action="{{ route('user.bookings.cancel', $booking) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to cancel this reservation? This action cannot be undone.')">
+                                        @csrf
+                                        <button type="submit" class="w-full xs:w-auto inline-flex justify-center items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                            Cancel Reservation
+                                        </button>
+                                    </form>
+                                </dd>
+                            </div>
+                            @endif
+                            
+                            <!-- Regular Booking Cancel Button -->
+                            @if($booking->type !== 'reservation' && $booking->status !== 'cancelled' && $booking->status !== 'completed')
+                            <div class="flex flex-col sm:flex-row pt-4 border-t border-gray-200 mt-2">
+                                <dt class="text-sm font-medium text-gray-500 w-full sm:w-1/3">Actions</dt>
+                                <dd class="text-sm w-full sm:w-2/3">
+                                    <form action="{{ route('user.bookings.cancel', $booking) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to cancel this booking? This action cannot be undone.')">
+                                        @csrf
+                                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                            Cancel Booking
+                                        </button>
+                                    </form>
+                                </dd>
+                            </div>
+                            @endif
                         </dl>
                     </div>
                     
@@ -145,7 +245,7 @@
                     </div>
                     
                     <!-- Package Information -->
-                    @if($booking->package)
+                    @if($booking->package && $booking->type === 'wedding')
                     <div class="md:col-span-2 border-t border-gray-200 pt-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">

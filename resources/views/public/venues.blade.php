@@ -91,16 +91,16 @@
                         <div class="mt-5 pt-4 border-t border-gray-100 flex justify-between items-center">
                             <div>
                                 <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Price Range</p>
-                                <p class="text-primary font-bold text-lg">
+                                <div class="text-lg font-bold text-primary mt-2">
                                     @if($minPrice > 0)
                                         RM {{ number_format($minPrice, 0, ',', '.') }}
                                         @if($minPrice != $maxPrice)
-                                            - {{ number_format($maxPrice, 0, ',', '.') }}
+                                            - RM {{ number_format($maxPrice, 0, ',', '.') }}
                                         @endif
                                     @else
                                         Contact us
                                     @endif
-                                </p>
+                                </div>
                             </div>
                             <span class="bg-primary text-white text-sm px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0 shadow-md">
                                 View Details
