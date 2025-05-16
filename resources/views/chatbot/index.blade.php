@@ -93,7 +93,7 @@
             messageElement.innerHTML = `
                 <div class="flex items-start justify-end">
                     <div class="mr-3 bg-primary text-white rounded-lg py-3 px-4 max-w-3xl">
-                        <p>${message}</p>
+                        <p>${escapeHtml(message)}</p>
                     </div>
                     <div class="flex-shrink-0">
                         <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -117,10 +117,13 @@
             if (responseData.links && responseData.links.length > 0) {
                 linksHtml = '<div class="mt-3 flex flex-wrap gap-2">';
                 responseData.links.forEach(link => {
-                    linksHtml += `<a href="${link.url}" class="inline-flex items-center px-3 py-1 border border-primary text-sm font-medium rounded-full text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">${link.text}</a>`;
+                    linksHtml += `<a href="${escapeHtml(link.url)}" class="inline-flex items-center px-3 py-1 border border-primary text-sm font-medium rounded-full text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">${escapeHtml(link.text)}</a>`;
                 });
                 linksHtml += '</div>';
             }
+            
+            // Convert text with newlines to HTML with <br> tags
+            const formattedText = escapeHtml(responseData.text).replace(/\n/g, '<br>');
             
             messageElement.innerHTML = `
                 <div class="flex items-start">
@@ -133,8 +136,8 @@
                         </div>
                     </div>
                     <div class="ml-3 bg-gray-100 rounded-lg py-3 px-4 max-w-3xl">
-                        <p class="text-gray-800">${responseData.text.replace(/\n/g, '<br>')}</p>
-                        ${responseData.source === 'ai' ? '<div class="mt-2 flex items-center text-xs text-gray-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>Powered by DeepSeek AI</div>' : ''}
+                        <p class="text-gray-800">${formattedText}</p>
+                        ${responseData.source === 'ai' ? '<div class="mt-2 flex items-center text-xs text-gray-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>Powered by AI</div>' : ''}
                         ${linksHtml}
                     </div>
                 </div>
@@ -231,6 +234,16 @@
             });
         });
         
+        // Utility function to escape HTML
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        
         // Check for URL query parameter 'q' to pre-fill a question
         const urlParams = new URLSearchParams(window.location.search);
         const prefilledQuestion = urlParams.get('q');
@@ -247,4 +260,4 @@
     });
 </script>
 @endpush
-@endsection 
+@endsection

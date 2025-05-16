@@ -32,22 +32,77 @@ class ChatbotController extends Controller
     public function query(Request $request)
     {
         $query = strtolower($request->input('query'));
+        $useAI = config('chatbot.use_ai', false) && !empty(config('chatbot.deepseek_api_key'));
         
-        // Check if we should use AI for this query
-        if (config('chatbot.use_ai', false) && !empty(config('chatbot.deepseek_api_key'))) {
+        // First try with AI if it's enabled
+        if ($useAI) {
             try {
                 $response = $this->generateAIResponse($query);
                 return response()->json(['response' => $response]);
             } catch (\Exception $e) {
-                Log::error('AI Chatbot error: ' . $e->getMessage());
+                Log::error('AI Chatbot error: ' . $e->getMessage(), [
+                    'query' => $query,
+                    'trace' => $e->getTraceAsString()
+                ]);
                 // Fallback to rule-based response if AI fails
                 $response = $this->generateRuleBasedResponse($query);
                 return response()->json(['response' => $response]);
             }
         }
         
-        // Use rule-based response if AI is not configured
+        // Use rule-based response if AI is not configured as primary
         $response = $this->generateRuleBasedResponse($query);
+        
+        // Check if rule-based response didn't find a good match
+        $isGenericResponse = false;
+        
+        // Detect default fallback response
+        if ($response['text'] === "I'm here to help with your wedding venue booking questions. You can ask about our venues, packages, booking process, availability, or get personalized recommendations.") {
+            $isGenericResponse = true;
+        }
+        
+        // Check for very short queries that might have been misunderstood
+        if (strlen($query) > 10 && count(explode(' ', $query)) > 2 && !$isGenericResponse) {
+            // For more complex queries, check if the response has very generic links
+            $defaultLinks = [
+                ['text' => 'Browse Wedding Venues', 'url' => route('public.venues')],
+                ['text' => 'Find Your Perfect Package', 'url' => route('package-recommendation.index')],
+                ['text' => 'Check Availability', 'url' => route('booking.calendar')]
+            ];
+            
+            // If the response has exactly these default links, it might be a generic response
+            if (count($response['links']) === 3) {
+                $matchCount = 0;
+                foreach ($response['links'] as $link) {
+                    foreach ($defaultLinks as $defaultLink) {
+                        if ($link['text'] === $defaultLink['text']) {
+                            $matchCount++;
+                            break;
+                        }
+                    }
+                }
+                
+                if ($matchCount === 3) {
+                    $isGenericResponse = true;
+                }
+            }
+        }
+        
+        // If we have a generic response and DeepSeek is configured, try AI as a fallback
+        if ($isGenericResponse && !empty(config('chatbot.deepseek_api_key'))) {
+            try {
+                Log::info('Using AI fallback for unhandled query', ['query' => $query]);
+                $aiResponse = $this->generateAIResponse($query);
+                return response()->json(['response' => $aiResponse]);
+            } catch (\Exception $e) {
+                Log::error('AI fallback error: ' . $e->getMessage(), [
+                    'query' => $query,
+                    'trace' => $e->getTraceAsString()
+                ]);
+                // Keep the original rule-based response if AI fails
+            }
+        }
+        
         return response()->json(['response' => $response]);
     }
     
@@ -71,7 +126,8 @@ class ChatbotController extends Controller
             $bookingCount = Booking::where('user_id', $user->id)->count();
             $requestCount = BookingRequest::where('user_id', $user->id)->count();
             $userContext = "The user is logged in as {$user->name}. ";
-            $userContext .= "They have {$bookingCount} bookings and {$requestCount} booking requests in our system.";
+            $userContext .= "They have {$bookingCount} " . ($bookingCount == 1 ? 'booking' : 'bookings');
+            $userContext .= " and {$requestCount} booking " . ($requestCount == 1 ? 'request' : 'requests') . " in our system.";
         } else {
             $userContext = "The user is not logged in.";
         }
@@ -86,6 +142,17 @@ class ChatbotController extends Controller
         $systemPrompt .= "Our booking process involves: 1) Submitting a booking request 2) Staff approval 3) Payment of 30% deposit 4) Final payment due 14 days before event. ";
         $systemPrompt .= "We have a cancellation policy that allows full refunds for cancellations 30+ days before the event. ";
         $systemPrompt .= "{$userContext}";
+        
+        // Enable debugging if configured
+        if (config('chatbot.debug', false)) {
+            Log::debug('DeepSeek API Request', [
+                'system_prompt' => $systemPrompt,
+                'user_query' => $query,
+                'model' => config('chatbot.model', 'deepseek-chat'),
+                'temperature' => config('chatbot.temperature', 0.7),
+                'max_tokens' => config('chatbot.max_tokens', 300),
+            ]);
+        }
         
         // Make API request to DeepSeek
         $response = Http::withHeaders([
@@ -104,6 +171,14 @@ class ChatbotController extends Controller
         // Process the response
         if ($response->successful()) {
             $result = $response->json();
+            
+            if (config('chatbot.debug', false)) {
+                Log::debug('DeepSeek API Response', [
+                    'status' => $response->status(),
+                    'result' => $result,
+                ]);
+            }
+            
             $aiText = $result['choices'][0]['message']['content'] ?? 'I apologize, but I couldn\'t generate a response. Please try again.';
             
             // Determine relevant links based on the query and AI response
@@ -115,6 +190,13 @@ class ChatbotController extends Controller
                 'source' => 'ai'
             ];
         }
+        
+        // Log error response for debugging
+        Log::error('DeepSeek API request failed', [
+            'status' => $response->status(),
+            'body' => $response->body(),
+            'query' => $query
+        ]);
         
         // Fallback if the API request fails
         throw new \Exception('API request failed: ' . $response->body());
@@ -130,38 +212,59 @@ class ChatbotController extends Controller
     private function determineRelevantLinks($query, $aiText)
     {
         $links = [];
-        $combinedText = $query . ' ' . $aiText;
-        $combinedText = strtolower($combinedText);
+        $combinedText = strtolower($query . ' ' . $aiText);
         
         // Check for venue-related content
-        if (strpos($combinedText, 'venue') !== false || strpos($combinedText, 'location') !== false) {
+        if (preg_match('/\b(venue|location|hall|place|space|site)\b/', $combinedText)) {
             $links[] = ['text' => 'View Wedding Venues', 'url' => route('public.venues')];
         }
         
         // Check for booking-related content
-        if (strpos($combinedText, 'book') !== false || strpos($combinedText, 'reserve') !== false || 
-            strpos($combinedText, 'request') !== false) {
+        if (preg_match('/\b(book|reserve|request|reservation|schedule|appointment)\b/', $combinedText)) {
             $links[] = ['text' => 'Submit Booking Request', 'url' => route('booking-requests.create')];
         }
         
         // Check for package-related content
-        if (strpos($combinedText, 'package') !== false || strpos($combinedText, 'price') !== false || 
-            strpos($combinedText, 'cost') !== false) {
+        if (preg_match('/\b(package|price|cost|fee|budget|affordable|expensive|option)\b/', $combinedText)) {
             $links[] = ['text' => 'Find the Perfect Package', 'url' => route('package-recommendation.index')];
         }
         
         // Check for calendar/date-related content
-        if (strpos($combinedText, 'date') !== false || strpos($combinedText, 'calendar') !== false || 
-            strpos($combinedText, 'availability') !== false || strpos($combinedText, 'available') !== false) {
+        if (preg_match('/\b(date|calendar|availability|available|when|schedule|time|month|day)\b/', $combinedText)) {
             $links[] = ['text' => 'View Booking Calendar', 'url' => route('booking.calendar')];
         }
         
         // Add a link for logged-in users to view their bookings
-        if (Auth::check() && (strpos($combinedText, 'my booking') !== false || strpos($combinedText, 'my request') !== false)) {
+        if (Auth::check() && preg_match('/\b(my booking|my request|reservation|status)\b/', $combinedText)) {
             $links[] = ['text' => 'View My Bookings', 'url' => route('user.bookings')];
         }
         
-        return $links;
+        // Add calendar link if asking about dates for specific months
+        if (preg_match('/\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/', $combinedText)) {
+            if (!in_array(['text' => 'View Booking Calendar', 'url' => route('booking.calendar')], $links)) {
+                $links[] = ['text' => 'View Booking Calendar', 'url' => route('booking.calendar')];
+            }
+        }
+        
+        // If asking about contact or help
+        if (preg_match('/\b(contact|help|support|phone|email|reach|message|chat)\b/', $combinedText)) {
+            $links[] = ['text' => 'Contact a Wedding Specialist', 'url' => '#contact-form'];
+        }
+        
+        // For visualization/images related queries
+        if (preg_match('/\b(picture|photo|image|gallery|decoration|look|tour|virtual)\b/', $combinedText)) {
+            $links[] = ['text' => 'View Gallery', 'url' => route('public.venues')];
+        }
+        
+        // If no links were added, provide default ones based on most common needs
+        if (empty($links)) {
+            // Limit to 2 default links to avoid overwhelming the user
+            $links[] = ['text' => 'Browse Wedding Venues', 'url' => route('public.venues')];
+            $links[] = ['text' => 'Submit Booking Request', 'url' => route('booking-requests.create')];
+        }
+        
+        // Limit to at most 3 links to not overwhelm users
+        return array_slice($links, 0, 3);
     }
 
     /**
@@ -315,4 +418,4 @@ class ChatbotController extends Controller
             'source' => 'rule'
         ];
     }
-} 
+}

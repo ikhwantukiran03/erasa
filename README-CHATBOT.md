@@ -6,6 +6,7 @@ This chatbot provides an interactive way for users to get information about wedd
 
 - Natural language understanding powered by DeepSeek's AI models
 - Fallback to rule-based responses when AI is unavailable
+- AI fallback for queries not handled by the rule-based system
 - Contextual awareness of user authentication state
 - Smart suggestion of relevant links based on conversation context
 - Floating chat widget available throughout the site
@@ -28,9 +29,10 @@ DEEPSEEK_MAX_TOKENS=300
 CHATBOT_DEBUG=false
 ```
 
-2. Set `CHATBOT_USE_AI=true` to enable AI responses. If set to `false`, the system will use rule-based responses.
+2. Set `CHATBOT_USE_AI=true` to enable AI responses as the primary handling method. If set to `false`, the system will use rule-based responses.
 
-3. Get an API key from DeepSeek and set it as the `DEEPSEEK_API_KEY` value.
+3. Get an API key from DeepSeek and set it as the `DEEPSEEK_API_KEY` value. 
+   **Important:** Even if `CHATBOT_USE_AI` is set to `false`, adding a valid API key will enable AI fallback for queries not handled by rules.
 
 ### Model Configuration
 
@@ -54,9 +56,15 @@ The chatbot is available in two forms:
 ### How It Works
 
 1. User queries are sent to the backend
-2. If AI is enabled and configured, the system attempts to generate an AI response
-3. If AI fails or is disabled, the system falls back to rule-based responses
-4. The response is displayed with relevant action links when applicable
+2. If AI is enabled (`CHATBOT_USE_AI=true`), the system attempts to generate an AI response first
+3. If AI fails or is disabled, the system uses rule-based responses
+4. If the rule-based system cannot find a specific match AND a DeepSeek API key is configured:
+   - The system will try using AI as a fallback, even if `CHATBOT_USE_AI` is set to false
+   - The chatbot has several ways to detect unhandled queries:
+     * When the default generic response text is returned
+     * When a complex query receives only the generic default links
+   - This ensures that uncommon, complex, or specialized questions still receive helpful responses
+5. The response is displayed with relevant action links when applicable
 
 ## Extending
 

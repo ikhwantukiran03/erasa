@@ -20,7 +20,7 @@ return [
     | When false, the system will use rule-based responses.
     |
     */
-    'use_ai' => env('CHATBOT_USE_AI', false),
+    'use_ai' => env('CHATBOT_USE_AI', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -74,4 +74,4 @@ return [
     |
     */
     'debug' => env('CHATBOT_DEBUG', false),
-]; 
+];
