@@ -188,9 +188,9 @@ class InvoiceController extends Controller
             $message = 'Your payment proof has been submitted successfully.';
         }
 
-        // If this is a deposit and booking status is 'waiting for deposit', update to 'pending_verification'
-        if ($request->type === 'deposit' && $booking->status === 'waiting for deposit') {
-            $booking->update(['status' => 'pending_verification']);
+        // If this is a deposit payment, set status to ongoing immediately
+        if ($request->type === 'deposit') {
+            $booking->update(['status' => 'ongoing']);
         }
 
         return redirect()->route('user.bookings.show', $booking)
@@ -239,10 +239,8 @@ class InvoiceController extends Controller
             'invoice_notes' => $request->staff_notes,
         ]);
 
-        // If this is a deposit payment and it's verified, update booking status
-        if ($invoice->type === 'deposit' && $request->action === 'verify') {
-            $booking->update(['status' => 'ongoing']);
-        }
+        // If this is a deposit payment and it's rejected, we don't change the status
+        // Status will remain 'ongoing' as set during submission
 
         $message = $request->action === 'verify' 
             ? 'Payment has been verified successfully.' 

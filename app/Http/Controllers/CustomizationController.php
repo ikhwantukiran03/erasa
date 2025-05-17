@@ -174,6 +174,32 @@ class CustomizationController extends Controller
     }
     
     /**
+     * Display the specified customization request.
+     *
+     * @param  \App\Models\Booking  $booking
+     * @param  \App\Models\Customization  $customization
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public function show(Booking $booking, Customization $customization)
+    {
+        // Check if the booking belongs to the authenticated user
+        if ($booking->user_id !== Auth::id()) {
+            return redirect()->route('user.bookings')
+                ->with('error', 'You do not have permission to view this customization.');
+        }
+        
+        // Check if the customization belongs to the booking
+        if ($customization->booking_id !== $booking->id) {
+            return redirect()->route('user.bookings.show', $booking)
+                ->with('error', 'This customization request does not belong to this booking.');
+        }
+        
+        $packageItem = $customization->packageItem;
+        
+        return view('user.customizations.show', compact('booking', 'customization', 'packageItem'));
+    }
+    
+    /**
      * Remove the specified customization request from storage.
      *
      * @param  \App\Models\Booking  $booking

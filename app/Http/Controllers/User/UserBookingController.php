@@ -4,18 +4,50 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class UserBookingController extends Controller
 {
     /**
-     * Show form to confirm a reservation with package selection.
+     * Display a listing of the user's bookings.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function index()
+    {
+        $bookings = Booking::where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return view('user.bookings', compact('bookings'));
+    }
+    
+    /**
+     * Display the specified booking.
      *
      * @param  \App\Models\Booking  $booking
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function showConfirmForm(Booking $booking)
+    public function show(Booking $booking)
+    {
+        // Check if user owns the booking
+        if ($booking->user_id !== Auth::id()) {
+            return redirect()->route('user.bookings')
+                ->with('error', 'You do not have permission to view this booking.');
+        }
+        
+        return view('user.booking-show', compact('booking'));
+    }
+
+    /**
+     * Show the confirmation form for a reservation booking.
+     *
+     * @param  \App\Models\Booking  $booking
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public function confirmReservationForm(Booking $booking)
     {
         // Check if user owns the booking
         if ($booking->user_id !== Auth::id()) {
@@ -28,11 +60,12 @@ class UserBookingController extends Controller
             return redirect()->route('user.bookings.show', $booking)
                 ->with('error', 'Only reservations can be confirmed.');
         }
-
-        // Get available packages for selection
-        $packages = \App\Models\Package::orderBy('name')->get();
         
-        return view('user.bookings.confirm-reservation', compact('booking', 'packages'));
+        // Get packages available for this venue
+        $packages = Package::where('venue_id', $booking->venue_id)
+            ->get();
+            
+        return view('user.bookings.confirm', compact('booking', 'packages'));
     }
 
     /**
@@ -55,18 +88,23 @@ class UserBookingController extends Controller
             return redirect()->route('user.bookings.show', $booking)
                 ->with('error', 'Only reservations can be confirmed.');
         }
-
-        // Validate inputs
-        $request->validate([
+        
+        // Validate package selection
+        $validator = $request->validate([
             'package_id' => 'required|exists:packages,id',
-            'price_id' => 'required|exists:prices,id',
+            'price_id' => 'nullable|exists:prices,id',
         ]);
 
-        // Update the booking type to wedding, status to waiting for deposit, and add package details
+        // Update the booking type to wedding and status to waiting for deposit
         $booking->type = 'wedding';
         $booking->status = 'waiting for deposit';
         $booking->package_id = $request->package_id;
-        $booking->price_id = $request->price_id;
+        
+        // Save the price_id if provided
+        if ($request->has('price_id')) {
+            $booking->price_id = $request->price_id;
+        }
+        
         $booking->save();
 
         return redirect()->route('user.bookings.show', $booking)
@@ -87,17 +125,11 @@ class UserBookingController extends Controller
                 ->with('error', 'You do not have permission to cancel this booking.');
         }
 
-        // Check if booking can be cancelled (not already cancelled or completed)
-        if (in_array($booking->status, ['cancelled', 'completed'])) {
-            return redirect()->route('user.bookings.show', $booking)
-                ->with('error', 'This booking cannot be cancelled because it is already ' . $booking->status . '.');
-        }
-
-        // Cancel the booking
+        // Update booking status to cancelled
         $booking->status = 'cancelled';
         $booking->save();
 
         return redirect()->route('user.bookings.show', $booking)
-            ->with('success', 'Your booking has been successfully cancelled.');
+            ->with('success', 'Your booking has been cancelled successfully.');
     }
 } 

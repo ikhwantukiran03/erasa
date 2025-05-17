@@ -25,7 +25,8 @@
             <div class="h-1.5 {{ 
                 $booking->status === 'ongoing' ? 'bg-yellow-400' : 
                 ($booking->status === 'waiting for deposit' ? 'bg-blue-400' : 
-                ($booking->status === 'completed' ? 'bg-green-500' : 'bg-red-500')) 
+                ($booking->status === 'completed' ? 'bg-green-500' : 
+                ($booking->status === 'pending_verification' ? 'bg-purple-500' : 'bg-red-500'))) 
             }}"></div>
             
             <div class="p-6">
@@ -106,6 +107,11 @@
                                     <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
                                     Completed
                                 </span>
+                            @elseif($booking->status === 'pending_verification')
+                                <span class="px-3 py-1.5 inline-flex items-center text-sm font-semibold rounded-full bg-purple-100 text-purple-800">
+                                    <span class="w-1.5 h-1.5 bg-purple-500 rounded-full mr-1.5"></span>
+                                    Pending Verification
+                                </span>
                             @else
                                 <span class="px-3 py-1.5 inline-flex items-center text-sm font-semibold rounded-full bg-red-100 text-red-800">
                                     <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
@@ -124,13 +130,22 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Event Information -->
                     <div class="bg-gray-50 p-5 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            Event Information
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center justify-between">
+                            <span class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                Event Information
+                            </span>
+                            <button type="button" id="toggleEventInfo" class="text-primary hover:text-primary-dark text-sm flex items-center">
+                                <span class="show-text hidden">Show</span>
+                                <span class="hide-text">Hide</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 toggle-icon rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
                         </h3>
-                        <dl class="space-y-3">
+                        <dl class="space-y-3 event-info-details">
                             <div class="flex flex-col sm:flex-row">
                                 <dt class="text-sm font-medium text-gray-500 w-full sm:w-1/3">Event Type</dt>
                                 <dd class="text-sm text-gray-900 font-medium capitalize w-full sm:w-2/3">
@@ -222,13 +237,22 @@
                     
                     <!-- Venue Information -->
                     <div class="bg-gray-50 p-5 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                            </svg>
-                            Venue Information
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center justify-between">
+                            <span class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                                Venue Information
+                            </span>
+                            <button type="button" id="toggleVenueInfo" class="text-primary hover:text-primary-dark text-sm flex items-center">
+                                <span class="show-text hidden">Show</span>
+                                <span class="hide-text">Hide</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 toggle-icon rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
                         </h3>
-                        <dl class="space-y-3">
+                        <dl class="space-y-3 venue-info-details">
                             <div class="flex flex-col sm:flex-row">
                                 <dt class="text-sm font-medium text-gray-500 w-full sm:w-1/3">Venue Name</dt>
                                 <dd class="text-sm text-gray-900 font-medium w-full sm:w-2/3">{{ $booking->venue->name }}</dd>
@@ -247,14 +271,23 @@
                     <!-- Package Information -->
                     @if($booking->package && $booking->type === 'wedding')
                     <div class="md:col-span-2 border-t border-gray-200 pt-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                            </svg>
-                            Package Information
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center justify-between">
+                            <span class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                                Package Information
+                            </span>
+                            <button type="button" id="togglePackageInfo" class="text-primary hover:text-primary-dark text-sm flex items-center">
+                                <span class="show-text">Show</span>
+                                <span class="hide-text hidden">Hide</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 toggle-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
                         </h3>
                         
-                        <div class="bg-gray-50 p-5 rounded-lg mb-6">
+                        <div class="bg-gray-50 p-5 rounded-lg mb-6 package-info-details hidden">
                             <dl class="space-y-4">
                                 <div class="flex flex-col sm:flex-row">
                                     <dt class="text-sm font-medium text-gray-500 w-full sm:w-1/4">Package Name</dt>
@@ -334,37 +367,54 @@
                                     Click on any item below to request customization for your wedding package
                                 </p>
                             </div>
+                        </div>
+                        @endif
+                        
+                        <!-- Package Items -->
+                        @if($booking->package->packageItems->count() > 0)
+                        <div class="mt-6 col-span-3 package-info-details hidden">
+                            <h4 class="text-md font-medium text-gray-800 mb-3 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                Included Items
+                            </h4>
                             
-                            <div class="space-y-4 mt-4">
-                                @php
-                                    $packageItemsByCategory = $booking->package->packageItems->groupBy(function($item) {
-                                        return $item->item->category->name;
-                                    });
-                                @endphp
-                                
+                            @php
+                                $packageItemsByCategory = $booking->package->packageItems->groupBy(function($item) {
+                                    return $item->item->category->name;
+                                });
+                            @endphp
+                            
+                            <div class="space-y-4 mt-2">
                                 @foreach($packageItemsByCategory as $categoryName => $packageItems)
-                                    <div class="bg-gray-50 p-4 rounded-lg">
-                                        <h4 class="font-medium text-gray-700 mb-3 flex items-center">
+                                    <div class="bg-white p-4 rounded-lg border border-gray-200">
+                                        <h5 class="font-medium text-gray-700 mb-2 flex items-center text-sm">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                                             </svg>
                                             {{ $categoryName }}
-                                        </h4>
-                                        <ul class="space-y-2">
+                                        </h5>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                             @foreach($packageItems as $packageItem)
                                                 @php
                                                     $customization = $booking->customizations()
                                                         ->where('package_item_id', $packageItem->id)
                                                         ->first();
                                                 @endphp
-                                                <li class="flex justify-between items-center p-2.5 hover:bg-gray-100 rounded-md transition border border-gray-200">
-                                                    <div>
-                                                        <span class="font-medium text-gray-800">{{ $packageItem->item->name }}</span>
-                                                        @if($packageItem->description)
-                                                            <p class="text-sm text-gray-600 mt-0.5">{{ $packageItem->description }}</p>
-                                                        @endif
+                                                <div class="flex justify-between items-start space-x-2 p-2 rounded-md bg-gray-50">
+                                                    <div class="flex items-start space-x-2">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                        <div>
+                                                            <span class="font-medium text-gray-800 text-sm">{{ $packageItem->item->name }}</span>
+                                                            @if($packageItem->description)
+                                                                <p class="text-xs text-gray-600 mt-0.5">{{ $packageItem->description }}</p>
+                                                            @endif
+                                                        </div>
                                                     </div>
-                                                    <div>
+                                                    @if($booking->status === 'ongoing')
                                                         @if($customization)
                                                             @if($customization->status === 'pending')
                                                                 <a href="{{ route('user.customizations.edit', [$booking, $customization]) }}" 
@@ -400,53 +450,7 @@
                                                                 Customize
                                                             </a>
                                                         @endif
-                                                    </div>
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                        @endif
-                        
-                        <!-- Package Items -->
-                        @if($booking->package->packageItems->count() > 0)
-                        <div class="mt-6 col-span-3">
-                            <h4 class="text-md font-medium text-gray-800 mb-3 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                </svg>
-                                Included Items
-                            </h4>
-                            
-                            @php
-                                $packageItemsByCategory = $booking->package->packageItems->groupBy(function($item) {
-                                    return $item->item->category->name;
-                                });
-                            @endphp
-                            
-                            <div class="space-y-4 mt-2">
-                                @foreach($packageItemsByCategory as $categoryName => $packageItems)
-                                    <div class="bg-white p-4 rounded-lg border border-gray-200">
-                                        <h5 class="font-medium text-gray-700 mb-2 flex items-center text-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                            </svg>
-                                            {{ $categoryName }}
-                                        </h5>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                            @foreach($packageItems as $packageItem)
-                                                <div class="flex items-start space-x-2 p-2 rounded-md bg-gray-50">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                    <div>
-                                                        <span class="font-medium text-gray-800 text-sm">{{ $packageItem->item->name }}</span>
-                                                        @if($packageItem->description)
-                                                            <p class="text-xs text-gray-600 mt-0.5">{{ $packageItem->description }}</p>
-                                                        @endif
-                                                    </div>
+                                                    @endif
                                                 </div>
                                             @endforeach
                                         </div>
@@ -661,146 +665,97 @@
     </div>
 @endif
 
-@if($booking->package && $booking->package->packageItems->count() > 0 && $booking->type === 'wedding' && in_array($booking->status, ['ongoing', 'waiting for deposit']))
-<!-- Package Customization Section -->
-<div class="md:col-span-2 border-t border-gray-200 pt-6 mt-6">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            Package Customization
-        </h3>
-        @if($booking->customizations()->count() > 0)
-        <a href="{{ route('user.customizations.index', $booking) }}" class="mt-2 sm:mt-0 inline-flex items-center text-primary hover:text-primary-dark transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-            </svg>
-            View All Customization Requests
-        </a>
-        @endif
-    </div>
+
     
-    <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg mb-4">
-        <p class="text-gray-700 flex items-start">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500 mr-1.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-            </svg>
-            <span>
-                Personalize your wedding package by customizing individual items. Click the "Customize" button next to any item you wish to modify.
-                <br class="hidden md:block">
-                Our team will review your request and get back to you within 48 hours.
-            </span>
-        </p>
-    </div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        @php
-            $packageItemsByCategory = $booking->package->packageItems->groupBy(function($item) {
-                return $item->item->category->name;
-            });
-        @endphp
-        
-        @foreach($packageItemsByCategory as $categoryName => $packageItems)
-        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-            <h4 class="font-medium text-gray-800 pb-2 mb-3 border-b border-gray-200 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                </svg>
-                {{ $categoryName }}
-            </h4>
-            
-            <ul class="space-y-3">
-                @foreach($packageItems as $packageItem)
-                @php
-                    $customization = $booking->customizations()
-                        ->where('package_item_id', $packageItem->id)
-                        ->first();
-                @endphp
-                <li class="flex justify-between items-center px-3 py-2.5 hover:bg-gray-50 rounded-md transition border border-gray-200">
-                    <div>
-                        <span class="font-medium text-gray-800">{{ $packageItem->item->name }}</span>
-                        @if($packageItem->description)
-                        <p class="text-sm text-gray-600 mt-0.5">{{ $packageItem->description }}</p>
-                        @endif
-                    </div>
-                    <div>
-                        @if($customization)
-                            @if($customization->status === 'pending')
-                            <a href="{{ route('user.customizations.edit', [$booking, $customization]) }}" 
-                                class="inline-flex items-center px-3 py-1.5 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium hover:bg-yellow-200 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Pending
-                            </a>
-                            @elseif($customization->status === 'approved')
-                            <a href="{{ route('user.customizations.show', [$booking, $customization]) }}" 
-                                class="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-800 rounded-full text-xs font-medium hover:bg-green-200 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                                Approved
-                            </a>
-                            @elseif($customization->status === 'rejected')
-                            <a href="{{ route('user.customizations.show', [$booking, $customization]) }}" 
-                                class="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-800 rounded-full text-xs font-medium hover:bg-red-200 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                                Rejected
-                            </a>
-                            @endif
-                        @else
-                        <a href="{{ route('user.customizations.create', [$booking, $packageItem]) }}" 
-                            class="inline-flex items-center px-3 py-1.5 bg-primary text-white rounded-md text-xs font-medium hover:bg-primary-dark transition-colors shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                            </svg>
-                            Customize
-                        </a>
-                        @endif
-                    </div>
-                </li>
-                @endforeach
-            </ul>
-        </div>
-        @endforeach
-    </div>
-    
-    @if($booking->customizations()->count() > 0)
-    <div class="mt-6 p-5 bg-blue-50 rounded-lg border border-blue-100">
-        <h4 class="font-medium text-gray-800 mb-3 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Customization Request Status
-        </h4>
-        
-        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-center">
-            <div class="bg-white p-3 rounded-lg border border-gray-200">
-                <span class="text-2xl font-bold text-gray-800">{{ $booking->customizations()->count() }}</span>
-                <p class="text-sm text-gray-600">Total Requests</p>
-            </div>
-            <div class="bg-white p-3 rounded-lg border border-gray-200">
-                <span class="text-2xl font-bold text-yellow-500">{{ $booking->customizations()->where('status', 'pending')->count() }}</span>
-                <p class="text-sm text-gray-600">Pending</p>
-            </div>
-            <div class="bg-white p-3 rounded-lg border border-gray-200">
-                <span class="text-2xl font-bold text-green-600">{{ $booking->customizations()->where('status', 'approved')->count() }}</span>
-                <p class="text-sm text-gray-600">Approved</p>
-            </div>
-            <div class="bg-white p-3 rounded-lg border border-gray-200">
-                <span class="text-2xl font-bold text-red-600">{{ $booking->customizations()->where('status', 'rejected')->count() }}</span>
-                <p class="text-sm text-gray-600">Rejected</p>
-            </div>
-        </div>
-    </div>
-    @endif
-</div>
-@endif
+
             </div>
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Toggle sections visibility
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleButtons = [
+            { buttonId: 'toggleEventInfo', contentClass: 'event-info-details', initiallyVisible: true },
+            { buttonId: 'toggleVenueInfo', contentClass: 'venue-info-details', initiallyVisible: true },
+            { buttonId: 'togglePackageInfo', contentClass: 'package-info-details', initiallyVisible: false }
+        ];
+        
+        toggleButtons.forEach(toggle => {
+            const button = document.getElementById(toggle.buttonId);
+            if (button) {
+                button.addEventListener('click', function() {
+                    const content = document.querySelectorAll('.' + toggle.contentClass);
+                    const showText = this.querySelector('.show-text');
+                    const hideText = this.querySelector('.hide-text');
+                    const icon = this.querySelector('.toggle-icon');
+                    
+                    content.forEach(element => {
+                        element.classList.toggle('hidden');
+                    });
+                    
+                    // Toggle button text
+                    showText.classList.toggle('hidden');
+                    hideText.classList.toggle('hidden');
+                    
+                    // Rotate icon
+                    icon.classList.toggle('rotate-180');
+                });
+            }
+        });
+    });
+</script>
+
+<!-- Package Details for Reservation Confirmation Modal -->
+@if($booking->type === 'reservation' && $booking->status !== 'cancelled')
+<div id="packageDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center p-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800">Package Details</h3>
+            <button id="closePackageDetails" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="p-6">
+            <div id="packageContent" class="space-y-4">
+                <p class="text-center mb-4">Click the button below to proceed to the confirmation page where you can select a package for your reservation.</p>
+                <a href="{{ route('user.bookings.confirm.form', $booking) }}" class="block w-full bg-primary text-white text-center py-3 rounded hover:bg-primary-dark transition">
+                    Continue to Package Selection
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Package details modal functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const confirmReservationBtn = document.querySelector('a[href="{{ route("user.bookings.confirm.form", $booking) }}"]');
+        const packageDetailsModal = document.getElementById('packageDetailsModal');
+        const closePackageDetails = document.getElementById('closePackageDetails');
+        
+        if (confirmReservationBtn && packageDetailsModal) {
+            confirmReservationBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                packageDetailsModal.classList.remove('hidden');
+            });
+            
+            closePackageDetails.addEventListener('click', function() {
+                packageDetailsModal.classList.add('hidden');
+            });
+            
+            // Close modal when clicking outside
+            packageDetailsModal.addEventListener('click', function(e) {
+                if (e.target === packageDetailsModal) {
+                    packageDetailsModal.classList.add('hidden');
+                }
+            });
+        }
+    });
+</script>
+@endif

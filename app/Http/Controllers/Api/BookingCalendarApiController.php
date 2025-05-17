@@ -24,7 +24,8 @@ class BookingCalendarApiController extends Controller
 
         $query = Booking::with(['venue', 'user', 'package'])
             ->whereBetween('booking_date', [$start, $end])
-            ->where('type', '!=', 'viewing');
+            ->where('type', '!=', 'viewing')
+            ->where('status', '!=', 'cancelled');
             
         if ($venueId) {
             $query->where('venue_id', $venueId);
@@ -65,6 +66,7 @@ class BookingCalendarApiController extends Controller
         $bookings = Booking::with(['venue', 'user'])
             ->where('booking_date', '>=', Carbon::now())
             ->where('type', '!=', 'viewing')
+            ->where('status', '!=', 'cancelled')
             ->orderBy('booking_date')
             ->limit(5)
             ->get();

@@ -125,7 +125,9 @@
                             Update Profile
                         </button>
                     </div>
-                    <!-- Delete Account Section -->
+                </form>
+                
+                <!-- Delete Account Section -->
                 <div id="delete-account" class="mt-10 border-t border-gray-200 pt-6">
                     <h3 class="text-lg font-semibold text-red-600 mb-4">Delete Account</h3>
                     <p class="text-gray-600 text-sm mb-4">Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.</p>
@@ -135,16 +137,16 @@
                         @method('DELETE')
                         
                         <div class="mb-4">
-                            <label for="delete-password" class="block text-dark font-medium mb-1">Password</label>
+                            <label for="delete_password" class="block text-dark font-medium mb-1">Password</label>
                             <input 
                                 type="password" 
-                                id="delete-password" 
-                                name="password" 
+                                id="delete_password" 
+                                name="delete_password" 
                                 required 
-                                class="form-input @error('password') border-red-500 @enderror" 
+                                class="form-input @error('delete_password') border-red-500 @enderror" 
                                 placeholder="Enter your password to confirm"
                             >
-                            @error('password')
+                            @error('delete_password')
                                 <p class="error-message">{{ $message }}</p>
                             @enderror
                         </div>
@@ -154,7 +156,8 @@
                                 Delete Account
                             </button>
                         </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

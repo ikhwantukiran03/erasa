@@ -1,99 +1,123 @@
 <!-- resources/views/user/customizations/show.blade.php -->
 @extends('layouts.app')
 
-@section('title', 'Customization Request Details - Enak Rasa Wedding Hall')
+@section('title', 'Customization Request - Enak Rasa Wedding Hall')
 
 @section('content')
-<div class="bg-gray-50 py-6">
-    <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center">
+<div class="bg-gray-50 py-8">
+    <div class="container mx-auto px-4 sm:px-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
             <div>
                 <h1 class="text-3xl font-display font-bold text-dark">Customization Request</h1>
-                <p class="text-gray-600 mt-2">Details of your customization request</p>
+                <p class="text-gray-600 mt-1">View your customization request details</p>
             </div>
-            <a href="{{ route('user.bookings.show', $booking) }}" class="text-primary hover:underline">Back to Booking</a>
+            <div class="mt-4 md:mt-0">
+                <a href="{{ route('user.bookings.show', $booking) }}" class="inline-flex items-center text-primary hover:text-primary-dark transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Back to Booking
+                </a>
+            </div>
         </div>
         
-        <div class="mt-8 bg-white rounded-lg shadow overflow-hidden">
-            <div class="p-1 {{ $customization->status === 'pending' ? 'bg-yellow-400' : ($customization->status === 'approved' ? 'bg-green-500' : 'bg-red-500') }}"></div>
-            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-gray-800">Customization Request</h2>
-                <div>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="h-1.5 
+                @if($customization->status === 'pending')
+                    bg-yellow-400
+                @elseif($customization->status === 'approved')
+                    bg-green-500
+                @else
+                    bg-red-500
+                @endif
+            "></div>
+            
+            <div class="p-6">
+                <!-- Status Badge -->
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800">Request #{{ $customization->id }}</h2>
+                    
                     @if($customization->status === 'pending')
-                        <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                            Pending
+                        <span class="px-3 py-1.5 inline-flex items-center text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                            <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full mr-1.5"></span>
+                            Pending Review
                         </span>
                     @elseif($customization->status === 'approved')
-                        <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-green-100 text-green-800">
+                        <span class="px-3 py-1.5 inline-flex items-center text-sm font-semibold rounded-full bg-green-100 text-green-800">
+                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
                             Approved
                         </span>
                     @else
-                        <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-red-100 text-red-800">
+                        <span class="px-3 py-1.5 inline-flex items-center text-sm font-semibold rounded-full bg-red-100 text-red-800">
+                            <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
                             Rejected
                         </span>
                     @endif
                 </div>
-            </div>
-            
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="font-semibold text-gray-800 mb-3">Item Details</h3>
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <p><span class="font-medium">Item:</span> {{ $customization->packageItem->item->name }}</p>
-                            <p><span class="font-medium">Category:</span> {{ $customization->packageItem->item->category->name }}</p>
-                            @if($customization->packageItem->description)
-                                <p><span class="font-medium">Description:</span> {{ $customization->packageItem->description }}</p>
-                            @endif
+                
+                <!-- Package Item Info -->
+                <div class="mb-8 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Item Information</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-gray-600">Category:</p>
+                            <p class="font-medium text-gray-800">{{ $packageItem->item->category->name }}</p>
                         </div>
-                    </div>
-                    
-                    <div>
-                        <h3 class="font-semibold text-gray-800 mb-3">Request Status</h3>
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <p><span class="font-medium">Submitted on:</span> {{ $customization->created_at->format('M d, Y H:i') }}</p>
-                            
-                            @if($customization->status !== 'pending')
-                                <p><span class="font-medium">Processed on:</span> {{ $customization->handled_at->format('M d, Y H:i') }}</p>
-                                
-                                @if($customization->handler)
-                                    <p><span class="font-medium">Processed by:</span> {{ $customization->handler->name }}</p>
-                                @endif
-                            @endif
-                            
-                            <p class="mt-2"><span class="font-medium">Status:</span> 
-                                @if($customization->status === 'pending')
-                                    <span class="text-yellow-600 font-semibold">Pending</span>
-                                @elseif($customization->status === 'approved')
-                                    <span class="text-green-600 font-semibold">Approved</span>
-                                @else
-                                    <span class="text-red-600 font-semibold">Rejected</span>
-                                @endif
-                            </p>
+                        <div>
+                            <p class="text-gray-600">Item Name:</p>
+                            <p class="font-medium text-gray-800">{{ $packageItem->item->name }}</p>
                         </div>
+                        @if($packageItem->description)
+                        <div class="md:col-span-2">
+                            <p class="text-gray-600">Default Description:</p>
+                            <p class="font-medium text-gray-800">{{ $packageItem->description }}</p>
+                        </div>
+                        @endif
                     </div>
                 </div>
                 
-                <div class="mt-6">
-                    <h3 class="font-semibold text-gray-800 mb-3">Your Customization Request</h3>
-                    <div class="bg-gray-50 p-4 rounded-lg whitespace-pre-wrap">
-                        {{ $customization->customization }}
+                <!-- Customization Request -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Your Customization Request</h3>
+                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                        <p class="text-gray-800 whitespace-pre-line">{{ $customization->customization }}</p>
                     </div>
                 </div>
                 
-                @if($customization->staff_notes)
-                    <div class="mt-6">
-                        <h3 class="font-semibold text-gray-800 mb-3">Staff Response</h3>
-                        <div class="bg-gray-50 p-4 rounded-lg whitespace-pre-wrap {{ $customization->status === 'approved' ? 'text-green-800' : 'text-red-800' }}">
-                            {{ $customization->staff_notes }}
-                        </div>
+                <!-- Staff Response -->
+                @if($customization->staff_response)
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Staff Response</h3>
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <p class="text-gray-800 whitespace-pre-line">{{ $customization->staff_response }}</p>
                     </div>
+                </div>
                 @endif
                 
-                <div class="mt-8 flex justify-end">
-                    <a href="{{ route('user.bookings.show', $booking) }}" class="bg-primary text-white px-6 py-2 rounded hover:bg-opacity-90 transition">
-                        Back to Booking
-                    </a>
+                <!-- Action Buttons -->
+                <div class="flex flex-col-reverse sm:flex-row justify-between">
+                    <div>
+                        @if($customization->status === 'pending')
+                            <div class="flex flex-col xs:flex-row gap-3">
+                                <a href="{{ route('user.customizations.edit', [$booking, $customization]) }}" class="btn-secondary py-2 px-4 text-center">
+                                    Edit Request
+                                </a>
+                                <form action="{{ route('user.customizations.destroy', [$booking, $customization]) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to cancel this customization request?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-danger py-2 px-4 w-full">
+                                        Cancel Request
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <div class="mb-4 sm:mb-0">
+                        <a href="{{ route('user.customizations.index', $booking) }}" class="btn-outline py-2 px-4">
+                            View All Requests
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

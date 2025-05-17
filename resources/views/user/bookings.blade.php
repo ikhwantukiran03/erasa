@@ -50,6 +50,7 @@
                         <a href="{{ route('user.bookings', ['status' => 'upcoming']) }}" class="px-4 py-2 {{ request('status') == 'upcoming' ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} rounded-full text-sm transition-colors">Upcoming</a>
                         <a href="{{ route('user.bookings', ['type' => 'reservation']) }}" class="px-4 py-2 {{ request('type') == 'reservation' ? 'bg-purple-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} rounded-full text-sm transition-colors">Reservations</a>
                         <a href="{{ route('user.bookings', ['status' => 'waiting_for_deposit']) }}" class="px-4 py-2 {{ request('status') == 'waiting_for_deposit' ? 'bg-blue-500 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} rounded-full text-sm transition-colors">Waiting for Deposit</a>
+                        <a href="{{ route('user.bookings', ['status' => 'pending_verification']) }}" class="px-4 py-2 {{ request('status') == 'pending_verification' ? 'bg-purple-500 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} rounded-full text-sm transition-colors">Pending Verification</a>
                         <a href="{{ route('user.bookings', ['status' => 'ongoing']) }}" class="px-4 py-2 {{ request('status') == 'ongoing' ? 'bg-yellow-500 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} rounded-full text-sm transition-colors">Ongoing</a>
                         <a href="{{ route('user.bookings', ['status' => 'completed']) }}" class="px-4 py-2 {{ request('status') == 'completed' ? 'bg-green-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} rounded-full text-sm transition-colors">Completed</a>
                         <a href="{{ route('user.bookings', ['status' => 'cancelled']) }}" class="px-4 py-2 {{ request('status') == 'cancelled' ? 'bg-red-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} rounded-full text-sm transition-colors">Cancelled</a>
@@ -146,6 +147,11 @@
                                         <span class="px-2 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                             <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
                                             Completed
+                                        </span>
+                                    @elseif($booking->status === 'pending_verification')
+                                        <span class="px-2 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                                            <span class="w-1.5 h-1.5 bg-purple-500 rounded-full mr-1.5"></span>
+                                            Pending Verification
                                         </span>
                                     @elseif($booking->status === 'cancelled')
                                         <span class="px-2 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">

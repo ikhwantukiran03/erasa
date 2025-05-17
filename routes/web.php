@@ -231,16 +231,11 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
     Route::get('/booking-requests/{bookingRequest}', [BookingRequestController::class, 'show'])->name('booking-requests.show');
     
     // Bookings
-    Route::get('/bookings', function () {
-        return view('user.bookings');
-    })->name('bookings');
-    Route::get('/bookings/{booking}', function ($booking) {
-        $booking = \App\Models\Booking::findOrFail($booking);
-        return view('user.booking-show', compact('booking'));
-    })->name('bookings.show');
+    Route::get('/bookings', [UserBookingController::class, 'index'])->name('bookings');
+    Route::get('/bookings/{booking}', [UserBookingController::class, 'show'])->name('bookings.show');
     
     // Booking Actions
-    Route::get('/bookings/{booking}/confirm', [UserBookingController::class, 'showConfirmForm'])->name('bookings.confirm.form');
+    Route::get('/bookings/{booking}/confirm', [UserBookingController::class, 'confirmReservationForm'])->name('bookings.confirm.form');
     Route::post('/bookings/{booking}/confirm', [UserBookingController::class, 'confirmReservation'])->name('bookings.confirm');
     Route::post('/bookings/{booking}/cancel', [UserBookingController::class, 'cancelBooking'])->name('bookings.cancel');
 
