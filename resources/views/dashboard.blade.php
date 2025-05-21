@@ -89,8 +89,42 @@
                 </a>
             </div>
             
-            <!-- My Profile -->
+            <!-- My Support Tickets -->
             <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="400">
+                <div class="flex items-center">
+                    <div class="bg-yellow-50 rounded-full p-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">My Support Tickets</p>
+                        <p class="text-lg font-semibold text-gray-800">{{ \App\Models\Ticket::where('user_id', Auth::id())->count() }}</p>
+                    </div>
+                </div>
+                <div class="mt-4 space-y-2">
+                    <a href="{{ route('user.tickets.index') }}" class="inline-flex items-center text-sm text-yellow-600 hover:underline">
+                        View all tickets
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                    <div class="flex items-center space-x-2 text-sm">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            {{ \App\Models\Ticket::where('user_id', Auth::id())->where('status', 'open')->count() }} Open
+                        </span>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            {{ \App\Models\Ticket::where('user_id', Auth::id())->where('status', 'in_progress')->count() }} In Progress
+                        </span>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            {{ \App\Models\Ticket::where('user_id', Auth::id())->where('status', 'closed')->count() }} Closed
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Profile -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="500">
                 <div class="flex items-center">
                     <div class="bg-purple-50 rounded-full p-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -110,6 +144,8 @@
                 </a>
             </div>
         </div>
+
+        
 
         <!-- Upcoming Bookings Section -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-10 border border-gray-100" data-aos="fade-up">
@@ -208,7 +244,7 @@
         </div>
 
         <!-- Recent Booking Requests Section -->
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100" data-aos="fade-up">
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 mb-8" data-aos="fade-up">
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <div class="flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -311,6 +347,123 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             Submit a booking request
+                        </a>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- My Support Tickets Section -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 mb-8" data-aos="fade-up">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-800">My Support Tickets</h2>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <a href="{{ route('user.tickets.create') }}" class="inline-flex items-center text-primary hover:underline">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            New Ticket
+                        </a>
+                        <a href="{{ route('user.tickets.index') }}" class="text-primary hover:underline">View all tickets →</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                @php
+                    $userTickets = \App\Models\Ticket::with(['replies'])
+                        ->where('user_id', Auth::id())
+                        ->orderBy('created_at', 'desc')
+                        ->take(5)
+                        ->get();
+                @endphp
+                
+                @if($userTickets->count() > 0)
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ticket ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Reply</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach($userTickets as $ticket)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        #{{ $ticket->id }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ Str::limit($ticket->title, 30) }}</div>
+                                        <div class="text-sm text-gray-500">{{ Str::limit($ticket->description, 50) }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            {{ ucfirst($ticket->category) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($ticket->status === 'open')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                Open
+                                            </span>
+                                        @elseif($ticket->status === 'in_progress')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                In Progress
+                                            </span>
+                                        @elseif($ticket->status === 'closed')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                Closed
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        @if($ticket->replies->count() > 0)
+                                            {{ $ticket->replies->last()->created_at->diffForHumans() }}
+                                        @else
+                                            No replies yet
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ $ticket->created_at->format('M d, Y') }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="{{ route('user.tickets.show', $ticket) }}" class="text-indigo-600 hover:text-indigo-900">
+                                            View
+                                        </a>
+                                        @if($ticket->status !== 'closed')
+                                            <a href="{{ route('user.tickets.show', $ticket) }}" class="ml-3 text-blue-600 hover:text-blue-900">
+                                                Reply
+                                            </a>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="text-center py-12 bg-gray-50 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p class="text-gray-600 mb-4">You haven't submitted any support tickets yet.</p>
+                        <a href="{{ route('user.tickets.create') }}" class="inline-flex items-center bg-primary text-white px-5 py-2.5 rounded-lg hover:bg-opacity-90 transition-colors shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Create a support ticket
                         </a>
                     </div>
                 @endif

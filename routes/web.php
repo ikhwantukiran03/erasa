@@ -23,6 +23,8 @@ use App\Http\Controllers\CustomizationController;
 use App\Http\Controllers\PackageRecommendationController;
 use App\Http\Controllers\WeddingCardController;
 use App\Http\Controllers\User\UserBookingController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\Staff\TicketController as StaffTicketController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -88,14 +90,15 @@ Route::middleware('auth')->group(function () {
         return view('bookings.index');
     })->name('bookings.index');
 
-    // Wedding Card Routes
-    Route::get('/wedding-cards', [WeddingCardController::class, 'index'])->name('wedding-cards.index');
-    Route::get('/wedding-cards/create', [WeddingCardController::class, 'create'])->name('wedding-cards.create');
-    Route::post('/wedding-cards', [WeddingCardController::class, 'store'])->name('wedding-cards.store');
-    Route::get('/wedding-cards/{uuid}/edit', [WeddingCardController::class, 'edit'])->name('wedding-cards.edit');
-    Route::put('/wedding-cards/{uuid}', [WeddingCardController::class, 'update'])->name('wedding-cards.update');
-    Route::delete('/wedding-cards/{uuid}', [WeddingCardController::class, 'destroy'])->name('wedding-cards.destroy');
+    
 });
+// Wedding Card Routes
+Route::get('/wedding-cards', [WeddingCardController::class, 'index'])->name('wedding-cards.index');
+Route::get('/wedding-cards/create', [WeddingCardController::class, 'create'])->name('wedding-cards.create');
+Route::post('/wedding-cards', [WeddingCardController::class, 'store'])->name('wedding-cards.store');
+Route::get('/wedding-cards/{uuid}/edit', [WeddingCardController::class, 'edit'])->name('wedding-cards.edit');
+Route::put('/wedding-cards/{uuid}', [WeddingCardController::class, 'update'])->name('wedding-cards.update');
+Route::delete('/wedding-cards/{uuid}', [WeddingCardController::class, 'destroy'])->name('wedding-cards.destroy');
 
 // Public wedding card route
 Route::get('/wedding-cards/{uuid}', [WeddingCardController::class, 'show'])->name('wedding-cards.show');
@@ -212,12 +215,22 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
     Route::delete('/bookings/{booking}', [App\Http\Controllers\Staff\BookingController::class, 'destroy'])->name('bookings.destroy');
     Route::patch('/bookings/{booking}/cancel', [App\Http\Controllers\Staff\BookingController::class, 'cancel'])->name('bookings.cancel');
 
+    // Ticket Routes
+    Route::get('/tickets', [StaffTicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/create', [StaffTicketController::class, 'create'])->name('tickets.create');
+    Route::post('/tickets', [StaffTicketController::class, 'store'])->name('tickets.store');
+    Route::get('/tickets/{ticket}', [StaffTicketController::class, 'show'])->name('tickets.show');
+    Route::get('/tickets/{ticket}/edit', [StaffTicketController::class, 'edit'])->name('tickets.edit');
+    Route::put('/tickets/{ticket}', [StaffTicketController::class, 'update'])->name('tickets.update');
+    Route::post('/tickets/{ticket}/reply', [StaffTicketController::class, 'reply'])->name('tickets.reply');
+    Route::post('/tickets/{ticket}/status', [StaffTicketController::class, 'updateStatus'])->name('tickets.update-status');
+
     
     // Invoice verification routes
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{booking}', [InvoiceController::class, 'showVerificationForm'])->name('invoices.show');
     Route::post('/invoices/{booking}/verify', [InvoiceController::class, 'verify'])->name('invoices.verify');
-
+    
     // Customization Management Routes
     Route::get('/customizations', [StaffCustomizationController::class, 'index'])->name('customizations.index');
     Route::get('/customizations/{customization}', [StaffCustomizationController::class, 'show'])->name('customizations.show');
@@ -254,4 +267,23 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
     Route::get('/bookings/{booking}/customizations/{customization}/edit', [CustomizationController::class, 'edit'])->name('customizations.edit');
     Route::put('/bookings/{booking}/customizations/{customization}', [CustomizationController::class, 'update'])->name('customizations.update');
     Route::delete('/bookings/{booking}/customizations/{customization}', [CustomizationController::class, 'destroy'])->name('customizations.destroy');
+
+    // Ticket Routes
+    Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
+    Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');
+    Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
+    Route::post('/tickets/{ticket}/reply', [TicketController::class, 'reply'])->name('tickets.reply');
 });
+
+
+
+    
+
+
+
+
+    
+
+
+

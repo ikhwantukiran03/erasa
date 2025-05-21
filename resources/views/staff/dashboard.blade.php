@@ -112,6 +112,34 @@
                 <a href="{{ route('staff.invoices.index') }}" class="mt-4 inline-block text-sm text-blue-600 hover:underline">Verify payments →</a>
             </div>
 
+            <!-- Pending Support Tickets -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="bg-yellow-100 rounded-full p-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Open Support Tickets</p>
+                        <p class="text-2xl font-semibold text-gray-800">
+                            {{ \App\Models\Ticket::whereIn('status', ['open', 'in_progress'])->count() }}
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-4 space-y-2">
+                    <a href="{{ route('staff.tickets.index') }}" class="inline-block text-sm text-yellow-600 hover:underline">View all tickets →</a>
+                    <div class="flex items-center text-sm text-gray-500">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 mr-2">
+                            {{ \App\Models\Ticket::where('status', 'open')->count() }} Open
+                        </span>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            {{ \App\Models\Ticket::where('status', 'in_progress')->count() }} In Progress
+                        </span>
+                    </div>
+                </div>
+            </div>
+
             
             
             
@@ -236,7 +264,7 @@
         </div>
 
         <!-- Recent Booking Requests -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
             <div class="px-6 py-4 border-b border-gray-200">
                 <h2 class="text-xl font-semibold text-gray-800">Recent Booking Requests</h2>
             </div>
@@ -333,6 +361,103 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <p class="mt-4">No booking requests found.</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Recent Support Tickets -->
+        <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-semibold text-gray-800">Recent Support Tickets</h2>
+                    <a href="{{ route('staff.tickets.index') }}" class="text-primary hover:underline">View all tickets →</a>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                @php
+                    $recentTickets = \App\Models\Ticket::with(['user', 'replies'])
+                        ->orderBy('created_at', 'desc')
+                        ->take(5)
+                        ->get();
+                @endphp
+                
+                @if($recentTickets->count() > 0)
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ticket ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Reply</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach($recentTickets as $ticket)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        #{{ $ticket->id }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">{{ $ticket->user->name }}</div>
+                                        <div class="text-sm text-gray-500">{{ $ticket->user->email }}</div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-gray-900">{{ Str::limit($ticket->title, 30) }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            {{ ucfirst($ticket->category) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($ticket->status === 'open')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                Open
+                                            </span>
+                                        @elseif($ticket->status === 'in_progress')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                In Progress
+                                            </span>
+                                        @elseif($ticket->status === 'closed')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                Closed
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        @if($ticket->replies->count() > 0)
+                                            {{ $ticket->replies->last()->created_at->diffForHumans() }}
+                                        @else
+                                            No replies yet
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="{{ route('staff.tickets.show', $ticket) }}" class="text-indigo-600 hover:text-indigo-900">
+                                            View
+                                        </a>
+                                        @if($ticket->status !== 'closed')
+                                            <a href="{{ route('staff.tickets.edit', $ticket) }}" class="ml-3 text-blue-600 hover:text-blue-900">
+                                                Reply
+                                            </a>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="text-center text-gray-500 py-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p class="mt-4">No support tickets found.</p>
                     </div>
                 @endif
             </div>

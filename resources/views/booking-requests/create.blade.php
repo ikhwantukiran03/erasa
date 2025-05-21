@@ -478,7 +478,7 @@ document.addEventListener('DOMContentLoaded', function() {
             sortedPrices.forEach(price => {
                 const option = document.createElement('option');
                 option.value = price.id;
-                option.textContent = `${price.pax} pax - RM ${parseFloat(price.price).toLocaleString('en-MY', {minimumFractionDigits: 2})}`;
+                option.textContent = ${price.pax} pax - RM ${parseFloat(price.price).toLocaleString('en-MY', {minimumFractionDigits: 2})};
 
                 if (selectedPriceId && price.id == selectedPriceId) {
                     option.selected = true;
@@ -510,7 +510,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Visual indication that check is in progress
         venueSelect.classList.add('bg-yellow-50');
         
-        fetch(`/api/check-availability?date=${date}&venue_id=${venueId}&session=${session}`)
+        fetch(/api/check-availability?date=${date}&venue_id=${venueId}&session=${session})
             .then(response => response.json())
             .then(data => {
                 // Reset background
