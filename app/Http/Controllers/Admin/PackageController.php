@@ -20,15 +20,46 @@ class PackageController extends Controller
      *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         if (!auth()->user()->isAdmin()) {
             return redirect()->route('dashboard')
                 ->with('error', 'You do not have permission to access this resource.');
         }
         
-        $packages = Package::with(['venue', 'prices'])->get();
-        return view('admin.packages.index', compact('packages'));
+        // Start with a base query
+        $packagesQuery = Package::with(['venue', 'prices']);
+        
+        // Apply search filter
+        if ($request->has('search') && $request->search) {
+            $packagesQuery->where('name', 'like', '%' . $request->search . '%');
+        }
+        
+        // Apply venue filter
+        if ($request->has('venue') && $request->venue) {
+            $packagesQuery->where('venue_id', $request->venue);
+        }
+        
+        // Apply price range filter
+        if ($request->has('price_range') && $request->price_range) {
+            $priceRange = explode('-', $request->price_range);
+            if (count($priceRange) == 2) {
+                $minPrice = $priceRange[0];
+                $maxPrice = $priceRange[1];
+                
+                $packagesQuery->whereHas('prices', function($query) use ($minPrice, $maxPrice) {
+                    $query->whereBetween('price', [$minPrice, $maxPrice]);
+                });
+            }
+        }
+        
+        // Get all venues for the filter dropdown
+        $venues = \App\Models\Venue::all();
+        
+        // Paginate the results
+        $packages = $packagesQuery->paginate(9)->withQueryString();
+        
+        return view('admin.packages.index', compact('packages', 'venues'));
     }
 
     /**
@@ -288,104 +319,125 @@ class PackageController extends Controller
     }
 
     /**
- * Duplicate the specified package.
- *
- * @param  \App\Models\Package  $package
- * @return \Illuminate\Http\RedirectResponse
- */
-public function duplicate(Package $package)
-{
-    if (!auth()->user()->isAdmin()) {
-        return redirect()->route('dashboard')
-            ->with('error', 'You do not have permission to access this resource.');
-    }
-    
-    try {
-        DB::beginTransaction();
-        
-        // Create a new package with same data but append "(Copy)" to the name
-        $newPackage = Package::create([
-            'name' => $package->name . ' (Copy)',
-            'description' => $package->description,
-            'venue_id' => $package->venue_id,
-        ]);
-        
-        // Duplicate prices
-        foreach ($package->prices as $price) {
-            Price::create([
-                'package_id' => $newPackage->id,
-                'pax' => $price->pax,
-                'price' => $price->price,
-            ]);
+     * Duplicate the specified package.
+     *
+     * @param  \App\Models\Package  $package
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function duplicate(Package $package)
+    {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.');
         }
         
-        // Duplicate package items
-        foreach ($package->packageItems as $packageItem) {
-            PackageItem::create([
-                'package_id' => $newPackage->id,
-                'item_id' => $packageItem->item_id,
-                'description' => $packageItem->description,
-            ]);
-        }
-        
-        DB::commit();
-        
-        return redirect()->route('admin.packages.index')
-            ->with('success', 'Package duplicated successfully.');
+        try {
+            DB::beginTransaction();
             
-    } catch (\Exception $e) {
-        DB::rollBack();
-        
-        return redirect()->back()
-            ->with('error', 'An error occurred while duplicating the package: ' . $e->getMessage());
+            // Create a new package with same data but append "(Copy)" to the name
+            $newPackage = Package::create([
+                'name' => $package->name . ' (Copy)',
+                'description' => $package->description,
+                'venue_id' => $package->venue_id,
+            ]);
+            
+            // Duplicate prices
+            foreach ($package->prices as $price) {
+                Price::create([
+                    'package_id' => $newPackage->id,
+                    'pax' => $price->pax,
+                    'price' => $price->price,
+                ]);
+            }
+            
+            // Duplicate package items
+            foreach ($package->packageItems as $packageItem) {
+                PackageItem::create([
+                    'package_id' => $newPackage->id,
+                    'item_id' => $packageItem->item_id,
+                    'description' => $packageItem->description,
+                ]);
+            }
+            
+            DB::commit();
+            
+            return redirect()->route('admin.packages.index')
+                ->with('success', 'Package duplicated successfully.');
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return redirect()->back()
+                ->with('error', 'An error occurred while duplicating the package: ' . $e->getMessage());
+        }
     }
-}
 
-
-/**
- * Display a public listing of packages organized by venues.
- *
- * @param  \Illuminate\Http\Request  $request
- * @return \Illuminate\View\View
- */
-public function publicIndex(Request $request)
-{
-    // Get all venues for the filter
-    $venues = Venue::all();
-    
-    // If venue_id is provided, show packages for that specific venue
-    if ($request->has('venue_id')) {
-        $venueWithPackages = Venue::with(['packages.prices', 'packages.packageItems.item', 'galleries'])
-            ->findOrFail($request->venue_id);
+    /**
+     * Display a public listing of packages organized by venues.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
+     */
+    public function publicIndex(Request $request)
+    {
+        // Get all venues for the filter
+        $venues = Venue::all();
         
-        return view('packages.index', compact('venues', 'venueWithPackages'));
+        // If venue_id is provided, show packages for that specific venue
+        if ($request->has('venue_id')) {
+            $venueWithPackages = Venue::with(['packages.prices', 'packages.packageItems.item', 'galleries'])
+                ->findOrFail($request->venue_id);
+            
+            return view('packages.index', compact('venues', 'venueWithPackages'));
+        }
+        
+        // Otherwise, show all venues with their packages
+        $venuesWithPackages = Venue::with(['packages.prices', 'packages.packageItems.item'])
+            ->has('packages')
+            ->get();
+        
+        return view('packages.index', compact('venues', 'venuesWithPackages'));
     }
-    
-    // Otherwise, show all venues with their packages
-    $venuesWithPackages = Venue::with(['packages.prices', 'packages.packageItems.item'])
-        ->has('packages')
-        ->get();
-    
-    return view('packages.index', compact('venues', 'venuesWithPackages'));
-}
 
-/**
- * Display the public view of the specified package.
- *
- * @param  \App\Models\Package  $package
- * @return \Illuminate\View\View
- */
-public function publicShow(Package $package)
-{
-    $package->load(['venue', 'prices', 'packageItems.item.category']);
-    
-    // Get related packages from the same venue
-    $relatedPackages = Package::where('venue_id', $package->venue_id)
-        ->where('id', '!=', $package->id)
-        ->with(['prices', 'venue'])
-        ->take(3)
-        ->get();
-    
-    return view('packages.show', compact('package', 'relatedPackages'));
-}
+    /**
+     * Display the public view of the specified package.
+     *
+     * @param  \App\Models\Package  $package
+     * @return \Illuminate\View\View
+     */
+    public function publicShow(Package $package)
+    {
+        $package->load(['venue', 'prices', 'packageItems.item.category']);
+        
+        // Get related packages from the same venue
+        $relatedPackages = Package::where('venue_id', $package->venue_id)
+            ->where('id', '!=', $package->id)
+            ->with(['prices', 'venue'])
+            ->take(3)
+            ->get();
+        
+        return view('packages.show', compact('package', 'relatedPackages'));
+    }
+
+    /**
+     * Get a formatted pax string for display.
+     *
+     * @param \App\Models\Package $package
+     * @return string
+     */
+    protected function getPaxString(Package $package) 
+    {
+        if ($package->prices->isEmpty()) {
+            return 'No pax information';
+        }
+        
+        $minPax = $package->prices->min('pax');
+        $maxPax = $package->prices->max('pax');
+        
+        if ($minPax == $maxPax) {
+            return "$minPax pax";
+        }
+        
+        return "$minPax - $maxPax pax";
+    }
 }

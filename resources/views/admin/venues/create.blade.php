@@ -152,7 +152,7 @@
                                     value="{{ old('city') }}" 
                                     required 
                                     class="form-input w-full @error('city') border-red-500 @enderror" 
-                                    placeholder="Jakarta"
+                                    placeholder="KuaLa Lumpur"
                                 >
                             </div>
                             
@@ -165,7 +165,7 @@
                                     value="{{ old('state') }}" 
                                     required 
                                     class="form-input w-full @error('state') border-red-500 @enderror" 
-                                    placeholder="DKI Jakarta"
+                                    placeholder="Kampung Baru"
                                 >
                             </div>
                             

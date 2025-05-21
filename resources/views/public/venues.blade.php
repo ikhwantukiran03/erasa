@@ -11,9 +11,55 @@
     </div>
 </div>
 
+<!-- Filter Section -->
+<div class="bg-white py-10 border-b border-gray-100">
+    <div class="container mx-auto px-4">
+        <form action="{{ route('public.venues') }}" method="GET" class="max-w-xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-end gap-4">
+                <div class="flex-grow">
+                    <label for="city" class="block text-sm font-medium text-gray-700 mb-1">Filter by City</label>
+                    <select id="city" name="city" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20">
+                        <option value="">All Cities</option>
+                        @foreach($cities as $city)
+                            <option value="{{ $city }}" {{ request('city') == $city ? 'selected' : '' }}>
+                                {{ $city }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex space-x-2">
+                    <button type="submit" class="bg-primary text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition">
+                        Filter
+                    </button>
+                    @if(request()->has('city'))
+                        <a href="{{ route('public.venues') }}" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition">
+                            Clear
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Venues Overview -->
 <div class="bg-white py-16">
     <div class="container mx-auto px-4">
+        @if(request()->has('city'))
+            <div class="mb-8 flex justify-between items-center">
+                <h2 class="text-xl font-semibold text-primary">
+                    Showing venues in <span class="font-bold">{{ request('city') }}</span>
+                    <span class="text-gray-500 text-base">({{ $venues->total() }} {{ Str::plural('venue', $venues->total()) }})</span>
+                </h2>
+                <a href="{{ route('public.venues') }}" class="text-primary hover:underline text-sm flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Clear Filter
+                </a>
+            </div>
+        @endif
+
         <!-- All Venues Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             @foreach($venues as $venue)
@@ -109,6 +155,11 @@
                     </div>
                 </a>
             @endforeach
+        </div>
+        
+        <!-- Pagination -->
+        <div class="mt-8 mb-6">
+            {{ $venues->appends(request()->query())->links() }}
         </div>
         
         @if($selectedVenue)

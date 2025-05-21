@@ -22,6 +22,7 @@ class Venue extends Model
         'city',
         'state',
         'postal_code',
+        
     ];
 
     /**
@@ -40,21 +41,19 @@ class Venue extends Model
         return $address . ', ' . $this->city . ', ' . $this->state . ' ' . $this->postal_code;
     }
 
-    // Add this method to app/Models/Venue.php inside the Venue class
+    /**
+     * Get the gallery images for the venue.
+     */
+    public function galleries()
+    {
+        return $this->hasMany(Gallery::class);
+    }
 
-/**
- * Get the gallery images for the venue.
- */
-public function galleries()
-{
-    return $this->hasMany(Gallery::class);
-}
-
-/**
- * Get the packages for the venue.
- */
-public function packages()
-{
-    return $this->hasMany(Package::class);
-}
+    /**
+     * Get the packages for the venue.
+     */
+    public function packages()
+    {
+        return $this->hasMany(Package::class);
+    }
 }

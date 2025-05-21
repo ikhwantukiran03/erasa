@@ -48,6 +48,51 @@
             </div>
         @endif
         
+        <!-- Search and Filter Section -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <form action="{{ route('admin.packages.index') }}" method="GET" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                        <input type="text" id="search" name="search" value="{{ request('search') }}" 
+                            class="form-input w-full rounded-md" placeholder="Search by package name...">
+                    </div>
+                    
+                    <div>
+                        <label for="venue_filter" class="block text-sm font-medium text-gray-700 mb-1">Venue</label>
+                        <select id="venue_filter" name="venue" class="form-select w-full rounded-md">
+                            <option value="">All Venues</option>
+                            @foreach($venues as $venue)
+                                <option value="{{ $venue->id }}" {{ request('venue') == $venue->id ? 'selected' : '' }}>
+                                    {{ $venue->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="price_range" class="block text-sm font-medium text-gray-700 mb-1">Price Range</label>
+                        <select id="price_range" name="price_range" class="form-select w-full rounded-md">
+                            <option value="">Any Price</option>
+                            <option value="0-5000" {{ request('price_range') == '0-5000' ? 'selected' : '' }}>Under RM 5,000</option>
+                            <option value="5000-10000" {{ request('price_range') == '5000-10000' ? 'selected' : '' }}>RM 5,000 - RM 10,000</option>
+                            <option value="10000-20000" {{ request('price_range') == '10000-20000' ? 'selected' : '' }}>RM 10,000 - RM 20,000</option>
+                            <option value="20000-999999" {{ request('price_range') == '20000-999999' ? 'selected' : '' }}>Above RM 20,000</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <a href="{{ route('admin.packages.index') }}" class="px-4 py-2 text-gray-500 bg-gray-100 rounded-md hover:bg-gray-200">
+                        Reset
+                    </a>
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90">
+                        Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+        
         @if($packages->count() > 0)
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($packages as $package)
@@ -119,19 +164,31 @@
                     </div>
                 @endforeach
             </div>
+            
+            <!-- Pagination -->
+            <div class="mt-6">
+                {{ $packages->appends(request()->query())->links() }}
+            </div>
         @else
             <div class="bg-white rounded-xl shadow-md p-10 text-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
-                <h3 class="mt-4 text-xl font-semibold text-gray-700">No Packages Yet</h3>
-                <p class="mt-2 text-gray-500">Get started by creating your first wedding package.</p>
-                <a href="{{ route('admin.packages.create') }}" class="mt-6 inline-flex items-center bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Create First Package
-                </a>
+                <h3 class="mt-4 text-xl font-semibold text-gray-700">No Packages Found</h3>
+                <p class="mt-2 text-gray-500">
+                    @if(request()->has('search') || request()->has('venue') || request()->has('price_range'))
+                        No packages match your search criteria. 
+                        <a href="{{ route('admin.packages.index') }}" class="text-primary hover:underline">Clear filters</a>
+                    @else
+                        Get started by creating your first wedding package.
+                        <a href="{{ route('admin.packages.create') }}" class="mt-6 inline-flex items-center bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Create First Package
+                        </a>
+                    @endif
+                </p>
             </div>
         @endif
     </div>

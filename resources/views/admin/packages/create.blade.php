@@ -80,7 +80,7 @@
                         <p class="text-gray-600 mb-4">Add pricing tiers based on the number of guests (pax)</p>
                         
                         <div id="prices-container">
-                            <div class="price-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border border-gray-200 rounded-lg">
+                            <div class="price-row grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
                                 <div>
                                     <label class="block text-dark font-medium mb-1">Number of Guests (Pax)</label>
                                     <input 
@@ -91,6 +91,7 @@
                                         min="1"
                                         placeholder="e.g., 100"
                                     >
+                                    <p class="text-xs text-gray-500 mt-1">Minimum number of guests</p>
                                 </div>
                                 <div>
                                     <label class="block text-dark font-medium mb-1">Price (RM)</label>
@@ -101,14 +102,28 @@
                                         required 
                                         min="0"
                                         step="0.01"
-                                        placeholder="e.g., 25000000"
+                                        placeholder="e.g., 25000"
                                     >
+                                    <p class="text-xs text-gray-500 mt-1">Total package price for this number of guests</p>
+                                </div>
+                                <div class="flex items-end justify-between">
+                                    <div class="bg-blue-50 p-3 rounded-md flex-grow">
+                                        <p class="text-xs text-blue-700 font-medium">This pricing tier will appear in your package details.</p>
+                                    </div>
+                                    <button type="button" class="remove-price ml-2 text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 h-10 w-10 rounded-md flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="flex justify-end">
-                            <button type="button" id="add-price" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition mr-2">
+                            <button type="button" id="add-price" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition mr-2 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
                                 Add Another Price Tier
                             </button>
                         </div>
@@ -118,12 +133,28 @@
                         <h2 class="text-lg font-semibold text-gray-800 mb-4">Package Items</h2>
                         <p class="text-gray-600 mb-4">Select items to include in this package</p>
                         
+                        <!-- Search functionality for items -->
+                        <div class="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                            <label for="item-search" class="block text-dark font-medium mb-1">Search Items</label>
+                            <div class="flex">
+                                <input 
+                                    type="text" 
+                                    id="item-search" 
+                                    class="form-input flex-grow" 
+                                    placeholder="Search for items by name..."
+                                >
+                                <button type="button" id="search-items-btn" class="ml-2 bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90 transition">
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+                        
                         <!-- Container for items sorted by categories -->
                         <div id="categories-container" class="mb-6 space-y-4">
                             <!-- Items will be grouped by categories here -->
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border border-gray-200 rounded-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
                             <div>
                                 <label for="category-select" class="block text-dark font-medium mb-1">Select Category</label>
                                 <select id="category-select" class="form-input">
@@ -145,7 +176,7 @@
                                 <label for="item-description" class="block text-dark font-medium mb-1">Custom Description (Optional)</label>
                                 <textarea 
                                     id="item-description" 
-                                    rows="1" 
+                                    rows="2" 
                                     class="form-input" 
                                     placeholder="Add specific details about this item..."
                                     disabled
@@ -153,9 +184,20 @@
                             </div>
                             
                             <div class="md:col-span-2 flex justify-end">
-                                <button type="button" id="add-item-btn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition mr-2" disabled>
+                                <button type="button" id="add-item-btn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition mr-2 flex items-center" disabled>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
                                     Add Item to Package
                                 </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Selected items preview -->
+                        <div class="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                            <h3 class="font-medium text-dark mb-2">Selected Items</h3>
+                            <div id="selected-items-container" class="space-y-2">
+                                <p id="no-items-message" class="text-gray-500 italic">No items selected yet</p>
                             </div>
                         </div>
                     </div>
@@ -185,6 +227,10 @@
         const itemDescription = document.getElementById('item-description');
         const addItemButton = document.getElementById('add-item-btn');
         const categoriesContainer = document.getElementById('categories-container');
+        const selectedItemsContainer = document.getElementById('selected-items-container');
+        const noItemsMessage = document.getElementById('no-items-message');
+        const itemSearchInput = document.getElementById('item-search');
+        const searchItemsBtn = document.getElementById('search-items-btn');
         
         // Items data by category
         const itemsByCategory = {
@@ -208,6 +254,18 @@
             @endforeach
         };
         
+        // Flatten all items for search
+        const allItems = [];
+        Object.keys(itemsByCategory).forEach(categoryId => {
+            itemsByCategory[categoryId].forEach(item => {
+                allItems.push({
+                    ...item,
+                    categoryId: categoryId,
+                    categoryName: categoryNames[categoryId]
+                });
+            });
+        });
+        
         // Track selected items to prevent duplicates
         const selectedItems = new Set();
         
@@ -217,7 +275,7 @@
         // Add price tier button
         addPriceButton.addEventListener('click', function() {
             const priceRow = document.createElement('div');
-            priceRow.className = 'price-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border border-gray-200 rounded-lg';
+            priceRow.className = 'price-row grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50';
             
             priceRow.innerHTML = `
                 <div>
@@ -230,9 +288,10 @@
                         min="1"
                         placeholder="e.g., 100"
                     >
+                    <p class="text-xs text-gray-500 mt-1">Minimum number of guests</p>
                 </div>
-                <div class="relative">
-                    <label class="block text-dark font-medium mb-1">Price (Rp)</label>
+                <div>
+                    <label class="block text-dark font-medium mb-1">Price (RM)</label>
                     <input 
                         type="number" 
                         name="prices[${priceCount}][price]" 
@@ -240,9 +299,15 @@
                         required 
                         min="0"
                         step="0.01"
-                        placeholder="e.g., 25000000"
+                        placeholder="e.g., 25000"
                     >
-                    <button type="button" class="remove-price absolute top-0 right-0 text-red-500 hover:text-red-700">
+                    <p class="text-xs text-gray-500 mt-1">Total package price for this number of guests</p>
+                </div>
+                <div class="flex items-end justify-between">
+                    <div class="bg-blue-50 p-3 rounded-md flex-grow">
+                        <p class="text-xs text-blue-700 font-medium">This pricing tier will appear in your package details.</p>
+                    </div>
+                    <button type="button" class="remove-price ml-2 text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 h-10 w-10 rounded-md flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -260,195 +325,279 @@
             priceCount++;
         });
         
-        // Category select change event
+        // Handle category selection
         categorySelect.addEventListener('change', function() {
-            // Clear the item select
-            itemSelect.innerHTML = '<option value="">-- Select Item --</option>';
-            
-            // Disable item select if no category is selected
             const categoryId = this.value;
-            if (!categoryId) {
-                itemSelect.disabled = true;
-                itemDescription.disabled = true;
-                addItemButton.disabled = true;
-                return;
-            }
             
-            // Populate items for selected category
-            const items = itemsByCategory[categoryId] || [];
-            items.forEach(item => {
-                // Skip if already selected
-                if (selectedItems.has(parseInt(item.id))) {
-                    return;
-                }
-                
-                const option = document.createElement('option');
-                option.value = item.id;
-                option.textContent = item.name;
-                option.dataset.description = item.description || '';
-                itemSelect.appendChild(option);
-            });
-            
-            // Enable item select
-            itemSelect.disabled = false;
-            itemDescription.disabled = true;
+            // Reset item select
+            itemSelect.innerHTML = '<option value="">-- Select Item --</option>';
+            itemSelect.disabled = !categoryId;
+            itemDescription.disabled = !categoryId;
             addItemButton.disabled = true;
+            
+            if (categoryId) {
+                // Populate items for the selected category
+                const items = itemsByCategory[categoryId] || [];
+                items.forEach(item => {
+                    // Only add items that haven't been selected yet
+                    if (!selectedItems.has(item.id)) {
+                        const option = document.createElement('option');
+                        option.value = item.id;
+                        option.textContent = item.name;
+                        option.dataset.description = item.description || '';
+                        itemSelect.appendChild(option);
+                    }
+                });
+            }
         });
         
-        // Item select change event
+        // Handle item selection
         itemSelect.addEventListener('change', function() {
-            const itemId = this.value;
+            const selectedItemId = this.value;
+            addItemButton.disabled = !selectedItemId;
             
-            if (!itemId) {
-                itemDescription.disabled = true;
-                addItemButton.disabled = true;
+            if (selectedItemId) {
+                const selectedOption = this.options[this.selectedIndex];
+                itemDescription.value = selectedOption.dataset.description || '';
+            } else {
+                itemDescription.value = '';
+            }
+        });
+        
+        // Search items functionality
+        searchItemsBtn.addEventListener('click', searchItems);
+        itemSearchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchItems();
+            }
+        });
+        
+        function searchItems() {
+            const searchQuery = itemSearchInput.value.toLowerCase().trim();
+            
+            if (!searchQuery) {
+                alert('Please enter a search term');
                 return;
             }
             
-            // Enable description and add button
-            itemDescription.disabled = false;
-            addItemButton.disabled = false;
+            // Filter items that match the search query
+            const matchedItems = allItems.filter(item => 
+                item.name.toLowerCase().includes(searchQuery) || 
+                (item.description && item.description.toLowerCase().includes(searchQuery))
+            );
             
-            // Populate description from selected item
-            const selectedOption = this.options[this.selectedIndex];
-            itemDescription.value = selectedOption.dataset.description || '';
-        });
-        
-        // Function to update the categories display
-        function updateCategoriesDisplay() {
-            // Clear current display
-            categoriesContainer.innerHTML = '';
-            
-            // Iterate through categories and create sections
-            for (const categoryId in itemsBySelectedCategory) {
-                if (itemsBySelectedCategory[categoryId].length === 0) continue;
-                
-                const categoryName = categoryNames[categoryId];
-                const items = itemsBySelectedCategory[categoryId];
-                
-                // Create category section
-                const categorySection = document.createElement('div');
-                categorySection.className = 'category-section bg-gray-50 p-4 rounded-lg';
-                
-                // Create category header
-                const categoryHeader = document.createElement('h3');
-                categoryHeader.className = 'text-md font-semibold text-gray-700 mb-2';
-                categoryHeader.textContent = categoryName;
-                
-                // Create items container
-                const itemsContainer = document.createElement('div');
-                itemsContainer.className = 'flex flex-wrap gap-2';
-                itemsContainer.dataset.categoryId = categoryId;
-                
-                // Add all items
-                items.forEach(item => {
-                    itemsContainer.appendChild(item);
-                });
-                
-                // Assemble category section
-                categorySection.appendChild(categoryHeader);
-                categorySection.appendChild(itemsContainer);
-                
-                // Add to main container
-                categoriesContainer.appendChild(categorySection);
-            }
-        }
-        
-        // Add item button click - MODIFIED FOR SORTING BY CATEGORY
-        addItemButton.addEventListener('click', function() {
-            const itemId = itemSelect.value;
-            const itemName = itemSelect.options[itemSelect.selectedIndex].text;
-            const description = itemDescription.value;
-            const categoryId = categorySelect.value;
-            const categoryName = categorySelect.options[categorySelect.selectedIndex].text;
-            
-            // Add to selected items set
-            selectedItems.add(parseInt(itemId));
-            
-            // Create selected item element with compact design
-            const itemElement = document.createElement('div');
-            itemElement.className = 'selected-item bg-gray-50 p-2 border border-gray-200 rounded-md flex items-center';
-            itemElement.dataset.itemId = itemId;
-            itemElement.dataset.categoryId = categoryId;
-            
-            itemElement.innerHTML = `
-                <div class="mr-2">
-                    <p class="font-medium text-sm text-gray-800">${itemName}</p>
-                    <input type="hidden" name="items[${itemId}][item_id]" value="${itemId}">
-                    <input type="hidden" name="items[${itemId}][selected]" value="1">
-                    <input type="hidden" name="items[${itemId}][description]" value="${description}">
+            // Create a modal or popup to show search results
+            const resultsContainer = document.createElement('div');
+            resultsContainer.className = 'fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50';
+            resultsContainer.innerHTML = `
+                <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-1/2 max-h-[80vh] overflow-hidden flex flex-col">
+                    <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold">Search Results: "${searchQuery}"</h3>
+                        <button type="button" id="close-search-results" class="text-gray-400 hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-4 overflow-y-auto" style="max-height: calc(80vh - 60px);">
+                        ${
+                            matchedItems.length > 0 
+                            ? `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                ${matchedItems.map(item => `
+                                    <div class="border rounded-lg p-3 ${selectedItems.has(item.id) ? 'bg-gray-100 opacity-60' : 'bg-white'}">
+                                        <div class="flex justify-between">
+                                            <p class="font-medium">${item.name}</p>
+                                            <span class="text-xs text-gray-500">${item.categoryName}</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mt-1 line-clamp-2">${item.description || 'No description'}</p>
+                                        ${!selectedItems.has(item.id) ? 
+                                            `<button type="button" class="quick-add-item mt-2 px-3 py-1 bg-green-100 text-green-700 rounded-md hover:bg-green-200 text-sm" 
+                                                    data-item-id="${item.id}" 
+                                                    data-item-name="${item.name}" 
+                                                    data-category-id="${item.categoryId}"
+                                                    data-description="${item.description || ''}">
+                                                Add to Package
+                                            </button>` 
+                                            : '<p class="mt-2 text-xs text-gray-500 italic">Already added</p>'
+                                        }
+                                    </div>
+                                `).join('')}
+                              </div>`
+                            : '<p class="text-gray-500">No items found matching your search criteria.</p>'
+                        }
+                    </div>
                 </div>
-                <button type="button" class="remove-item text-red-500 hover:text-red-700 ml-auto">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
             `;
             
-            // Add event listener to remove button
-            const removeButton = itemElement.querySelector('.remove-item');
-            removeButton.addEventListener('click', function() {
-                // Remove from selected items set
-                selectedItems.delete(parseInt(itemId));
-                
-                // Remove element from category list
-                if (itemsBySelectedCategory[categoryId]) {
-                    const index = itemsBySelectedCategory[categoryId].findIndex(el => el.dataset.itemId === itemId);
-                    if (index !== -1) {
-                        itemsBySelectedCategory[categoryId].splice(index, 1);
-                    }
-                }
-                
-                // Update display
-                updateCategoriesDisplay();
-                
-                // Reset category select to refresh available items
-                const currentCategoryId = categorySelect.value;
-                if (currentCategoryId) {
-                    categorySelect.dispatchEvent(new Event('change'));
-                }
+            document.body.appendChild(resultsContainer);
+            
+            // Close button event
+            document.getElementById('close-search-results').addEventListener('click', function() {
+                resultsContainer.remove();
             });
             
-            // Add to the appropriate category
-            if (!itemsBySelectedCategory[categoryId]) {
-                itemsBySelectedCategory[categoryId] = [];
-            }
-            itemsBySelectedCategory[categoryId].push(itemElement);
+            // Quick add buttons
+            resultsContainer.querySelectorAll('.quick-add-item').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = parseInt(this.dataset.itemId);
+                    const itemName = this.dataset.itemName;
+                    const categoryId = this.dataset.categoryId;
+                    const description = this.dataset.description;
+                    
+                    addItemToPackage(itemId, itemName, categoryId, description);
+                    this.closest('div').classList.add('bg-gray-100', 'opacity-60');
+                    this.outerHTML = '<p class="mt-2 text-xs text-gray-500 italic">Added to package</p>';
+                });
+            });
+        }
+        
+        // Add item to package
+        addItemButton.addEventListener('click', function() {
+            const itemId = parseInt(itemSelect.value);
+            if (!itemId) return;
             
-            // Update the display
-            updateCategoriesDisplay();
+            const itemName = itemSelect.options[itemSelect.selectedIndex].text;
+            const categoryId = categorySelect.value;
+            const description = itemDescription.value;
             
-            // Reset item selection fields
+            addItemToPackage(itemId, itemName, categoryId, description);
+            
+            // Reset item selection
             itemSelect.value = '';
             itemDescription.value = '';
-            itemDescription.disabled = true;
             addItemButton.disabled = true;
             
-            // Reset category select to refresh available items
+            // Re-trigger category change to refresh item list
             categorySelect.dispatchEvent(new Event('change'));
         });
         
-        // Form validation
-        document.getElementById('packageForm').addEventListener('submit', function(event) {
-            // Check if at least one price tier is provided
-            if (pricesContainer.querySelectorAll('.price-row').length === 0) {
-                event.preventDefault();
-                alert('Please add at least one price tier.');
-                return false;
-            }
+        function addItemToPackage(itemId, itemName, categoryId, description) {
+            // Skip if item already selected
+            if (selectedItems.has(itemId)) return;
             
-            // Check if at least one item is selected
-            let totalItems = 0;
-            for (const categoryId in itemsBySelectedCategory) {
-                totalItems += itemsBySelectedCategory[categoryId].length;
+            // Add to selected items set
+            selectedItems.add(itemId);
+            
+            // Add to selected items by category
+            if (!itemsBySelectedCategory[categoryId]) {
+                itemsBySelectedCategory[categoryId] = [];
             }
+            itemsBySelectedCategory[categoryId].push({
+                id: itemId,
+                name: itemName,
+                description: description
+            });
+            
+            // Update categories container
+            updateCategoriesDisplay();
+            
+            // Update selected items preview
+            updateSelectedItemsPreview();
+            
+            // Add hidden input for form submission
+            const hiddenInput = `
+                <input type="hidden" name="items[${itemId}][item_id]" value="${itemId}">
+                <input type="hidden" name="items[${itemId}][selected]" value="1">
+                <input type="hidden" name="items[${itemId}][description]" value="${description.replace(/"/g, '&quot;')}">
+            `;
+            document.getElementById('packageForm').insertAdjacentHTML('beforeend', hiddenInput);
+        }
+        
+        function updateCategoriesDisplay() {
+            categoriesContainer.innerHTML = '';
+            
+            Object.keys(itemsBySelectedCategory).forEach(categoryId => {
+                const items = itemsBySelectedCategory[categoryId];
+                if (items.length === 0) return;
+                
+                const categoryName = categoryNames[categoryId];
+                const categoryElement = document.createElement('div');
+                categoryElement.className = 'p-4 border border-gray-200 rounded-lg';
+                categoryElement.innerHTML = `
+                    <h3 class="font-semibold text-dark mb-2">${categoryName}</h3>
+                    <div class="space-y-2">
+                        ${items.map(item => `
+                            <div class="flex justify-between items-center bg-gray-50 p-2 rounded">
+                                <div>
+                                    <p class="font-medium">${item.name}</p>
+                                    ${item.description ? `<p class="text-sm text-gray-600">${item.description}</p>` : ''}
+                                </div>
+                                <button type="button" class="remove-item text-red-500 hover:text-red-700" data-item-id="${item.id}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Add event listeners to remove buttons
+                categoryElement.querySelectorAll('.remove-item').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const itemId = parseInt(this.dataset.itemId);
+                        removeItemFromPackage(itemId, categoryId);
+                    });
+                });
+                
+                categoriesContainer.appendChild(categoryElement);
+            });
+        }
+        
+        function updateSelectedItemsPreview() {
+            // Count total selected items
+            const totalItems = Array.from(selectedItems).length;
             
             if (totalItems === 0) {
-                event.preventDefault();
-                alert('Please select at least one item for the package.');
-                return false;
+                selectedItemsContainer.innerHTML = '<p class="text-gray-500 italic">No items selected yet</p>';
+                return;
             }
-        });
+            
+            // Group by category for the preview
+            const previewHTML = Object.keys(itemsBySelectedCategory)
+                .map(categoryId => {
+                    const items = itemsBySelectedCategory[categoryId];
+                    if (items.length === 0) return '';
+                    
+                    return `
+                        <div class="mb-2">
+                            <span class="text-sm font-medium">${categoryNames[categoryId]}: </span>
+                            <span class="text-sm text-gray-600">${items.map(i => i.name).join(', ')}</span>
+                        </div>
+                    `;
+                })
+                .join('');
+            
+            selectedItemsContainer.innerHTML = `
+                <div>
+                    <p class="text-sm mb-2"><span class="font-medium">${totalItems}</span> item(s) selected</p>
+                    ${previewHTML}
+                </div>
+            `;
+        }
+        
+        function removeItemFromPackage(itemId, categoryId) {
+            // Remove from selected items set
+            selectedItems.delete(itemId);
+            
+            // Remove from selected items by category
+            itemsBySelectedCategory[categoryId] = itemsBySelectedCategory[categoryId].filter(item => item.id !== itemId);
+            
+            // Remove hidden inputs
+            document.querySelector(`input[name="items[${itemId}][item_id]"]`)?.remove();
+            document.querySelector(`input[name="items[${itemId}][selected]"]`)?.remove();
+            document.querySelector(`input[name="items[${itemId}][description]"]`)?.remove();
+            
+            // Update displays
+            updateCategoriesDisplay();
+            updateSelectedItemsPreview();
+            
+            // Re-trigger category change if the current category is the one we modified
+            if (categorySelect.value === categoryId) {
+                categorySelect.dispatchEvent(new Event('change'));
+            }
+        }
     });
 </script>
 @endpush
