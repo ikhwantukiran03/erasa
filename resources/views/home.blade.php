@@ -51,7 +51,7 @@
         /* Hero Image with Overlay */
         .hero-bg {
             background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
-                url('https://scontent.fkul8-3.fna.fbcdn.net/v/t39.30808-6/476350610_468705386313427_3344429432169983636_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeHm8_RZ-ThOy3uAa7CEoebdOUMqw389l1g5QyrDfz2XWAvhKAwGhW1Jrq9DIOOaCOBjYxJTyVu4KPgeff7p2in0&_nc_ohc=p1C2qEJKv90Q7kNvgHiVKXW&_nc_oc=AdnU4cq_1P4w5s95ePs7mDurBnYuO6gDg3UOUnBfvup7o4VhYa9cKSDQzNYnEAyNmgM&_nc_zt=23&_nc_ht=scontent.fkul8-3.fna&_nc_gid=WD9DVxSPjdf0w98eszH7mw&oh=00_AYFSbqzZ13OeyohJeiP--nLCirIE5kHhESjMzm5lgJy40A&oe=67E0271D');
+            url('{{ asset('assets/Home.jpg') }}');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -71,6 +71,7 @@
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <a href="/" class="flex items-center">
+                <img src="{{ asset('assets/logo.jpg') }}" class="h-10 w-auto" alt="Logo">
                     <span class="text-2xl font-display font-bold text-primary transition-colors duration-300">Enak Rasa</span>
                 </a>
                 
@@ -78,7 +79,7 @@
                 <nav class="hidden md:flex items-center space-x-8">
                     <a href="#home" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Home</a>
                     <a href="#gallery" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Gallery</a>
-                    <a href="#calendar" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Calendar</a>
+                    
                     <a href="{{ route('booking.calendar') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Calendar</a>
                     <a href="{{ route('public.venues') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Packages</a>
                     
@@ -147,6 +148,8 @@
     <!-- Hero Section -->
     <section class="hero-bg min-h-screen flex items-center justify-center text-white" id="home">
         <div class="container mx-auto px-4">
+       
+
             <div class="max-w-3xl mx-auto text-center" data-aos="fade-up" data-aos-duration="1000">
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-6 leading-tight">Create Unforgettable Wedding Memories</h1>
                 <p class="text-lg md:text-xl mb-8 mx-auto max-w-2xl">Enak Rasa Wedding Hall offers an elegant setting for your perfect day. Our dedicated team will transform your dreams into a celebration to remember.</p>
@@ -327,7 +330,7 @@
                     </div>
                     <div class="md:w-1/2 p-6 flex items-center justify-center">
                         <div class="w-full">
-                            <img src="https://images.unsplash.com/photo-1557596421-31f6419be91d?q=80&w=2864&auto=format&fit=crop" alt="Calendar" class="rounded-lg shadow-md w-full h-auto max-w-md mx-auto">
+                            <img src="https://www.brides.com/thmb/OY7d19OTuP-bOfuvEEz5Tex_C_0=/750x0/filters:no_upscale():max_bytes(150000):strip_icc()/wedding-planning-calendar-getty-images-98779599035c40409ecfca3ecced32a0.jpg" alt="Calendar" class="rounded-lg shadow-md w-full h-auto max-w-md mx-auto">
                             <div class="text-center mt-4">
                                 <p class="text-gray-600 font-medium">Stay organized with our interactive booking calendar</p>
                             </div>

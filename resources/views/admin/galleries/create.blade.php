@@ -152,16 +152,7 @@
                         <p class="text-gray-600 mb-4">These details will be applied to all uploaded images. You can edit individual image details later.</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="default_title" class="block text-dark font-medium mb-1">Default Title</label>
-                                <input 
-                                    type="text" 
-                                    id="default_title" 
-                                    name="default_title" 
-                                    class="form-input" 
-                                    placeholder="Enter default title for all images"
-                                >
-                            </div>
+                            
                             
                             <div>
                                 <label for="display_order" class="block text-dark font-medium mb-1">Starting Display Order</label>
@@ -176,16 +167,7 @@
                                 <p class="text-sm text-gray-500 mt-1">Images will be numbered starting from this value</p>
                             </div>
                             
-                            <div class="md:col-span-2">
-                                <label for="default_description" class="block text-dark font-medium mb-1">Default Description (Optional)</label>
-                                <textarea 
-                                    id="default_description" 
-                                    name="default_description" 
-                                    rows="3" 
-                                    class="form-input" 
-                                    placeholder="Enter default description for all images"
-                                ></textarea>
-                            </div>
+                            
                             
                             <div class="md:col-span-2 flex items-center">
                                 <input 

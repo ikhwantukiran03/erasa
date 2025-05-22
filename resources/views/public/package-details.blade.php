@@ -247,7 +247,7 @@
                         <div class="h-48 overflow-hidden relative">
                             @if($venueImage)
                                 @if($venueImage->source === 'local' && $venueImage->image_path)
-                                    <img src="{{ asset('storage/' . $venueImage->image_path) }}" 
+                                    <img src="{{ $venueImage->image_path }}"
                                          alt="{{ $venue->name }}" 
                                          class="w-full h-full object-cover transition duration-500 hover:scale-105">
                                 @elseif($venueImage->source === 'external' && $venueImage->image_url)

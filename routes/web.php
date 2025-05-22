@@ -170,6 +170,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::delete('/galleries/{gallery}', [GalleryController::class, 'destroy'])->name('galleries.destroy');
     Route::patch('/galleries/{gallery}/toggle-featured', [GalleryController::class, 'toggleFeatured'])->name('galleries.toggleFeatured');
     Route::post('/galleries/update-order', [GalleryController::class, 'updateOrder'])->name('galleries.updateOrder');
+    Route::post('/galleries/bulk-feature', [GalleryController::class, 'bulkFeature'])->name('galleries.bulkFeature');
 
     Route::get('/bookings', function () {
         if (!auth()->user()->isAdmin()) {

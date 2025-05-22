@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class GalleryController extends Controller
 {
@@ -415,5 +416,45 @@ class GalleryController extends Controller
         }
         
         return null;
+    }
+
+    /**
+     * Bulk feature or unfeature selected gallery items.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function bulkFeature(Request $request)
+    {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.');
+        }
+        
+        $validator = Validator::make($request->all(), [
+            'gallery_ids' => ['required', 'array'],
+            'gallery_ids.*' => ['required', 'exists:galleries,id'],
+            'action' => ['required', 'in:feature,unfeature'],
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('admin.galleries.index')
+                ->with('error', 'Invalid selection. Please try again.');
+        }
+
+        $gallery_ids = $request->gallery_ids;
+        $action = $request->action;
+        
+        // Update featured status based on action
+        $featureValue = ($action === 'feature') ? true : false;
+        
+        // Update all selected galleries
+        $updated = Gallery::whereIn('id', $gallery_ids)->update(['is_featured' => $featureValue]);
+        
+        $message = ($action === 'feature') 
+            ? $updated . ' ' . Str::plural('image', $updated) . ' marked as featured.' 
+            : $updated . ' ' . Str::plural('image', $updated) . ' removed from featured.';
+            
+        return redirect()->route('admin.galleries.index')->with('success', $message);
     }
 }

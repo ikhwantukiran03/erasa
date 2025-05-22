@@ -98,7 +98,7 @@
                     <div class="h-72 overflow-hidden relative">
                         @if($venueImage)
                             @if($venueImage->source === 'local' && $venueImage->image_path)
-                                <img src="{{ asset('storage/' . $venueImage->image_path) }}" 
+                                <img src="{{ $venueImage->image_path }}" 
                                      alt="{{ $venue->name }}" 
                                      class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
                             @elseif($venueImage->source === 'external' && $venueImage->image_url)
@@ -173,7 +173,7 @@
                     <div class="h-[450px] overflow-hidden">
                         @if($featuredImage)
                             @if($featuredImage->source === 'local')
-                                <img src="{{ asset('storage/' . $featuredImage->image_path) }}" 
+                                <img src="{{ $featuredImage->image_path }}" 
                                      alt="{{ $selectedVenue->name }}" 
                                      class="w-full h-full object-cover hover:scale-105 transition-transform duration-700">
                             @else
@@ -294,7 +294,7 @@
                         <div class="group relative overflow-hidden rounded-xl shadow-md bg-white {{ $gridClass }}" data-aos="fade-up" data-aos-delay="{{ $index * 50 }}">
                             <div class="{{ $isLarge ? 'h-80' : 'h-64' }} overflow-hidden">
                                 @if($gallery->source === 'local' && $gallery->image_path)
-                                    <img src="{{ asset('storage/' . $gallery->image_path) }}" 
+                                    <img src="{{ $gallery->image_path }}" 
                                          alt="{{ $gallery->title }}" 
                                          class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
                                 @elseif($gallery->source === 'external' && $gallery->image_url)
