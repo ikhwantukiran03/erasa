@@ -115,6 +115,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         return view('admin.dashboard');
     })->name('dashboard');
     
+    // Reports Route
+    Route::get('/reports', [App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+    
     // User Management Routes
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
