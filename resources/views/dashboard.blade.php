@@ -67,6 +67,27 @@
                     </svg>
                 </a>
             </div>
+
+            <!-- Wedding Card Quick Action -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="150">
+                <div class="flex items-center">
+                    <div class="bg-pink-50 rounded-full p-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h16v16H4V4zm4 4h8v8H8V8z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Personalize your event</p>
+                        <p class="text-lg font-semibold text-gray-800">Wedding Cards</p>
+                    </div>
+                </div>
+                <a href="{{ route('wedding-cards.index') }}" class="mt-4 inline-flex items-center text-sm text-pink-600 hover:underline">
+                    Manage your wedding cards
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </div>
             
             <!-- My Bookings -->
             <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="300">
@@ -88,7 +109,7 @@
                     </svg>
                 </a>
             </div>
-            
+
             <!-- My Support Tickets -->
             <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="400">
                 <div class="flex items-center">

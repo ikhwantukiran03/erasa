@@ -79,9 +79,10 @@
                 <nav class="hidden md:flex items-center space-x-8">
                     <a href="#home" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Home</a>
                     <a href="#gallery" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Gallery</a>
-                    
+                    <a href="{{ route('promotions.index') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Promotions</a>
                     <a href="{{ route('booking.calendar') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Calendar</a>
                     <a href="{{ route('public.venues') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Packages</a>
+                    <a href="{{ route('wedding-cards.index') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Wedding Cards</a>
                     
                     @guest
                         <div class="flex items-center space-x-3 ml-2">

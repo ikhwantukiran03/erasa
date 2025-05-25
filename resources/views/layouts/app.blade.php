@@ -139,6 +139,7 @@
                 <nav class="hidden md:flex items-center space-x-8">
                     <a href="/" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->is('/') ? 'active' : '' }}">Home</a>
                     <a href="{{ route('public.venues') }}" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->routeIs('public.venues') ? 'active' : '' }}">Venues</a>
+                    <a href="{{ route('promotions.index') }}" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->routeIs('promotions.*') ? 'active' : '' }}">Promotions</a>
                     <a href="{{ route('booking.calendar') }}" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->routeIs('booking.calendar') ? 'active' : '' }}">Calendar</a>
                     <a href="{{ route('chatbot.index') }}" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->routeIs('chatbot.index') ? 'active' : '' }}">
                         <span class="flex items-center">
@@ -200,6 +201,7 @@
                 <nav class="mt-4 border-t border-gray-100 pt-4 pb-2 space-y-1">
                     <a href="/" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->is('/') ? 'text-primary' : 'text-dark' }}">Home</a>
                     <a href="{{ route('public.venues') }}" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->routeIs('public.venues') ? 'text-primary' : 'text-dark' }}">Venues</a>
+                    <a href="{{ route('promotions.index') }}" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->routeIs('promotions.*') ? 'text-primary' : 'text-dark' }}">Promotions</a>
                     <a href="{{ route('booking.calendar') }}" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->routeIs('booking.calendar') ? 'text-primary' : 'text-dark' }}">Calendar</a>
                     <a href="{{ route('chatbot.index') }}" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->routeIs('chatbot.index') ? 'text-primary' : 'text-dark' }} flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">

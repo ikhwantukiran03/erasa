@@ -25,6 +25,7 @@ use App\Http\Controllers\WeddingCardController;
 use App\Http\Controllers\User\UserBookingController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\Staff\TicketController as StaffTicketController;
+use App\Http\Controllers\PromotionController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -90,17 +91,16 @@ Route::middleware('auth')->group(function () {
         return view('bookings.index');
     })->name('bookings.index');
 
-    
+    // Wedding Card Routes - Protected
+    Route::get('/wedding-cards', [WeddingCardController::class, 'index'])->name('wedding-cards.index');
+    Route::get('/wedding-cards/create', [WeddingCardController::class, 'create'])->name('wedding-cards.create');
+    Route::post('/wedding-cards', [WeddingCardController::class, 'store'])->name('wedding-cards.store');
+    Route::get('/wedding-cards/{uuid}/edit', [WeddingCardController::class, 'edit'])->name('wedding-cards.edit');
+    Route::put('/wedding-cards/{uuid}', [WeddingCardController::class, 'update'])->name('wedding-cards.update');
+    Route::delete('/wedding-cards/{uuid}', [WeddingCardController::class, 'destroy'])->name('wedding-cards.destroy');
 });
-// Wedding Card Routes
-Route::get('/wedding-cards', [WeddingCardController::class, 'index'])->name('wedding-cards.index');
-Route::get('/wedding-cards/create', [WeddingCardController::class, 'create'])->name('wedding-cards.create');
-Route::post('/wedding-cards', [WeddingCardController::class, 'store'])->name('wedding-cards.store');
-Route::get('/wedding-cards/{uuid}/edit', [WeddingCardController::class, 'edit'])->name('wedding-cards.edit');
-Route::put('/wedding-cards/{uuid}', [WeddingCardController::class, 'update'])->name('wedding-cards.update');
-Route::delete('/wedding-cards/{uuid}', [WeddingCardController::class, 'destroy'])->name('wedding-cards.destroy');
 
-// Public wedding card route
+// Public wedding card routes - Not protected
 Route::get('/wedding-cards/{uuid}', [WeddingCardController::class, 'show'])->name('wedding-cards.show');
 Route::post('/wedding-cards/{uuid}/comment', [WeddingCardController::class, 'addComment'])->name('wedding-cards.comment');
 
@@ -244,6 +244,55 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
     Route::get('/customizations', [StaffCustomizationController::class, 'index'])->name('customizations.index');
     Route::get('/customizations/{customization}', [StaffCustomizationController::class, 'show'])->name('customizations.show');
     Route::post('/customizations/{customization}/process', [StaffCustomizationController::class, 'process'])->name('customizations.process');
+
+    // Promotion routes
+    Route::get('/promotions', function () {
+        if (!auth()->user()->isStaff()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.');
+        }
+        return app()->make(App\Http\Controllers\Staff\PromotionController::class)->index();
+    })->name('promotions.index');
+
+    Route::get('/promotions/create', function () {
+        if (!auth()->user()->isStaff()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.');
+        }
+        return app()->make(App\Http\Controllers\Staff\PromotionController::class)->create();
+    })->name('promotions.create');
+
+    Route::post('/promotions', function () {
+        if (!auth()->user()->isStaff()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.');
+        }
+        return app()->make(App\Http\Controllers\Staff\PromotionController::class)->store(request());
+    })->name('promotions.store');
+
+    Route::get('/promotions/{promotion}/edit', function (App\Models\Promotion $promotion) {
+        if (!auth()->user()->isStaff()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.');
+        }
+        return app()->make(App\Http\Controllers\Staff\PromotionController::class)->edit($promotion);
+    })->name('promotions.edit');
+
+    Route::put('/promotions/{promotion}', function (App\Models\Promotion $promotion) {
+        if (!auth()->user()->isStaff()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.');
+        }
+        return app()->make(App\Http\Controllers\Staff\PromotionController::class)->update(request(), $promotion);
+    })->name('promotions.update');
+
+    Route::delete('/promotions/{promotion}', function (App\Models\Promotion $promotion) {
+        if (!auth()->user()->isStaff()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this resource.');
+        }
+        return app()->make(App\Http\Controllers\Staff\PromotionController::class)->destroy($promotion);
+    })->name('promotions.destroy');
 });
 
 // User Routes for Bookings and Booking Requests
@@ -284,6 +333,10 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
     Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
     Route::post('/tickets/{ticket}/reply', [TicketController::class, 'reply'])->name('tickets.reply');
 });
+
+// Promotion routes for users
+Route::get('/promotions', [PromotionController::class, 'index'])->name('promotions.index');
+Route::get('/promotions/{promotion}', [PromotionController::class, 'show'])->name('promotions.show');
 
 
 
