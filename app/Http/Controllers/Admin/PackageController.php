@@ -80,6 +80,120 @@ class PackageController extends Controller
         return view('admin.packages.create', compact('venues', 'categories'));
     }
 
+     /**
+     * Store a newly created category via AJAX.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function storeCategory(Request $request)
+    {
+        if (!auth()->user()->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255', 'unique:categories,name'],
+            'description' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $category = Category::create([
+                'name' => $request->name,
+                'description' => $request->description,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'category' => [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'description' => $category->description,
+                ],
+                'message' => 'Category created successfully!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to create category'], 500);
+        }
+    }
+
+    /**
+     * Store a newly created item via AJAX.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function storeItem(Request $request)
+    {
+        if (!auth()->user()->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'category_id' => ['required', 'exists:categories,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $item = Item::create([
+                'name' => $request->name,
+                'description' => $request->description,
+                'category_id' => $request->category_id,
+            ]);
+
+            // Load the category relationship
+            $item->load('category');
+
+            return response()->json([
+                'success' => true,
+                'item' => [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'description' => $item->description,
+                    'category_id' => $item->category_id,
+                    'category_name' => $item->category->name,
+                ],
+                'message' => 'Item created successfully!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to create item'], 500);
+        }
+    }
+
+    /**
+     * Get items by category via AJAX.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getItemsByCategory(Request $request)
+    {
+        if (!auth()->user()->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $categoryId = $request->get('category_id');
+        
+        if (!$categoryId) {
+            return response()->json(['items' => []]);
+        }
+
+        $items = Item::where('category_id', $categoryId)
+            ->select('id', 'name', 'description')
+            ->get();
+
+        return response()->json(['items' => $items]);
+    }
+
     /**
      * Store a newly created package in storage.
      *
