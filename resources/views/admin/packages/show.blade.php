@@ -80,7 +80,7 @@
                                             {{ $price->pax }} pax
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">
-                                            {{ $price->formatted_price }}
+                                            {{ 'RM ' . number_format($price->price, 0, ',', ',') }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ 'RM ' . number_format($price->price / $price->pax, 0, ',', '.') }} / person
