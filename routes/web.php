@@ -162,6 +162,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::put('/packages/{package}', [PackageController::class, 'update'])->name('packages.update');
     Route::delete('/packages/{package}', [PackageController::class, 'destroy'])->name('packages.destroy');
     Route::post('/packages/{package}/duplicate', [PackageController::class, 'duplicate'])->name('packages.duplicate');
+    
+    // AJAX routes for creating categories and items from package creation page
+    Route::post('/packages/store-category', [PackageController::class, 'storeCategory'])->name('packages.storeCategory');
+    Route::post('/packages/store-item', [PackageController::class, 'storeItem'])->name('packages.storeItem');
+    Route::get('/packages/get-items-by-category', [PackageController::class, 'getItemsByCategory'])->name('packages.getItemsByCategory');
 
     // Gallery Management Routes
     Route::get('/galleries', [GalleryController::class, 'index'])->name('galleries.index');
