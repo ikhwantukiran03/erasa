@@ -1,112 +1,132 @@
 @extends('layouts.app')
 
+@section('title', $ticket->title)
+
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="mb-6">
-        <a href="{{ route('staff.tickets.index') }}" class="text-indigo-600 hover:text-indigo-900 flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to Tickets
-        </a>
-    </div>
-
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-        <!-- Ticket Header -->
-        <div class="px-6 py-4 border-b border-gray-200">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">Ticket #{{ $ticket->id }}</h1>
-                    <p class="mt-1 text-sm text-gray-600">Created by {{ $ticket->user->name }} on {{ $ticket->created_at->format('M d, Y H:i') }}</p>
-                </div>
+<div class="bg-gradient-to-r from-primary/10 to-secondary/20 py-10">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+            <div data-aos="fade-up">
                 <div class="flex items-center space-x-4">
-                    <span class="px-3 py-1 text-sm font-semibold rounded-full 
-                        @if($ticket->status === 'open') bg-yellow-100 text-yellow-800
-                        @elseif($ticket->status === 'in_progress') bg-blue-100 text-blue-800
-                        @else bg-green-100 text-green-800
-                        @endif">
-                        {{ str_replace('_', ' ', ucfirst($ticket->status)) }}
+                    <a href="{{ route('staff.tickets.index') }}" class="text-primary hover:underline">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                    </a>
+                    <h1 class="text-3xl font-display font-bold text-primary">{{ $ticket->title }}</h1>
+                </div>
+                <div class="flex items-center space-x-4 mt-2">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                        {{ $ticket->category }}
                     </span>
-                    <span class="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {{ ucfirst($ticket->category) }}
-                    </span>
+                    <form action="{{ route('staff.tickets.update-status', $ticket) }}" method="POST" class="flex items-center">
+                        @csrf
+                        <select name="status" onchange="this.form.submit()" 
+                            class="rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary/20 text-sm font-medium">
+                            <option value="open" {{ $ticket->status === 'open' ? 'selected' : '' }} class="bg-green-100 text-green-800">Open</option>
+                            <option value="in_progress" {{ $ticket->status === 'in_progress' ? 'selected' : '' }} class="bg-yellow-100 text-yellow-800">In Progress</option>
+                            <option value="closed" {{ $ticket->status === 'closed' ? 'selected' : '' }} class="bg-gray-100 text-gray-800">Closed</option>
+                        </select>
+                    </form>
+                    <span class="text-sm text-gray-500">Created {{ $ticket->created_at->format('M d, Y H:i') }}</span>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Ticket Content -->
-        <div class="px-6 py-4">
-            <h2 class="text-lg font-semibold text-gray-800 mb-2">{{ $ticket->title }}</h2>
-            <div class="prose max-w-none">
-                {{ $ticket->description }}
-            </div>
-        </div>
-
-        <!-- Status Update Form -->
-        <div class="px-6 py-4 border-t border-gray-200">
-            <form action="{{ route('staff.tickets.update-status', $ticket) }}" method="POST" class="flex items-center space-x-4">
-                @csrf
-                <label for="status" class="text-sm font-medium text-gray-700">Update Status:</label>
-                <select name="status" id="status" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                    <option value="open" {{ $ticket->status === 'open' ? 'selected' : '' }}>Open</option>
-                    <option value="in_progress" {{ $ticket->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                    <option value="closed" {{ $ticket->status === 'closed' ? 'selected' : '' }}>Closed</option>
-                </select>
-                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Update Status
-                </button>
-            </form>
-        </div>
-
-        <!-- Replies Section -->
-        <div class="px-6 py-4 border-t border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Replies</h3>
-            
-            <div class="space-y-6">
-                @forelse($ticket->replies as $reply)
-                    <div class="flex space-x-4">
+<div class="bg-gray-50 py-10">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <!-- Ticket Description -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 mb-6">
+                <div class="p-6">
+                    <div class="flex items-start space-x-4">
                         <div class="flex-shrink-0">
-                            <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                <span class="text-gray-500 font-medium">{{ substr($reply->user->name, 0, 1) }}</span>
+                            <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span class="text-primary font-semibold">{{ substr($ticket->user->name, 0, 1) }}</span>
                             </div>
                         </div>
-                        <div class="flex-1">
+                        <div class="flex-1 min-w-0">
                             <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900">{{ $reply->user->name }}</p>
-                                    <p class="text-sm text-gray-500">{{ $reply->created_at->format('M d, Y H:i') }}</p>
-                                </div>
-                                @if($reply->is_staff_reply)
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">Staff</span>
-                                @endif
+                                <p class="text-sm font-medium text-gray-900">{{ $ticket->user->name }}</p>
+                                <p class="text-sm text-gray-500">{{ $ticket->created_at->format('M d, Y H:i') }}</p>
                             </div>
-                            <div class="mt-2 text-sm text-gray-700">
-                                {{ $reply->message }}
+                            <div class="mt-2 text-sm text-gray-700 prose prose-sm max-w-none">
+                                {{ $ticket->description }}
                             </div>
                         </div>
                     </div>
-                @empty
-                    <p class="text-gray-500 text-center py-4">No replies yet.</p>
-                @endforelse
+                </div>
+            </div>
+
+            <!-- Chat Interface -->
+            <div class="space-y-4">
+                @foreach($ticket->replies as $reply)
+                    <div class="flex {{ $reply->is_staff_reply ? 'justify-end' : 'justify-start' }}">
+                        <div class="flex items-end space-x-2 max-w-[80%]">
+                            @if(!$reply->is_staff_reply)
+                                <div class="flex-shrink-0">
+                                    <div class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <span class="text-primary font-semibold text-sm">
+                                            {{ substr($reply->user->name, 0, 1) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            @endif
+                            <div class="flex flex-col {{ $reply->is_staff_reply ? 'items-end' : 'items-start' }}">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <p class="text-xs font-medium {{ $reply->is_staff_reply ? 'text-primary' : 'text-blue-600' }}">
+                                        {{ $reply->user->name }}
+                                        @if($reply->is_staff_reply)
+                                            <span class="text-xs text-gray-500">(Staff)</span>
+                                        @endif
+                                    </p>
+                                    <span class="text-xs text-gray-500">{{ $reply->created_at->format('H:i') }}</span>
+                                </div>
+                                <div class="rounded-2xl px-4 py-2 {{ $reply->is_staff_reply ? 'bg-primary text-white' : 'bg-gray-100 text-gray-800' }}">
+                                    <p class="text-sm">{{ $reply->message }}</p>
+                                </div>
+                            </div>
+                            @if($reply->is_staff_reply)
+                                <div class="flex-shrink-0">
+                                    <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <span class="text-blue-600 font-semibold text-sm">
+                                            {{ substr($reply->user->name, 0, 1) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
             </div>
 
             <!-- Reply Form -->
             @if($ticket->status !== 'closed')
-                <form action="{{ route('staff.tickets.reply', $ticket) }}" method="POST" class="mt-6">
-                    @csrf
-                    <div class="mb-4">
-                        <label for="message" class="block text-sm font-medium text-gray-700">Add Reply</label>
-                        <textarea name="message" id="message" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required></textarea>
-                    </div>
-                    <div class="flex justify-end">
-                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Send Reply
-                        </button>
-                    </div>
-                </form>
+                <div class="mt-6 bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+                    <form action="{{ route('staff.tickets.reply', $ticket) }}" method="POST" class="p-4">
+                        @csrf
+                        <div class="flex items-end space-x-4">
+                            <div class="flex-1">
+                                <textarea name="message" id="message" rows="1" 
+                                    class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary/20 @error('message') border-red-300 @enderror" 
+                                    placeholder="Type your reply here...">{{ old('message') }}</textarea>
+                                @error('message')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <button type="submit" class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-primary text-white hover:bg-opacity-90 transition-colors shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             @else
-                <div class="mt-6 p-4 bg-gray-50 rounded-md text-center">
-                    <p class="text-gray-500">This ticket is closed and cannot receive new replies.</p>
+                <div class="mt-6 bg-gray-50 rounded-xl p-6 text-center">
+                    <p class="text-gray-600">This ticket is closed and no longer accepting replies.</p>
                 </div>
             @endif
         </div>

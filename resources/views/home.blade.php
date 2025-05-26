@@ -83,6 +83,7 @@
                     <a href="{{ route('booking.calendar') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Calendar</a>
                     <a href="{{ route('public.venues') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Packages</a>
                     <a href="{{ route('wedding-cards.index') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Wedding Cards</a>
+                    <a href="{{ route('public.feedback') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Feedback</a>
                     
                     @guest
                         <div class="flex items-center space-x-3 ml-2">
@@ -127,6 +128,7 @@
                 <a href="#calendar" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Calendar</a>
                 <a href="{{ route('booking.calendar') }}" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Calendar</a>
                 <a href="{{ route('public.venues') }}" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Packages</a>
+                <a href="{{ route('public.feedback') }}" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Feedback</a>
                 
                 @guest
                     <div class="flex flex-col space-y-2 p-4">

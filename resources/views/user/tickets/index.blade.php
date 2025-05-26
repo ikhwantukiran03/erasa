@@ -75,7 +75,7 @@
                                     {{ $ticket->updated_at->format('M d, Y') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <a href="{{ route('tickets.show', $ticket) }}" class="text-primary hover:underline">View</a>
+                                    <a href="{{ route('user.tickets.show', $ticket) }}" class="text-primary hover:underline">View</a>
                                 </td>
                             </tr>
                         @empty

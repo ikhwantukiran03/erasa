@@ -9,7 +9,7 @@ use Cloudinary\Configuration\Configuration;
 
 class CloudinaryService
 {
-    protected $cloudinary;
+    private $cloudinary;
 
     /**
      * Create a new Cloudinary service instance.
@@ -20,9 +20,9 @@ class CloudinaryService
     {
         Configuration::instance([
             'cloud' => [
-                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                'api_key' => env('CLOUDINARY_API_KEY'),
-                'api_secret' => env('CLOUDINARY_API_SECRET'),
+                'cloud_name' => 'dwqzoq6lc',
+                'api_key' => '886926516794117',
+                'api_secret' => 'lkApG6vTkjXduLjv57c58vwGQmc'
             ],
             'url' => [
                 'secure' => true

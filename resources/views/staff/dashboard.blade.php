@@ -64,7 +64,7 @@
                     <div class="ml-4">
                         <p class="text-sm text-gray-500">Today's Bookings</p>
                         <p class="text-2xl font-semibold text-gray-800">
-                            {{ \App\Models\Booking::whereDate('booking_date', today())->count() }}
+                            {{ \App\Models\Booking::whereDate('booking_date', today())->whereIn('status', ['confirmed', 'ongoing'])->count() }}
                         </p>
                     </div>
                 </div>
@@ -100,7 +100,7 @@
                     <div class="ml-4">
                         <p class="text-sm text-gray-500">Pending Payment Verifications</p>
                         <p class="text-2xl font-semibold text-gray-800">
-                            {{ \App\Models\Booking::where('status', 'waiting for deposit')
+                            {{ \App\Models\Booking::where('status', 'waiting_for_deposit')
                                 ->whereHas('invoice', function($query) {
                                     $query->whereNotNull('invoice_path')
                                           ->whereNull('invoice_verified_at');
@@ -139,10 +139,43 @@
                     </div>
                 </div>
             </div>
-
+<!-- Feedback Statistics Card -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="bg-yellow-100 rounded-full p-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Pending Feedback Review</p>
+                        <p class="text-2xl font-semibold text-gray-800">{{ \App\Models\Feedback::where('status', 'pending')->count() }}</p>
+                    </div>
+                </div>
+                <a href="{{ route('staff.feedback.index', ['status' => 'pending']) }}" class="mt-4 inline-block text-sm text-yellow-600 hover:underline">Review feedback →</a>
+            </div>
             
-            
-            
+            <!-- Average Rating Card -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="bg-green-100 rounded-full p-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Average Rating</p>
+                        <p class="text-2xl font-semibold text-gray-800">
+                            @php
+                                $avgRating = \App\Models\Feedback::where('status', 'published')->avg('rating');
+                                echo number_format($avgRating, 1);
+                            @endphp
+                            <span class="text-sm text-gray-500">/ 5</span>
+                        </p>
+                    </div>
+                </div>
+                <a href="{{ route('staff.feedback.index') }}" class="mt-4 inline-block text-sm text-green-600 hover:underline">View all feedback →</a>
+            </div>
         </div>
 
         <!-- Quick Actions -->
@@ -171,17 +204,17 @@
     <span>Verify Payment Proofs</span>
 </a>
                 <a href="{{ route('staff.customizations.index', ['status' => 'pending']) }}" class="flex items-center p-4 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    <span>Process Customization Requests</span>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+    </svg>
+    <span>Process Customization Requests</span>
                 </a>
                 <a href="{{ route('staff.promotions.index') }}" class="flex items-center p-4 bg-orange-50 text-orange-700 rounded-lg hover:bg-orange-100 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
                     </svg>
                     <span>Manage Promotions</span>
-                </a>
+</a>
                 <a href="{{ route('profile.edit') }}" class="flex items-center p-4 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />

@@ -26,6 +26,7 @@ use App\Http\Controllers\User\UserBookingController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\Staff\TicketController as StaffTicketController;
 use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\FeedbackController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -33,6 +34,7 @@ Route::get('/', [HomeController::class, 'index']);
 //Public Routes
 Route::get('/wedding-venues', [PublicController::class, 'showVenues'])->name('public.venues');
 Route::get('/wedding-package/{package}', [PublicController::class, 'showPackage'])->name('public.package');
+Route::get('/feedback', [FeedbackController::class, 'publicIndex'])->name('public.feedback');
 
 // Package Recommendation Routes
 Route::get('/package-recommendation', [PackageRecommendationController::class, 'index'])->name('package-recommendation.index');
@@ -92,12 +94,12 @@ Route::middleware('auth')->group(function () {
     })->name('bookings.index');
 
     // Wedding Card Routes - Protected
-    Route::get('/wedding-cards', [WeddingCardController::class, 'index'])->name('wedding-cards.index');
-    Route::get('/wedding-cards/create', [WeddingCardController::class, 'create'])->name('wedding-cards.create');
-    Route::post('/wedding-cards', [WeddingCardController::class, 'store'])->name('wedding-cards.store');
-    Route::get('/wedding-cards/{uuid}/edit', [WeddingCardController::class, 'edit'])->name('wedding-cards.edit');
-    Route::put('/wedding-cards/{uuid}', [WeddingCardController::class, 'update'])->name('wedding-cards.update');
-    Route::delete('/wedding-cards/{uuid}', [WeddingCardController::class, 'destroy'])->name('wedding-cards.destroy');
+Route::get('/wedding-cards', [WeddingCardController::class, 'index'])->name('wedding-cards.index');
+Route::get('/wedding-cards/create', [WeddingCardController::class, 'create'])->name('wedding-cards.create');
+Route::post('/wedding-cards', [WeddingCardController::class, 'store'])->name('wedding-cards.store');
+Route::get('/wedding-cards/{uuid}/edit', [WeddingCardController::class, 'edit'])->name('wedding-cards.edit');
+Route::put('/wedding-cards/{uuid}', [WeddingCardController::class, 'update'])->name('wedding-cards.update');
+Route::delete('/wedding-cards/{uuid}', [WeddingCardController::class, 'destroy'])->name('wedding-cards.destroy');
 });
 
 // Public wedding card routes - Not protected
@@ -245,6 +247,11 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
     Route::get('/customizations/{customization}', [StaffCustomizationController::class, 'show'])->name('customizations.show');
     Route::post('/customizations/{customization}/process', [StaffCustomizationController::class, 'process'])->name('customizations.process');
 
+    // Feedback routes
+    Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
+    Route::get('/feedback/{feedback}', [FeedbackController::class, 'show'])->name('feedback.show');
+    Route::patch('/feedback/{feedback}', [FeedbackController::class, 'update'])->name('feedback.update');
+
     // Promotion routes
     Route::get('/promotions', function () {
         if (!auth()->user()->isStaff()) {
@@ -310,6 +317,10 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
     Route::post('/bookings/{booking}/confirm', [UserBookingController::class, 'confirmReservation'])->name('bookings.confirm');
     Route::post('/bookings/{booking}/cancel', [UserBookingController::class, 'cancelBooking'])->name('bookings.cancel');
 
+    // Feedback routes
+    Route::get('/bookings/{booking}/feedback', [FeedbackController::class, 'create'])->name('bookings.feedback');
+    Route::post('/bookings/{booking}/feedback', [FeedbackController::class, 'store'])->name('bookings.feedback.store');
+
     // Invoice management
     Route::get('/bookings/{booking}/invoice', [InvoiceController::class, 'showSubmitForm'])->name('invoices.create');
     Route::post('/bookings/{booking}/invoice', [InvoiceController::class, 'submit'])->name('invoices.store');
@@ -326,17 +337,27 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
     Route::put('/bookings/{booking}/customizations/{customization}', [CustomizationController::class, 'update'])->name('customizations.update');
     Route::delete('/bookings/{booking}/customizations/{customization}', [CustomizationController::class, 'destroy'])->name('customizations.destroy');
 
-    // Ticket Routes
-    Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
-    Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
-    Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');
-    Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
-    Route::post('/tickets/{ticket}/reply', [TicketController::class, 'reply'])->name('tickets.reply');
+    // User Ticket Routes
+    Route::prefix('tickets')->name('tickets.')->group(function () {
+        Route::get('/', [TicketController::class, 'index'])->name('index');
+        Route::get('/create', [TicketController::class, 'create'])->name('create');
+        Route::post('/', [TicketController::class, 'store'])->name('store');
+        Route::get('/{ticket}', [TicketController::class, 'show'])->name('show');
+        Route::get('/{ticket}/edit', [TicketController::class, 'edit'])->name('edit');
+        Route::put('/{ticket}', [TicketController::class, 'update'])->name('update');
+        Route::post('/{ticket}/reply', [TicketController::class, 'reply'])->name('reply');
+        Route::patch('/{ticket}/status', [TicketController::class, 'updateStatus'])->name('update-status');
+    });
 });
 
 // Promotion routes for users
 Route::get('/promotions', [PromotionController::class, 'index'])->name('promotions.index');
 Route::get('/promotions/{promotion}', [PromotionController::class, 'show'])->name('promotions.show');
+
+
+    
+
+    
 
 
 

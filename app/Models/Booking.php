@@ -230,4 +230,9 @@ class Booking extends Model
     {
         return $this->invoice()->exists();
     }
+
+    public function feedback()
+    {
+        return $this->hasOne(Feedback::class);
+    }
 }

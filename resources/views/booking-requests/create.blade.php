@@ -206,6 +206,29 @@
                             <p class="text-sm text-gray-500 mt-1 ml-1">Tentative date for your event</p>
                         </div>
                         
+                        <!-- Session Selection -->
+                        <div class="form-group">
+                            <label for="session" class="block text-dark font-medium mb-1">Session <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                </div>
+                                <select 
+                                    id="session" 
+                                    name="session" 
+                                    required 
+                                    class="form-input w-full pl-10 focus:ring-primary focus:border-primary"
+                                >
+                                    <option value="">-- Select Session --</option>
+                                    <option value="morning" {{ old('session') == 'morning' ? 'selected' : '' }}>Morning Session</option>
+                                    <option value="evening" {{ old('session') == 'evening' ? 'selected' : '' }}>Evening Session</option>
+                                </select>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1 ml-1">Choose your preferred time of day</p>
+                        </div>
+                        
                         <div class="form-group">
                             <label for="venue_id" class="block text-dark font-medium mb-1">Preferred Venue</label>
                             <div class="relative">

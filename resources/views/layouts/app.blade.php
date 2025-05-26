@@ -150,6 +150,7 @@
                             Chat Assistant
                         </span>
                     </a>
+                    <a href="{{ route('public.feedback') }}" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->routeIs('public.feedback') ? 'active' : '' }}">Feedback</a>
                     
                     @guest
                         <div class="flex items-center space-x-4 ml-4">
@@ -210,6 +211,7 @@
                         </svg>
                         Chat Assistant
                     </a>
+                    <a href="{{ route('public.feedback') }}" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->routeIs('public.feedback') ? 'text-primary' : 'text-dark' }}">Feedback</a>
                     
                     @guest
                         <div class="border-t border-gray-100 mt-2 pt-2">
