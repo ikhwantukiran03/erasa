@@ -4,12 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Session;
+use App\Services\DeepSeekService;
 use App\Models\Package;
 use App\Models\Venue;
 use App\Models\Booking;
 
 class ChatbotController extends Controller
 {
+    protected $deepSeekService;
+
+    public function __construct(DeepSeekService $deepSeekService)
+    {
+        $this->deepSeekService = $deepSeekService;
+    }
+
     /**
      * Display the chatbot interface.
      */
@@ -19,11 +28,11 @@ class ChatbotController extends Controller
     }
 
     /**
-     * Handle chatbot queries and return responses.
+     * Handle chatbot queries and return AI-powered or fallback responses.
      */
     public function query(Request $request): JsonResponse
     {
-        $query = strtolower(trim($request->input('query', '')));
+        $query = trim($request->input('query', ''));
         
         if (empty($query)) {
             return response()->json([
@@ -35,11 +44,77 @@ class ChatbotController extends Controller
             ]);
         }
 
-        // Get response based on query
-        $response = $this->getResponse($query);
+        try {
+            // Check if AI is enabled and available
+            if ($this->deepSeekService->isEnabled()) {
+                // Get conversation history from session
+                $conversationHistory = Session::get('chatbot_conversation', []);
+                
+                // Generate AI response
+                if (empty($conversationHistory)) {
+                    // First message - no context needed
+                    $response = $this->deepSeekService->generateResponse($query);
+                } else {
+                    // Contextual response with conversation history
+                    $response = $this->deepSeekService->generateContextualResponse($conversationHistory, $query);
+                }
+
+                // Update conversation history
+                $conversationHistory[] = ['role' => 'user', 'content' => $query];
+                $conversationHistory[] = ['role' => 'assistant', 'content' => $response['text']];
+                
+                // Keep only last 10 messages to prevent session from getting too large
+                if (count($conversationHistory) > 10) {
+                    $conversationHistory = array_slice($conversationHistory, -10);
+                }
+
+                Session::put('chatbot_conversation', $conversationHistory);
+                
+                return response()->json([
+                    'response' => $response
+                ]);
+            } else {
+                // Fallback to rule-based responses if AI is disabled
+                $response = $this->getResponse(strtolower($query));
+                
+                return response()->json([
+                    'response' => $response
+                ]);
+            }
+            
+        } catch (\Exception $e) {
+            \Log::error('Chatbot Error: ' . $e->getMessage());
+            
+            // Fallback to rule-based response on error
+            $response = $this->getResponse(strtolower($query));
+            
+            return response()->json([
+                'response' => $response
+            ]);
+        }
+    }
+
+    /**
+     * Clear conversation history
+     */
+    public function clearConversation(Request $request): JsonResponse
+    {
+        Session::forget('chatbot_conversation');
         
         return response()->json([
-            'response' => $response
+            'message' => 'Conversation history cleared successfully.'
+        ]);
+    }
+
+    /**
+     * Get conversation history
+     */
+    public function getConversationHistory(Request $request): JsonResponse
+    {
+        $conversationHistory = Session::get('chatbot_conversation', []);
+        
+        return response()->json([
+            'conversation' => $conversationHistory
         ]);
     }
 

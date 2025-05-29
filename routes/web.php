@@ -49,6 +49,8 @@ Route::get('/my-requests', [BookingRequestController::class, 'myRequests'])->nam
 // Chatbot Routes
 Route::get('/chatbot', [App\Http\Controllers\ChatbotController::class, 'index'])->name('chatbot.index');
 Route::post('/chatbot/query', [App\Http\Controllers\ChatbotController::class, 'query'])->name('chatbot.query');
+Route::post('/chatbot/clear-conversation', [App\Http\Controllers\ChatbotController::class, 'clearConversation'])->name('chatbot.clear');
+Route::get('/chatbot/conversation-history', [App\Http\Controllers\ChatbotController::class, 'getConversationHistory'])->name('chatbot.history');
 
 // Booking Calendar Route 
 Route::get('/booking-calendar', [App\Http\Controllers\BookingCalendarController::class, 'index'])->name('booking.calendar');
