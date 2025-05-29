@@ -336,7 +336,7 @@
                                         <div class="flex items-center">
                                             <div>
                                                 <div class="text-sm font-medium text-gray-900">{{ $request->name }}</div>
-                                                <div class="text-sm text-gray-500">{{ $request->whatsapp_no }}</div>
+                                                <div class="text-sm text-gray-500">{{ $request->email }}</div>
                                             </div>
                                         </div>
                                     </td>

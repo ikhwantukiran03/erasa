@@ -2,5 +2,5 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    App\Providers\WhatsAppServiceProvider::class,
+    App\Providers\EmailServiceProvider::class,
 ];

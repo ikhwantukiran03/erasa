@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BookingRequest;
 use App\Models\Booking;
 use App\Models\User;
-use App\Services\WhatsAppService;
+use App\Services\EmailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -15,16 +15,16 @@ use Illuminate\Support\Str;
 
 class StaffBookingRequestController extends Controller
 {
-    protected $whatsAppService;
+    protected $emailService;
 
     /**
      * Create a new controller instance.
      *
-     * @param WhatsAppService $whatsAppService
+     * @param EmailService $emailService
      */
-    public function __construct(WhatsAppService $whatsAppService)
+    public function __construct(EmailService $emailService)
     {
-        $this->whatsAppService = $whatsAppService;
+        $this->emailService = $emailService;
     }
 
     /**
@@ -174,67 +174,26 @@ class StaffBookingRequestController extends Controller
             // Commit transaction
             \DB::commit();
 
-            // Prepare WhatsApp message
-            $message = "Hello {$bookingRequest->name},\n\n";
-            $message .= "🎉 *Your booking request has been APPROVED!* 🎉\n\n";
-            
-            // Only include package information for non-reservation types
-            if ($bookingRequest->type !== 'reservation' && $bookingRequest->type !== 'appointment' && $bookingRequest->package) {
-                $message .= "*Package:* {$bookingRequest->package->name}\n";
-            }
-            
-            if ($bookingRequest->venue) {
-                $message .= "*Venue:* {$bookingRequest->venue->name}\n";
-            }
-            
-            if ($bookingRequest->event_date) {
-                $message .= "*Event Date:* {$bookingRequest->event_date->format('d M Y')}\n";
-                $message .= "*Session:* " . ucfirst($booking->session) . "\n";
-            }
-            
-            if ($request->admin_notes) {
-                $message .= "\n*Additional information:*\n{$request->admin_notes}\n";
-            }
-            
-            // Add booking confirmation
-            $message .= "\n*🎫 BOOKING CONFIRMATION:*\n";
-            $message .= "Your booking has been confirmed with reference number: B-{$booking->id}\n";
+            // Send email notification
+            $emailData = [
+                'name' => $bookingRequest->name,
+                'email' => $bookingRequest->email,
+                'type' => $bookingRequest->type,
+                'package' => $bookingRequest->package,
+                'venue' => $bookingRequest->venue,
+                'event_date' => $bookingRequest->event_date,
+                'session' => $booking->session,
+                'admin_notes' => $request->admin_notes,
+                'booking_id' => $booking->id,
+                'booking_type' => $booking->type,
+                'account_created' => $accountCreated,
+                'password' => $password,
+            ];
 
-            // Add deposit information for wedding bookings
-            if ($booking->type === 'wedding') {
-                $message .= "*⚠️ IMPORTANT: Your booking requires a deposit payment.*\n";
-                $message .= "Your booking status is 'Waiting for Deposit'. Please complete your payment to confirm your reservation.\n\n";
-                $message .= "*Payment Details:*\n";
-                $message .= "Bank Transfer to: Bank Negara Malaysia\n";
-                $message .= "Account Number: 1234-5678-9012\n";
-                $message .= "Reference: BOOKING-{$booking->id}\n\n";
-                $message .= "Please reply to this message with your payment proof once completed.\n";
-            }
-
-            $message .= "You can view your booking details in your account.\n";
-            
-            // Add account information if a new account was created
-            if ($accountCreated) {
-                $message .= "\n*💻 YOUR ACCOUNT DETAILS:*\n";
-                $message .= "We've created an account for you on our website:\n";
-                $message .= "*Email:* {$bookingRequest->email}\n";
-                $message .= "*Password:* {$password}\n\n";
-                $message .= "*LOGIN LINK:* " . route('login') . "\n\n";
-                $message .= "⚠️ *IMPORTANT:* For security purposes, please log in and change your password as soon as possible by visiting your profile page: " . route('profile.edit') . "\n";
-            } else {
-                $message .= "\n*🔑 ACCESS YOUR BOOKING:*\n";
-                $message .= "You can view the details of your booking by logging into your account: " . route('login') . "\n";
-                $message .= "Then navigate to My Bookings.\n";
-            }
-            
-            $message .= "\nThank you for choosing Enak Rasa Wedding Hall! 🙏\n";
-            $message .= "If you have any questions, please contact us at +60 123 456 789.";
-
-            // Send WhatsApp message
-            $this->whatsAppService->sendMessage($bookingRequest->whatsapp_no, $message);
+            $this->emailService->sendBookingApprovalEmail($bookingRequest->email, $emailData);
 
             return redirect()->route('staff.requests.index')
-                ->with('success', 'Booking request approved successfully, booking created, and WhatsApp notification sent.');
+                ->with('success', 'Booking request approved successfully, booking created, and email notification sent.');
                 
         } catch (\Exception $e) {
             // Rollback transaction on error
@@ -335,47 +294,22 @@ class StaffBookingRequestController extends Controller
         $bookingRequest->handled_at = now();
         $bookingRequest->save();
 
-        // Prepare WhatsApp message
-        $message = "Hello {$bookingRequest->name},\n\n";
-        $message .= "We regret to inform you that your booking request has been *DECLINED*.\n\n";
-        
-        if ($bookingRequest->package) {
-            $message .= "*Package:* {$bookingRequest->package->name}\n";
-        }
-        
-        if ($bookingRequest->venue) {
-            $message .= "*Venue:* {$bookingRequest->venue->name}\n";
-        }
-        
-        if ($bookingRequest->event_date) {
-            $message .= "*Event Date:* {$bookingRequest->event_date->format('d M Y')}\n";
-        }
-        
-        $message .= "\n*Reason:*\n{$request->admin_notes}\n";
-        
-        // Add account information if a new account was created
-        if ($accountCreated) {
-            $message .= "\n*💻 YOUR ACCOUNT DETAILS:*\n";
-            $message .= "Despite this rejection, we've created an account for you on our website so you can explore other options:\n";
-            $message .= "*Email:* {$bookingRequest->email}\n";
-            $message .= "*Password:* {$password}\n\n";
-            $message .= "*LOGIN LINK:* " . route('login') . "\n\n";
-            $message .= "⚠️ *IMPORTANT:* For security purposes, please log in and change your password as soon as possible by visiting your profile page: " . route('profile.edit') . "\n";
-            $message .= "You can explore other packages and venues that might suit your needs.\n";
-        } else {
-            $message .= "\n*🔍 EXPLORE OTHER OPTIONS:*\n";
-            $message .= "You can log into your account to explore other packages and venues that might better suit your needs: " . route('login') . "\n";
-            $message .= "View all available venues: " . route('public.venues') . "\n";
-        }
-        
-        $message .= "\nWe apologize for any inconvenience and thank you for considering Enak Rasa Wedding Hall. 🙏\n";
-        $message .= "If you have any questions, please contact us at +60 123 456 789.";
+        // Send email notification
+        $emailData = [
+            'name' => $bookingRequest->name,
+            'email' => $bookingRequest->email,
+            'package' => $bookingRequest->package,
+            'venue' => $bookingRequest->venue,
+            'event_date' => $bookingRequest->event_date,
+            'admin_notes' => $request->admin_notes,
+            'account_created' => $accountCreated,
+            'password' => $password,
+        ];
 
-        // Send WhatsApp message
-        $this->whatsAppService->sendMessage($bookingRequest->whatsapp_no, $message);
+        $this->emailService->sendBookingRejectionEmail($bookingRequest->email, $emailData);
 
         return redirect()->route('staff.requests.index')
-            ->with('success', 'Booking request rejected successfully and WhatsApp notification sent.');
+            ->with('success', 'Booking request rejected successfully and email notification sent.');
     }
 
     /**
