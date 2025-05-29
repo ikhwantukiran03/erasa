@@ -65,6 +65,55 @@
                     @endif
                     
                     @if(count($availableTypes) > 0)
+                        <!-- Debug Information (remove in production) -->
+                        @if(config('app.debug'))
+                        <div class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <h4 class="font-semibold text-yellow-800 mb-2" Information:</h4>
+                            <p class="text-sm text-yellow-700">Available payment types: {{ implode(', ', $availableTypes) }}</p>
+                            <p class="text-sm text-yellow-700">Booking status: {{ $booking->status }}</p>
+                            <p class="text-sm text-yellow-700">Event date: {{ $booking->booking_date }}</p>
+                            <p class="text-sm text-yellow-700">Days until event: {{ \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($booking->booking_date), false) }}</p>
+                            <p class="text-sm text-yellow-700">Existing invoices: {{ $invoices->count() }}</p>
+                            @foreach($invoices as $invoice)
+                                <p class="text-xs text-yellow-600">- {{ $invoice->type }}: {{ $invoice->status }}</p>
+                            @endforeach
+                            
+                            <!-- Payment Schedule Debug -->
+                            <div class="mt-3 pt-3 border-t border-yellow-300">
+                                <p class="text-sm font-semibold text-yellow-800">Payment Deadlines:</p>
+                                @php
+                                    $today = \Carbon\Carbon::today();
+                                @endphp
+                                <p class="text-xs text-yellow-600">Deposit: No deadline</p>
+                                
+                                @if($booking->type === 'wedding')
+                                    <p class="text-xs text-yellow-600">Second Deposit: {{ $paymentSchedule['second_deposit']->format('M d, Y') }} 
+                                        @if($today->greaterThan($paymentSchedule['second_deposit']))
+                                            <span class="text-red-600 font-bold">(PASSED)</span>
+                                        @else
+                                            <span class="text-green-600">({{ $today->diffInDays($paymentSchedule['second_deposit'], false) }} days left)</span>
+                                        @endif
+                                    </p>
+                                    <p class="text-xs text-yellow-600">Balance: {{ $paymentSchedule['balance']->format('M d, Y') }}
+                                        @if($today->greaterThan($paymentSchedule['balance']))
+                                            <span class="text-red-600 font-bold">(PASSED)</span>
+                                        @else
+                                            <span class="text-green-600">({{ $today->diffInDays($paymentSchedule['balance'], false) }} days left)</span>
+                                        @endif
+                                    </p>
+                                @else
+                                    <p class="text-xs text-yellow-600">Balance: {{ $paymentSchedule['balance']->format('M d, Y') }}
+                                        @if($today->greaterThan($paymentSchedule['balance']))
+                                            <span class="text-red-600 font-bold">(PASSED)</span>
+                                        @else
+                                            <span class="text-green-600">({{ $today->diffInDays($paymentSchedule['balance'], false) }} days left)</span>
+                                        @endif
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
+                        @endif
+                        
                         <form action="{{ route('user.invoices.store', $booking) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             
@@ -75,13 +124,19 @@
                                     @foreach($availableTypes as $type)
                                         <option value="{{ $type }}" {{ old('type') == $type ? 'selected' : '' }}>
                                             @if($type === 'deposit')
-                                                Deposit Payment (10%)
-                                            @elseif($type === 'payment_1')
-                                                First Installment (30%)
-                                            @elseif($type === 'payment_2')
-                                                Second Installment (30%)
-                                            @elseif($type === 'final_payment')
-                                                Final Payment (30%)
+                                                @if($booking->type === 'wedding')
+                                                    Deposit Payment (RM 3,000)
+                                                @else
+                                                    Deposit Payment (50%)
+                                                @endif
+                                            @elseif($type === 'second_deposit')
+                                                Second Deposit (50% of total)
+                                            @elseif($type === 'balance')
+                                                @if($booking->type === 'wedding')
+                                                    Balance Payment (Remaining amount)
+                                                @else
+                                                    Balance Payment (50%)
+                                                @endif
                                             @elseif($type === 'full_payment')
                                                 Full Payment (100%)
                                             @endif
@@ -108,20 +163,26 @@
                                 <label class="block text-dark font-medium mb-1">Payment Amount</label>
                                 <div class="bg-blue-50 rounded-lg p-4 text-blue-800">
                                     <div class="deposit-amount hidden">
-                                        <span class="font-semibold">Deposit (10%):</span> 
-                                        <span class="font-bold">RM {{ number_format($totalAmount * 0.10, 2) }}</span>
+                                        @if($booking->type === 'wedding')
+                                            <span class="font-semibold">Deposit:</span> 
+                                            <span class="font-bold">RM 3,000</span>
+                                        @else
+                                            <span class="font-semibold">Deposit (50%):</span> 
+                                            <span class="font-bold">RM {{ number_format($totalAmount * 0.50, 2) }}</span>
+                                        @endif
                                     </div>
-                                    <div class="payment-1-amount hidden">
-                                        <span class="font-semibold">First Installment (30%):</span> 
-                                        <span class="font-bold">RM {{ number_format($totalAmount * 0.30, 2) }}</span>
+                                    <div class="second-deposit-amount hidden">
+                                        <span class="font-semibold">Second Deposit (50% of total):</span> 
+                                        <span class="font-bold">RM {{ number_format($totalAmount * 0.50, 2) }}</span>
                                     </div>
-                                    <div class="payment-2-amount hidden">
-                                        <span class="font-semibold">Second Installment (30%):</span> 
-                                        <span class="font-bold">RM {{ number_format($totalAmount * 0.30, 2) }}</span>
-                                    </div>
-                                    <div class="final-payment-amount hidden">
-                                        <span class="font-semibold">Final Payment (30%):</span> 
-                                        <span class="font-bold">RM {{ number_format($totalAmount * 0.30, 2) }}</span>
+                                    <div class="balance-amount hidden">
+                                        @if($booking->type === 'wedding')
+                                            <span class="font-semibold">Balance Payment:</span> 
+                                            <span class="font-bold">RM {{ number_format($totalAmount - 3000 - ($totalAmount * 0.50), 2) }}</span>
+                                        @else
+                                            <span class="font-semibold">Balance Payment (50%):</span> 
+                                            <span class="font-bold">RM {{ number_format($totalAmount * 0.50, 2) }}</span>
+                                        @endif
                                     </div>
                                     <div class="full-payment-amount hidden">
                                         <span class="font-semibold">Full Payment (100%):</span> 
@@ -186,9 +247,8 @@
                                 const typeSelect = document.getElementById('type');
                                 const paymentAmounts = document.querySelector('.payment-amounts');
                                 const depositAmount = document.querySelector('.deposit-amount');
-                                const payment1Amount = document.querySelector('.payment-1-amount');
-                                const payment2Amount = document.querySelector('.payment-2-amount');
-                                const finalPaymentAmount = document.querySelector('.final-payment-amount');
+                                const secondDepositAmount = document.querySelector('.second-deposit-amount');
+                                const balanceAmount = document.querySelector('.balance-amount');
                                 const fullPaymentAmount = document.querySelector('.full-payment-amount');
                                 
                                 // File input display
@@ -207,19 +267,16 @@
                                 typeSelect.addEventListener('change', function() {
                                     paymentAmounts.classList.remove('hidden');
                                     depositAmount.classList.add('hidden');
-                                    payment1Amount.classList.add('hidden');
-                                    payment2Amount.classList.add('hidden');
-                                    finalPaymentAmount.classList.add('hidden');
+                                    secondDepositAmount.classList.add('hidden');
+                                    balanceAmount.classList.add('hidden');
                                     fullPaymentAmount.classList.add('hidden');
                                     
                                     if (this.value === 'deposit') {
                                         depositAmount.classList.remove('hidden');
-                                    } else if (this.value === 'payment_1') {
-                                        payment1Amount.classList.remove('hidden');
-                                    } else if (this.value === 'payment_2') {
-                                        payment2Amount.classList.remove('hidden');
-                                    } else if (this.value === 'final_payment') {
-                                        finalPaymentAmount.classList.remove('hidden');
+                                    } else if (this.value === 'second_deposit') {
+                                        secondDepositAmount.classList.remove('hidden');
+                                    } else if (this.value === 'balance') {
+                                        balanceAmount.classList.remove('hidden');
                                     } else if (this.value === 'full_payment') {
                                         fullPaymentAmount.classList.remove('hidden');
                                     } else {
@@ -239,7 +296,47 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                             <p class="text-gray-600 text-lg mb-2">No payments are available for submission at this time.</p>
-                            <p class="text-gray-500">All required payments have been submitted or are not yet due.</p>
+                            
+                            @php
+                                $existingInvoices = $invoices;
+                                $hasFullPayment = $existingInvoices->where('type', 'full_payment')->whereIn('status', ['pending', 'verified'])->count() > 0;
+                                $eventDate = \Carbon\Carbon::parse($booking->booking_date);
+                                $today = \Carbon\Carbon::today();
+                                $daysUntilEvent = $today->diffInDays($eventDate, false);
+                            @endphp
+                            
+                            @if($hasFullPayment)
+                                <p class="text-gray-500">You have already submitted a full payment for this booking.</p>
+                            @elseif($today->greaterThan($eventDate))
+                                <p class="text-gray-500">The event date has passed. No more payments can be submitted.</p>
+                                <p class="text-sm text-red-600 mt-2">Event date: {{ $eventDate->format('M d, Y') }}</p>
+                            @else
+                                <p class="text-gray-500">All required payments have been submitted or completed.</p>
+                                <p class="text-sm text-gray-500 mt-2">If you need to submit a late payment, please contact our staff for assistance.</p>
+                            @endif
+                            
+                            <!-- Debug Information for "no payments" case -->
+                            @if(config('app.debug'))
+                            <div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-left">
+                                <h4 class="font-semibold text-red-800 mb-2">Debug - Why no payments available:</h4>
+                                <p class="text-sm text-red-700">Booking status: {{ $booking->status }}</p>
+                                <p class="text-sm text-red-700">Event date: {{ $booking->booking_date }}</p>
+                                <p class="text-sm text-red-700">Days until event: {{ $daysUntilEvent }}</p>
+                                <p class="text-sm text-red-700">Existing invoices: {{ $existingInvoices->count() }}</p>
+                                @foreach($existingInvoices as $invoice)
+                                    <p class="text-xs text-red-600">- {{ $invoice->type }}: {{ $invoice->status }} (Amount: RM {{ number_format($invoice->amount, 2) }})</p>
+                                @endforeach
+                                
+                                @if($today->greaterThan($eventDate))
+                                    <p class="text-xs text-red-600 font-bold mt-2">Event date has passed - No more payments allowed</p>
+                                @endif
+                                
+                                @if($hasFullPayment)
+                                    <p class="text-xs text-red-600 font-bold mt-2">Full payment already submitted</p>
+                                @endif
+                            </div>
+                            @endif
+                            
                             <a href="{{ route('user.bookings.show', $booking) }}" class="mt-6 inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors shadow-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -275,12 +372,10 @@
                             } elseif ($booking->package) {
                                 $totalAmount = $booking->package->min_price;
                             }
-                            
-                            $depositAmount = $totalAmount * 0.10;
-                            $installmentAmount = $totalAmount * 0.30;
                         @endphp
                         
                         <div class="space-y-6">
+                            <!-- Deposit Payment -->
                             <div class="relative pb-6 border-l-2 border-gray-200">
                                 @php
                                     $depositInvoice = $invoices->where('type', 'deposit')->first();
@@ -310,9 +405,13 @@
                                 
                                 <div class="ml-6">
                                     <h3 class="font-bold text-gray-800 flex items-center">
-                                        Deposit (10%)
+                                        Deposit
                                         <span class="ml-2 px-2 py-0.5 bg-primary bg-opacity-10 text-primary rounded-full text-xs font-bold">
-                                            RM {{ number_format($depositAmount, 2) }}
+                                            @if($booking->type === 'wedding')
+                                                RM 3,000
+                                            @else
+                                                RM {{ number_format($totalAmount * 0.50, 2) }}
+                                            @endif
                                         </span>
                                     </h3>
                                     <p class="text-sm text-gray-600 mt-1">Due: Immediately</p>
@@ -324,103 +423,70 @@
                                 </div>
                             </div>
                             
-                            <div class="relative pb-6 border-l-2 border-gray-200">
-                                @php
-                                    $payment1Invoice = $invoices->where('type', 'payment_1')->first();
-                                    $statusColor = '';
-                                    $statusIcon = '';
-                                    
-                                    if($payment1Invoice) {
-                                        if($payment1Invoice->status === 'verified') {
-                                            $statusColor = 'bg-green-500';
-                                            $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
-                                        } elseif($payment1Invoice->status === 'pending') {
-                                            $statusColor = 'bg-yellow-500';
-                                            $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+                            @if($booking->type === 'wedding')
+                                <!-- Second Deposit (Wedding Only) -->
+                                <div class="relative pb-6 border-l-2 border-gray-200">
+                                    @php
+                                        $secondDepositInvoice = $invoices->where('type', 'second_deposit')->first();
+                                        $statusColor = '';
+                                        $statusIcon = '';
+                                        
+                                        if($secondDepositInvoice) {
+                                            if($secondDepositInvoice->status === 'verified') {
+                                                $statusColor = 'bg-green-500';
+                                                $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
+                                            } elseif($secondDepositInvoice->status === 'pending') {
+                                                $statusColor = 'bg-yellow-500';
+                                                $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+                                            } else {
+                                                $statusColor = 'bg-red-500';
+                                                $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
+                                            }
                                         } else {
-                                            $statusColor = 'bg-red-500';
-                                            $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
+                                            $statusColor = 'bg-gray-300';
+                                            $statusIcon = '2';
                                         }
-                                    } else {
-                                        $statusColor = 'bg-gray-300';
-                                        $statusIcon = '2';
-                                    }
-                                @endphp
-                                
-                                <div class="absolute left-0 mt-0.5 -ml-3.5 h-7 w-7 rounded-full {{ $statusColor }} flex items-center justify-center border-4 border-white shadow-sm">
-                                    {!! $statusIcon !!}
-                                </div>
-                                
-                                <div class="ml-6">
-                                    <h3 class="font-bold text-gray-800 flex items-center">
-                                        First Installment (30%)
-                                        <span class="ml-2 px-2 py-0.5 bg-primary bg-opacity-10 text-primary rounded-full text-xs font-bold">
-                                            RM {{ number_format($installmentAmount, 2) }}
-                                        </span>
-                                    </h3>
-                                    <p class="text-sm text-gray-600 mt-1">Due: {{ $paymentSchedule['payment_1']->format('M d, Y') }}</p>
-                                    @if($payment1Invoice)
-                                        <p class="mt-1 text-sm {{ $payment1Invoice->status === 'verified' ? 'text-green-600' : ($payment1Invoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
-                                            {{ $payment1Invoice->status === 'verified' ? 'Verified' : ($payment1Invoice->status === 'pending' ? 'Pending Verification' : 'Rejected - Please resubmit') }}
-                                        </p>
-                                    @endif
-                                </div>
-                            </div>
-                            
-                            <div class="relative pb-6 border-l-2 border-gray-200">
-                                @php
-                                    $payment2Invoice = $invoices->where('type', 'payment_2')->first();
-                                    $statusColor = '';
-                                    $statusIcon = '';
+                                    @endphp
                                     
-                                    if($payment2Invoice) {
-                                        if($payment2Invoice->status === 'verified') {
-                                            $statusColor = 'bg-green-500';
-                                            $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
-                                        } elseif($payment2Invoice->status === 'pending') {
-                                            $statusColor = 'bg-yellow-500';
-                                            $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
-                                        } else {
-                                            $statusColor = 'bg-red-500';
-                                            $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
-                                        }
-                                    } else {
-                                        $statusColor = 'bg-gray-300';
-                                        $statusIcon = '3';
-                                    }
-                                @endphp
-                                
-                                <div class="absolute left-0 mt-0.5 -ml-3.5 h-7 w-7 rounded-full {{ $statusColor }} flex items-center justify-center border-4 border-white shadow-sm">
-                                    {!! $statusIcon !!}
+                                    <div class="absolute left-0 mt-0.5 -ml-3.5 h-7 w-7 rounded-full {{ $statusColor }} flex items-center justify-center border-4 border-white shadow-sm">
+                                        {!! $statusIcon !!}
+                                    </div>
+                                    
+                                    <div class="ml-6">
+                                        <h3 class="font-bold text-gray-800 flex items-center">
+                                            Second Deposit (50%)
+                                            <span class="ml-2 px-2 py-0.5 bg-primary bg-opacity-10 text-primary rounded-full text-xs font-bold">
+                                                RM {{ number_format($totalAmount * 0.50, 2) }}
+                                            </span>
+                                        </h3>
+                                        <p class="text-sm text-gray-600 mt-1">Due: {{ $paymentSchedule['second_deposit']->format('M d, Y') }}</p>
+                                        <div class="inline-flex items-center mt-1 px-2 py-1 bg-orange-50 border border-orange-100 rounded-md text-xs text-orange-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Recommended 6 months before event
+                                        </div>
+                                        @if($secondDepositInvoice)
+                                            <p class="mt-1 text-sm {{ $secondDepositInvoice->status === 'verified' ? 'text-green-600' : ($secondDepositInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
+                                                {{ $secondDepositInvoice->status === 'verified' ? 'Verified' : ($secondDepositInvoice->status === 'pending' ? 'Pending Verification' : 'Rejected - Please resubmit') }}
+                                            </p>
+                                        @endif
+                                    </div>
                                 </div>
-                                
-                                <div class="ml-6">
-                                    <h3 class="font-bold text-gray-800 flex items-center">
-                                        Second Installment (30%)
-                                        <span class="ml-2 px-2 py-0.5 bg-primary bg-opacity-10 text-primary rounded-full text-xs font-bold">
-                                            RM {{ number_format($installmentAmount, 2) }}
-                                        </span>
-                                    </h3>
-                                    <p class="text-sm text-gray-600 mt-1">Due: {{ $paymentSchedule['payment_2']->format('M d, Y') }}</p>
-                                    @if($payment2Invoice)
-                                        <p class="mt-1 text-sm {{ $payment2Invoice->status === 'verified' ? 'text-green-600' : ($payment2Invoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
-                                            {{ $payment2Invoice->status === 'verified' ? 'Verified' : ($payment2Invoice->status === 'pending' ? 'Pending Verification' : 'Rejected - Please resubmit') }}
-                                        </p>
-                                    @endif
-                                </div>
-                            </div>
+                            @endif
                             
+                            <!-- Balance Payment -->
                             <div class="relative">
                                 @php
-                                    $finalInvoice = $invoices->where('type', 'final_payment')->first();
+                                    $balanceInvoice = $invoices->where('type', 'balance')->first();
                                     $statusColor = '';
                                     $statusIcon = '';
                                     
-                                    if($finalInvoice) {
-                                        if($finalInvoice->status === 'verified') {
+                                    if($balanceInvoice) {
+                                        if($balanceInvoice->status === 'verified') {
                                             $statusColor = 'bg-green-500';
                                             $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
-                                        } elseif($finalInvoice->status === 'pending') {
+                                        } elseif($balanceInvoice->status === 'pending') {
                                             $statusColor = 'bg-yellow-500';
                                             $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
                                         } else {
@@ -429,7 +495,7 @@
                                         }
                                     } else {
                                         $statusColor = 'bg-gray-300';
-                                        $statusIcon = '4';
+                                        $statusIcon = $booking->type === 'wedding' ? '3' : '2';
                                     }
                                 @endphp
                                 
@@ -439,50 +505,29 @@
                                 
                                 <div class="ml-6">
                                     <h3 class="font-bold text-gray-800 flex items-center">
-                                        Final Payment (30%)
+                                        Balance Payment
                                         <span class="ml-2 px-2 py-0.5 bg-primary bg-opacity-10 text-primary rounded-full text-xs font-bold">
-                                            RM {{ number_format($installmentAmount, 2) }}
+                                            @if($booking->type === 'wedding')
+                                                RM {{ number_format($totalAmount - 3000 - ($totalAmount * 0.50), 2) }}
+                                            @else
+                                                RM {{ number_format($totalAmount * 0.50, 2) }}
+                                            @endif
                                         </span>
                                     </h3>
-                                    <p class="text-sm text-gray-600 mt-1">Due: {{ $paymentSchedule['final_payment']->format('M d, Y') }}</p>
-                                    <div class="inline-flex items-center mt-1 px-2 py-1 bg-red-50 border border-red-100 rounded-md text-xs text-red-600">
+                                    <p class="text-sm text-gray-600 mt-1">Due: {{ $paymentSchedule['balance']->format('M d, Y') }}</p>
+                                    <div class="inline-flex items-center mt-1 px-2 py-1 bg-blue-50 border border-blue-100 rounded-md text-xs text-blue-600">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        Required 30 days before event
+                                        Recommended {{ $booking->type === 'wedding' ? '1 month' : '1 week' }} before event
                                     </div>
-                                    @if($finalInvoice)
-                                        <p class="mt-1 text-sm {{ $finalInvoice->status === 'verified' ? 'text-green-600' : ($finalInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
-                                            {{ $finalInvoice->status === 'verified' ? 'Verified' : ($finalInvoice->status === 'pending' ? 'Pending Verification' : 'Rejected - Please resubmit') }}
+                                    @if($balanceInvoice)
+                                        <p class="mt-1 text-sm {{ $balanceInvoice->status === 'verified' ? 'text-green-600' : ($balanceInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
+                                            {{ $balanceInvoice->status === 'verified' ? 'Verified' : ($balanceInvoice->status === 'pending' ? 'Pending Verification' : 'Rejected - Please resubmit') }}
                                         </p>
                                     @endif
                                 </div>
                             </div>
-                            
-                            <!-- Full Payment Option (if available) -->
-                            @php
-                                $fullPaymentInvoice = $invoices->where('type', 'full_payment')->first();
-                            @endphp
-                            @if($fullPaymentInvoice || in_array('full_payment', $availableTypes ?? []))
-                            <div class="mt-6 pt-6 border-t border-gray-200">
-                                <div class="bg-green-50 p-4 rounded-lg">
-                                    <h3 class="font-bold text-gray-800 flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Full Payment Option
-                                    </h3>
-                                    <p class="text-sm text-gray-700 mt-2">Pay the full amount at once:</p>
-                                    <div class="font-bold text-gray-900 mt-1">RM {{ number_format($totalAmount, 2) }}</div>
-                                    
-                                    @if($fullPaymentInvoice)
-                                        <p class="mt-2 text-sm {{ $fullPaymentInvoice->status === 'verified' ? 'text-green-600' : ($fullPaymentInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
-                                            Status: {{ $fullPaymentInvoice->status === 'verified' ? 'Verified' : ($fullPaymentInvoice->status === 'pending' ? 'Pending Verification' : 'Rejected - Please resubmit') }}
-                                        </p>
-                                    @endif
-                                </div>
-                            </div>
-                            @endif
                         </div>
                         
                         <!-- Bank Account Details -->
@@ -497,15 +542,15 @@
                                 <div class="space-y-3 text-sm">
                                     <div class="flex">
                                         <span class="font-medium text-gray-700 w-40">Bank Name:</span>
-                                        <span class="text-gray-800">Bank Negara Malaysia</span>
+                                        <span class="text-gray-800">Maybank</span>
                                     </div>
                                     <div class="flex">
                                         <span class="font-medium text-gray-700 w-40">Account Name:</span>
-                                        <span class="text-gray-800">Enak Rasa Wedding Hall Sdn Bhd</span>
+                                        <span class="text-gray-800">Kumpulan Enak Rasa Sdn Bhd</span>
                                     </div>
                                     <div class="flex">
                                         <span class="font-medium text-gray-700 w-40">Account Number:</span>
-                                        <span class="text-gray-800 font-mono">1234-5678-9012</span>
+                                        <span class="text-gray-800 font-mono">5624 0563 2039</span>
                                     </div>
                                     <div class="flex">
                                         <span class="font-medium text-gray-700 w-40">Reference:</span>
@@ -591,4 +636,29 @@
         </div>
     </div>
 </div>
+
+<!-- Full Payment Option (if available) -->
+@php
+    $fullPaymentInvoice = $invoices->where('type', 'full_payment')->first();
+@endphp
+@if($fullPaymentInvoice || in_array('full_payment', $availableTypes ?? []))
+<div class="mt-6 pt-6 border-t border-gray-200">
+    <div class="bg-green-50 p-4 rounded-lg">
+        <h3 class="font-bold text-gray-800 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Full Payment Option
+        </h3>
+        <p class="text-sm text-gray-700 mt-2">Pay the full amount at once:</p>
+        <div class="font-bold text-gray-900 mt-1">RM {{ number_format($totalAmount, 2) }}</div>
+        
+        @if($fullPaymentInvoice)
+            <p class="mt-2 text-sm {{ $fullPaymentInvoice->status === 'verified' ? 'text-green-600' : ($fullPaymentInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
+                Status: {{ $fullPaymentInvoice->status === 'verified' ? 'Verified' : ($fullPaymentInvoice->status === 'pending' ? 'Pending Verification' : 'Rejected - Please resubmit') }}
+            </p>
+        @endif
+    </div>
+</div>
+@endif
 @endsection

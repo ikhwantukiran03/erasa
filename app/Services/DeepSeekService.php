@@ -20,7 +20,7 @@ class DeepSeekService
     public function __construct()
     {
         // Use environment variables with fallback for security
-        $this->apiKey = env('DEEPSEEK_API_KEY') ?: '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';
+        $this->apiKey = env('DEEPSEEK_API_KEY') ?: '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';
         $this->apiUrl = env('DEEPSEEK_API_URL') ?: 'https://openrouter.ai/api/v1/chat/completions';
         $this->model = env('DEEPSEEK_MODEL') ?: 'deepseek/deepseek-r1';
         $this->temperature = (float) (env('DEEPSEEK_TEMPERATURE') ?: 0.7);

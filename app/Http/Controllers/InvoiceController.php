@@ -26,26 +26,67 @@ class InvoiceController extends Controller
     }
 
     /**
-     * Display a listing of the invoices for verification (staff view).
+     * Display a listing of the invoices for staff.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         if (!auth()->user()->isStaff() && !auth()->user()->isAdmin()) {
             return redirect()->route('dashboard')
                 ->with('error', 'You do not have permission to access this resource.');
         }
 
-        $pendingInvoices = Invoice::with(['booking.user', 'booking.venue'])
+        // Build query for pending invoices
+        $pendingQuery = Invoice::with(['booking.user', 'booking.venue'])
             ->pending()
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->orderBy('created_at', 'desc');
 
-        $verifiedInvoices = Invoice::with(['booking.user', 'booking.venue'])
+        // Build query for verified invoices
+        $verifiedQuery = Invoice::with(['booking.user', 'booking.venue', 'verifiedBy'])
             ->verified()
-            ->orderBy('invoice_verified_at', 'desc')
-            ->paginate(10);
+            ->orderBy('invoice_verified_at', 'desc');
+
+        // Apply filters
+        if ($request->filled('status')) {
+            if ($request->status === 'pending') {
+                $verifiedQuery = $verifiedQuery->whereRaw('1 = 0'); // No results
+            } elseif ($request->status === 'verified') {
+                $pendingQuery = $pendingQuery->whereRaw('1 = 0'); // No results
+            } elseif ($request->status === 'rejected') {
+                $pendingQuery = $pendingQuery->whereRaw('1 = 0'); // No results
+                $verifiedQuery = $verifiedQuery->whereRaw('1 = 0'); // No results
+                // Add rejected query if needed
+            }
+        }
+
+        if ($request->filled('type')) {
+            $pendingQuery->where('type', $request->type);
+            $verifiedQuery->where('type', $request->type);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $pendingQuery->whereHas('booking', function($q) use ($search) {
+                $q->where('id', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($userQ) use ($search) {
+                      $userQ->where('name', 'like', "%{$search}%")
+                           ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+            
+            $verifiedQuery->whereHas('booking', function($q) use ($search) {
+                $q->where('id', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($userQ) use ($search) {
+                      $userQ->where('name', 'like', "%{$search}%")
+                           ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $pendingInvoices = $pendingQuery->paginate(10, ['*'], 'pending_page');
+        $verifiedInvoices = $verifiedQuery->paginate(10, ['*'], 'verified_page');
 
         return view('staff.invoices.index', compact('pendingInvoices', 'verifiedInvoices'));
     }
@@ -108,7 +149,7 @@ class InvoiceController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'type' => ['required', 'string', 'in:deposit,payment_1,payment_2,final_payment'],
+            'type' => ['required', 'string', 'in:deposit,second_deposit,balance,full_payment'],
             'invoice_file' => ['required', 'file', 'max:5120', 'mimes:jpeg,png,jpg,pdf'], // 5MB max
             'notes' => ['nullable', 'string', 'max:500'],
         ]);
@@ -122,27 +163,34 @@ class InvoiceController extends Controller
         // Check if invoice type already exists for this booking
         $existingInvoice = $booking->invoice()->where('type', $request->type)->first();
         if ($existingInvoice) {
-            // If rejected, allow resubmission
-            if ($existingInvoice->status === 'rejected') {
-                // Delete old file from Cloudinary if it exists
-                if ($existingInvoice->invoice_public_id) {
-                    $this->cloudinaryService->deleteFile($existingInvoice->invoice_public_id);
-                }
-            } else {
+            // Don't allow resubmission if already verified
+            if ($existingInvoice->status === 'verified') {
                 return redirect()->back()
-                    ->with('error', 'An invoice of this type has already been submitted.');
+                    ->with('error', 'This payment has already been verified and cannot be resubmitted.');
+            }
+            
+            // Only check if event has already passed - remove deadline restrictions
+            $today = Carbon::today();
+            $eventDate = Carbon::parse($booking->booking_date);
+            
+            if ($today->greaterThan($eventDate)) {
+                return redirect()->back()
+                    ->with('error', 'Cannot submit payments after the event date has passed.');
+            }
+            
+            // Allow resubmission - delete old file from Cloudinary if it exists
+            if ($existingInvoice->invoice_public_id) {
+                $this->cloudinaryService->deleteFile($existingInvoice->invoice_public_id);
             }
         }
 
-        // Check for final payment timing
-        if ($request->type === 'final_payment') {
-            $eventDate = Carbon::parse($booking->booking_date);
-            $today = Carbon::today();
-            
-            if ($today->diffInDays($eventDate, false) < 30) {
-                return redirect()->back()
-                    ->with('error', 'Final payment must be made at least 30 days before the event date.');
-            }
+        // Only check if event has already passed - remove all other deadline restrictions
+        $today = Carbon::today();
+        $eventDate = Carbon::parse($booking->booking_date);
+        
+        if ($today->greaterThan($eventDate)) {
+            return redirect()->back()
+                ->with('error', 'Cannot submit payments after the event date has passed.');
         }
 
         // Upload file to Cloudinary
@@ -260,12 +308,20 @@ class InvoiceController extends Controller
     {
         $eventDate = Carbon::parse($booking->booking_date);
         
-        return [
-            'deposit' => Carbon::today(),
-            'payment_1' => Carbon::today()->addDays(30),
-            'payment_2' => Carbon::today()->addDays(60),
-            'final_payment' => $eventDate->copy()->subDays(30),
-        ];
+        if ($booking->type === 'wedding') {
+            // Wedding Event Payment Schedule
+            return [
+                'deposit' => Carbon::today(), // RM 3000 deposit - no deadline
+                'second_deposit' => $eventDate->copy()->subMonths(6), // 50% of total - 6 months before event
+                'balance' => $eventDate->copy()->subMonth(1), // Remaining amount - 1 month before event
+            ];
+        } else {
+            // Other Event Payment Schedule
+            return [
+                'deposit' => Carbon::today(), // 50% of total - no deadline
+                'balance' => $eventDate->copy()->subWeek(1), // Remaining amount - 1 week before event
+            ];
+        }
     }
 
     /**
@@ -278,37 +334,74 @@ class InvoiceController extends Controller
     private function getAvailableInvoiceTypes(Booking $booking, $paymentSchedule)
     {
         $availableTypes = [];
-        $existingInvoices = $booking->invoice()->whereIn('status', ['pending', 'verified'])->pluck('type')->toArray();
+        $today = Carbon::today();
         
-        // Deposit is always first
-        if (!in_array('deposit', $existingInvoices)) {
-            $availableTypes[] = 'deposit';
+        // Get all existing invoices for this booking
+        $existingInvoices = $booking->invoice()->get();
+        $verifiedTypes = $existingInvoices->where('status', 'verified')->pluck('type')->toArray();
+        $pendingTypes = $existingInvoices->where('status', 'pending')->pluck('type')->toArray();
+        $rejectedTypes = $existingInvoices->where('status', 'rejected')->pluck('type')->toArray();
+        
+        // Check if full payment has been verified
+        if (in_array('full_payment', $verifiedTypes)) {
+            return []; // No more payments needed
         }
         
-        // Other payments follow a sequence
-        if (in_array('deposit', $existingInvoices) && !in_array('payment_1', $existingInvoices)) {
-            $availableTypes[] = 'payment_1';
-        }
-        
-        if (in_array('payment_1', $existingInvoices) && !in_array('payment_2', $existingInvoices)) {
-            $availableTypes[] = 'payment_2';
-        }
-        
-        if (in_array('payment_2', $existingInvoices) && !in_array('final_payment', $existingInvoices)) {
-            // Check if it's not too late for final payment
-            $eventDate = Carbon::parse($booking->booking_date);
-            $today = Carbon::today();
-            
-            if ($today->diffInDays($eventDate, false) >= 30) {
-                $availableTypes[] = 'final_payment';
+        // Special handling for "waiting for full payment" status
+        if ($booking->status === 'waiting for full payment') {
+            if (!in_array('full_payment', $verifiedTypes)) {
+                // Allow full payment submission if not verified yet and event hasn't passed
+                $eventDate = Carbon::parse($booking->booking_date);
+                if ($today->lessThan($eventDate)) {
+                    $availableTypes[] = 'full_payment';
+                }
             }
+            return $availableTypes;
         }
         
-        // Add rejected invoices back to available types
-        $rejectedInvoices = $booking->invoice()->where('status', 'rejected')->get();
-        foreach ($rejectedInvoices as $invoice) {
-            if (!in_array($invoice->type, $availableTypes)) {
-                $availableTypes[] = $invoice->type;
+        // Check if event has already passed - only restriction we keep
+        $eventDate = Carbon::parse($booking->booking_date);
+        if ($today->greaterThan($eventDate)) {
+            return []; // No payments allowed after event date
+        }
+        
+        // For regular payment flow - remove all deadline restrictions
+        if ($booking->type === 'wedding') {
+            // Wedding Event Payment Flow
+            
+            // 1. Deposit (RM 3000) - always available if not verified
+            if (!in_array('deposit', $verifiedTypes)) {
+                $availableTypes[] = 'deposit';
+            }
+            // 2. Second Deposit (50% of total) - available if deposit is verified and not already submitted
+            elseif (in_array('deposit', $verifiedTypes) && !in_array('second_deposit', $verifiedTypes)) {
+                $availableTypes[] = 'second_deposit';
+            }
+            // 3. Balance Payment - available if second deposit is verified and not already submitted
+            elseif (in_array('second_deposit', $verifiedTypes) && !in_array('balance', $verifiedTypes)) {
+                $availableTypes[] = 'balance';
+            }
+            
+            // Full payment option - always available as alternative if no verified payments made yet
+            if (empty($verifiedTypes)) {
+                $availableTypes[] = 'full_payment';
+            }
+            
+        } else {
+            // Other Event Payment Flow (50% deposit, 50% balance)
+            
+            // 1. Deposit (50%) - always available if not verified
+            if (!in_array('deposit', $verifiedTypes)) {
+                $availableTypes[] = 'deposit';
+            }
+            // 2. Balance (50%) - available if deposit is verified and not already submitted
+            elseif (in_array('deposit', $verifiedTypes) && !in_array('balance', $verifiedTypes)) {
+                $availableTypes[] = 'balance';
+            }
+            
+            // Full payment option - always available as alternative if no verified payments made yet
+            if (empty($verifiedTypes)) {
+                $availableTypes[] = 'full_payment';
             }
         }
         
@@ -324,7 +417,7 @@ class InvoiceController extends Controller
      */
     private function calculateAmount(Booking $booking, $type)
     {
-        // For simplicity, assuming a package price exists
+        // Get total package price
         $totalPrice = 0;
         
         if ($booking->price_id) {
@@ -336,18 +429,155 @@ class InvoiceController extends Controller
             $totalPrice = $booking->package->min_price;
         }
         
-        // Calculate amount based on type
-        switch ($type) {
-            case 'deposit':
-                return $totalPrice * 0.10; // 10% deposit
-            case 'payment_1':
-                return $totalPrice * 0.30; // 30% first payment
-            case 'payment_2':
-                return $totalPrice * 0.30; // 30% second payment
-            case 'final_payment':
-                return $totalPrice * 0.30; // 30% final payment
-            default:
-                return 0;
+        if ($booking->type === 'wedding') {
+            // Wedding Event Payment Amounts
+            switch ($type) {
+                case 'deposit':
+                    return 3000; // Fixed RM 3000 deposit
+                case 'second_deposit':
+                    return $totalPrice * 0.50; // 50% of total
+                case 'balance':
+                    // Remaining amount after deposit and second deposit
+                    return $totalPrice - 3000 - ($totalPrice * 0.50);
+                case 'full_payment':
+                    return $totalPrice; // 100% full payment
+                default:
+                    return 0;
+            }
+        } else {
+            // Other Event Payment Amounts
+            switch ($type) {
+                case 'deposit':
+                    return $totalPrice * 0.50; // 50% of total
+                case 'balance':
+                    return $totalPrice * 0.50; // Remaining 50%
+                case 'full_payment':
+                    return $totalPrice; // 100% full payment
+                default:
+                    return 0;
+            }
+        }
+    }
+
+    /**
+     * Quick view for invoice details (AJAX).
+     *
+     * @param  \App\Models\Invoice  $invoice
+     * @return \Illuminate\View\View|\Illuminate\Http\JsonResponse
+     */
+    public function quickView(Invoice $invoice)
+    {
+        if (!auth()->user()->isStaff() && !auth()->user()->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        return view('staff.invoices.quick-view', compact('invoice'));
+    }
+
+    /**
+     * Bulk verify invoices.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function bulkVerify(Request $request)
+    {
+        if (!auth()->user()->isStaff() && !auth()->user()->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'invoice_ids' => ['required', 'array'],
+            'invoice_ids.*' => ['exists:invoices,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Invalid invoice IDs'], 400);
+        }
+
+        try {
+            $invoices = Invoice::whereIn('id', $request->invoice_ids)
+                              ->where('status', 'pending')
+                              ->get();
+
+            $verifiedCount = 0;
+            foreach ($invoices as $invoice) {
+                $invoice->update([
+                    'status' => 'verified',
+                    'invoice_verified_at' => now(),
+                    'verified_by' => auth()->id(),
+                ]);
+
+                // Update booking status if this is a deposit
+                if ($invoice->type === 'deposit') {
+                    $invoice->booking->update(['status' => 'ongoing']);
+                }
+
+                $verifiedCount++;
+            }
+
+            return response()->json([
+                'success' => true, 
+                'message' => "Successfully verified {$verifiedCount} payment(s)"
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'An error occurred while verifying payments'
+            ], 500);
+        }
+    }
+
+    /**
+     * Bulk reject invoices.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function bulkReject(Request $request)
+    {
+        if (!auth()->user()->isStaff() && !auth()->user()->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'invoice_ids' => ['required', 'array'],
+            'invoice_ids.*' => ['exists:invoices,id'],
+            'reason' => ['required', 'string', 'max:500'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Invalid data provided'], 400);
+        }
+
+        try {
+            $invoices = Invoice::whereIn('id', $request->invoice_ids)
+                              ->where('status', 'pending')
+                              ->get();
+
+            $rejectedCount = 0;
+            foreach ($invoices as $invoice) {
+                $invoice->update([
+                    'status' => 'rejected',
+                    'admin_notes' => $request->reason,
+                    'invoice_verified_at' => now(),
+                    'verified_by' => auth()->id(),
+                ]);
+
+                $rejectedCount++;
+            }
+
+            return response()->json([
+                'success' => true, 
+                'message' => "Successfully rejected {$rejectedCount} payment(s)"
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'An error occurred while rejecting payments'
+            ], 500);
         }
     }
 }

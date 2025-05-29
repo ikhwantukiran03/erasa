@@ -53,6 +53,11 @@
                         </div>
                         
                         <div>
+                            <dt class="text-sm font-medium text-gray-500">Event Type</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ ucfirst($booking->type) }}</dd>
+                        </div>
+                        
+                        <div>
                             <dt class="text-sm font-medium text-gray-500">Package</dt>
                             <dd class="mt-1 text-sm text-gray-900">
                                 @if($booking->package)
@@ -73,6 +78,10 @@
                                 @elseif($booking->status === 'waiting for deposit')
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                                         Waiting for Deposit
+                                    </span>
+                                @elseif($booking->status === 'waiting for full payment')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        Waiting for Full Payment
                                     </span>
                                 @elseif($booking->status === 'pending_verification')
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
@@ -109,6 +118,56 @@
                             RM {{ number_format($totalAmount, 2) }}
                         </p>
                     </div>
+                    
+                    <!-- Payment Schedule -->
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <h3 class="font-semibold text-gray-800 mb-3">Payment Schedule</h3>
+                        @php
+                            $eventDate = \Carbon\Carbon::parse($booking->booking_date);
+                            $today = \Carbon\Carbon::today();
+                            
+                            // Calculate payment schedule
+                            if ($booking->type === 'wedding') {
+                                $secondDepositDate = $eventDate->copy()->subMonths(6);
+                                $balanceDate = $eventDate->copy()->subMonth();
+                            } else {
+                                $balanceDate = $eventDate->copy()->subWeek();
+                            }
+                        @endphp
+                        
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Deposit:</span>
+                                <span class="font-medium">
+                                    @if($booking->type === 'wedding')
+                                        RM 3,000
+                                    @else
+                                        RM {{ number_format($totalAmount * 0.50, 2) }} (50%)
+                                    @endif
+                                </span>
+                            </div>
+                            
+                            @if($booking->type === 'wedding')
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Second Deposit:</span>
+                                    <span class="font-medium">RM {{ number_format($totalAmount * 0.50, 2) }} (50%)</span>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-4">Due: {{ $secondDepositDate->format('M d, Y') }}</div>
+                                
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Balance:</span>
+                                    <span class="font-medium">RM {{ number_format($totalAmount - 3000 - ($totalAmount * 0.50), 2) }}</span>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-4">Due: {{ $balanceDate->format('M d, Y') }}</div>
+                            @else
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Balance:</span>
+                                    <span class="font-medium">RM {{ number_format($totalAmount * 0.50, 2) }} (50%)</span>
+                                </div>
+                                <div class="text-xs text-gray-500 ml-4">Due: {{ $balanceDate->format('M d, Y') }}</div>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -124,13 +183,21 @@
                         <h2 class="text-xl font-semibold text-gray-800">
                             Payment Proof Verification - 
                             @if($pendingInvoice->type === 'deposit')
-                                Deposit Payment
-                            @elseif($pendingInvoice->type === 'payment_1')
-                                First Installment
-                            @elseif($pendingInvoice->type === 'payment_2')
-                                Second Installment
-                            @elseif($pendingInvoice->type === 'final_payment')
-                                Final Payment
+                                @if($booking->type === 'wedding')
+                                    Deposit Payment (RM 3,000)
+                                @else
+                                    Deposit Payment (50%)
+                                @endif
+                            @elseif($pendingInvoice->type === 'second_deposit')
+                                Second Deposit (50%)
+                            @elseif($pendingInvoice->type === 'balance')
+                                @if($booking->type === 'wedding')
+                                    Balance Payment
+                                @else
+                                    Balance Payment (50%)
+                                @endif
+                            @elseif($pendingInvoice->type === 'full_payment')
+                                Full Payment (100%)
                             @else
                                 {{ ucfirst(str_replace('_', ' ', $pendingInvoice->type)) }}
                             @endif
@@ -155,13 +222,21 @@
                                 <div class="bg-gray-50 p-4 rounded-lg">
                                     <p><span class="font-medium">Payment Type:</span> 
                                         @if($pendingInvoice->type === 'deposit')
-                                            Deposit Payment (25%)
-                                        @elseif($pendingInvoice->type === 'payment_1')
-                                            First Installment (25%)
-                                        @elseif($pendingInvoice->type === 'payment_2')
-                                            Second Installment (25%)
-                                        @elseif($pendingInvoice->type === 'final_payment')
-                                            Final Payment (25%)
+                                            @if($booking->type === 'wedding')
+                                                Deposit Payment (RM 3,000)
+                                            @else
+                                                Deposit Payment (50%)
+                                            @endif
+                                        @elseif($pendingInvoice->type === 'second_deposit')
+                                            Second Deposit (50% of total)
+                                        @elseif($pendingInvoice->type === 'balance')
+                                            @if($booking->type === 'wedding')
+                                                Balance Payment (Remaining amount)
+                                            @else
+                                                Balance Payment (50%)
+                                            @endif
+                                        @elseif($pendingInvoice->type === 'full_payment')
+                                            Full Payment (100%)
                                         @else
                                             {{ ucfirst(str_replace('_', ' ', $pendingInvoice->type)) }}
                                         @endif
@@ -175,7 +250,15 @@
                                                 <span class="text-red-600 text-xs">(Overdue)</span>
                                             @endif
                                         @else
-                                            Not specified
+                                            @if($pendingInvoice->type === 'deposit')
+                                                Immediately
+                                            @elseif($pendingInvoice->type === 'second_deposit' && $booking->type === 'wedding')
+                                                {{ $secondDepositDate->format('M d, Y') }}
+                                            @elseif($pendingInvoice->type === 'balance')
+                                                {{ $balanceDate->format('M d, Y') }}
+                                            @else
+                                                Not specified
+                                            @endif
                                         @endif
                                     </p>
                                     @if($pendingInvoice->invoice_notes)
@@ -189,28 +272,47 @@
                                 <div class="bg-gray-50 p-4 rounded-lg">
                                     @php
                                         $depositInvoice = $invoices->where('type', 'deposit')->first();
-                                        $payment1Invoice = $invoices->where('type', 'payment_1')->first();
-                                        $payment2Invoice = $invoices->where('type', 'payment_2')->first();
-                                        $finalInvoice = $invoices->where('type', 'final_payment')->first();
+                                        $secondDepositInvoice = $invoices->where('type', 'second_deposit')->first();
+                                        $balanceInvoice = $invoices->where('type', 'balance')->first();
+                                        $fullPaymentInvoice = $invoices->where('type', 'full_payment')->first();
                                     @endphp
                                     
                                     <ul class="space-y-2">
                                         <li class="flex items-center">
                                             <div class="h-4 w-4 rounded-full {{ $depositInvoice && $depositInvoice->status === 'verified' ? 'bg-green-500' : 'bg-gray-300' }} mr-2"></div>
-                                            <span class="text-sm {{ $depositInvoice && $depositInvoice->status === 'verified' ? 'text-green-600 font-medium' : 'text-gray-500' }}">Deposit</span>
+                                            <span class="text-sm {{ $depositInvoice && $depositInvoice->status === 'verified' ? 'text-green-600 font-medium' : 'text-gray-500' }}">
+                                                Deposit
+                                                @if($booking->type === 'wedding')
+                                                    (RM 3,000)
+                                                @else
+                                                    (50%)
+                                                @endif
+                                            </span>
                                         </li>
+                                        
+                                        @if($booking->type === 'wedding')
+                                            <li class="flex items-center">
+                                                <div class="h-4 w-4 rounded-full {{ $secondDepositInvoice && $secondDepositInvoice->status === 'verified' ? 'bg-green-500' : 'bg-gray-300' }} mr-2"></div>
+                                                <span class="text-sm {{ $secondDepositInvoice && $secondDepositInvoice->status === 'verified' ? 'text-green-600 font-medium' : 'text-gray-500' }}">Second Deposit (50%)</span>
+                                            </li>
+                                        @endif
+                                        
                                         <li class="flex items-center">
-                                            <div class="h-4 w-4 rounded-full {{ $payment1Invoice && $payment1Invoice->status === 'verified' ? 'bg-green-500' : 'bg-gray-300' }} mr-2"></div>
-                                            <span class="text-sm {{ $payment1Invoice && $payment1Invoice->status === 'verified' ? 'text-green-600 font-medium' : 'text-gray-500' }}">First Installment</span>
+                                            <div class="h-4 w-4 rounded-full {{ $balanceInvoice && $balanceInvoice->status === 'verified' ? 'bg-green-500' : 'bg-gray-300' }} mr-2"></div>
+                                            <span class="text-sm {{ $balanceInvoice && $balanceInvoice->status === 'verified' ? 'text-green-600 font-medium' : 'text-gray-500' }}">
+                                                Balance Payment
+                                                @if($booking->type !== 'wedding')
+                                                    (50%)
+                                                @endif
+                                            </span>
                                         </li>
-                                        <li class="flex items-center">
-                                            <div class="h-4 w-4 rounded-full {{ $payment2Invoice && $payment2Invoice->status === 'verified' ? 'bg-green-500' : 'bg-gray-300' }} mr-2"></div>
-                                            <span class="text-sm {{ $payment2Invoice && $payment2Invoice->status === 'verified' ? 'text-green-600 font-medium' : 'text-gray-500' }}">Second Installment</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <div class="h-4 w-4 rounded-full {{ $finalInvoice && $finalInvoice->status === 'verified' ? 'bg-green-500' : 'bg-gray-300' }} mr-2"></div>
-                                            <span class="text-sm {{ $finalInvoice && $finalInvoice->status === 'verified' ? 'text-green-600 font-medium' : 'text-gray-500' }}">Final Payment</span>
-                                        </li>
+                                        
+                                        @if($fullPaymentInvoice)
+                                            <li class="flex items-center">
+                                                <div class="h-4 w-4 rounded-full {{ $fullPaymentInvoice && $fullPaymentInvoice->status === 'verified' ? 'bg-green-500' : 'bg-gray-300' }} mr-2"></div>
+                                                <span class="text-sm {{ $fullPaymentInvoice && $fullPaymentInvoice->status === 'verified' ? 'text-green-600 font-medium' : 'text-gray-500' }}">Full Payment (100%)</span>
+                                            </li>
+                                        @endif
                                     </ul>
                                 </div>
                             </div>
@@ -288,13 +390,21 @@
                                             <div>
                                                 <span class="font-medium text-gray-800">
                                                     @if($invoice->type === 'deposit')
-                                                        Deposit Payment (25%)
-                                                    @elseif($invoice->type === 'payment_1')
-                                                        First Installment (25%)
-                                                    @elseif($invoice->type === 'payment_2')
-                                                        Second Installment (25%)
-                                                    @elseif($invoice->type === 'final_payment')
-                                                        Final Payment (25%)
+                                                        @if($booking->type === 'wedding')
+                                                            Deposit Payment (RM 3,000)
+                                                        @else
+                                                            Deposit Payment (50%)
+                                                        @endif
+                                                    @elseif($invoice->type === 'second_deposit')
+                                                        Second Deposit (50%)
+                                                    @elseif($invoice->type === 'balance')
+                                                        @if($booking->type === 'wedding')
+                                                            Balance Payment
+                                                        @else
+                                                            Balance Payment (50%)
+                                                        @endif
+                                                    @elseif($invoice->type === 'full_payment')
+                                                        Full Payment (100%)
                                                     @else
                                                         {{ ucfirst(str_replace('_', ' ', $invoice->type)) }}
                                                     @endif
@@ -332,7 +442,10 @@
                                                 </div>
                                                 <div>
                                                     @if($invoice->invoice_notes)
-                                                        <p class="text-sm text-gray-600"><span class="font-medium">Notes:</span> {{ $invoice->invoice_notes }}</p>
+                                                        <p class="text-sm text-gray-600"><span class="font-medium">Customer Notes:</span> {{ $invoice->invoice_notes }}</p>
+                                                    @endif
+                                                    @if($invoice->admin_notes)
+                                                        <p class="text-sm text-gray-600"><span class="font-medium">Staff Notes:</span> {{ $invoice->admin_notes }}</p>
                                                     @endif
                                                 </div>
                                             </div>

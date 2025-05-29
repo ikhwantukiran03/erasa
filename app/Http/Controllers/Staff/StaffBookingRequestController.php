@@ -112,6 +112,11 @@ class StaffBookingRequestController extends Controller
                 ->with('error', 'This booking request has already been processed.');
         }
 
+        // For booking requests with type = 'booking', redirect to create booking form
+        if ($bookingRequest->type === 'booking') {
+            return $this->redirectToCreateBookingForm($bookingRequest, $request->admin_notes);
+        }
+
         try {
             // Begin transaction
             \DB::beginTransaction();
@@ -202,6 +207,83 @@ class StaffBookingRequestController extends Controller
             return redirect()->back()
                 ->with('error', 'An error occurred: ' . $e->getMessage())
                 ->withInput();
+        }
+    }
+
+    /**
+     * Redirect to create booking form with pre-filled data from booking request.
+     *
+     * @param  \App\Models\BookingRequest  $bookingRequest
+     * @param  string|null  $adminNotes
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    private function redirectToCreateBookingForm(BookingRequest $bookingRequest, $adminNotes = null)
+    {
+        try {
+            // Create user account if the requester doesn't have one
+            $user = null;
+            $accountCreated = false;
+            $password = '';
+            
+            if ($bookingRequest->user_id) {
+                $user = User::find($bookingRequest->user_id);
+            } else {
+                // Check if a user with this email already exists
+                $user = User::where('email', $bookingRequest->email)->first();
+                
+                if (!$user) {
+                    // Create a new user with a secure random password
+                    $password = Str::random(10);
+                    
+                    $user = User::create([
+                        'name' => $bookingRequest->name,
+                        'email' => $bookingRequest->email,
+                        'whatsapp' => $bookingRequest->whatsapp_no,
+                        'password' => Hash::make($password),
+                        'role' => 'user',
+                    ]);
+                    
+                    $accountCreated = true;
+                    
+                    // Associate the booking request with the user
+                    $bookingRequest->user_id = $user->id;
+                    $bookingRequest->save();
+                }
+            }
+
+            // Update the booking request status to approved
+            $bookingRequest->status = 'approved';
+            $bookingRequest->admin_notes = $adminNotes;
+            $bookingRequest->handled_by = Auth::id();
+            $bookingRequest->handled_at = now();
+            $bookingRequest->save();
+
+            // Store booking request data in session for pre-filling the form
+            session([
+                'booking_request_data' => [
+                    'booking_request_id' => $bookingRequest->id,
+                    'user_id' => $user->id,
+                    'venue_id' => $bookingRequest->venue_id,
+                    'package_id' => $bookingRequest->package_id,
+                    'price_id' => $bookingRequest->price_id,
+                    'booking_date' => $bookingRequest->event_date ? $bookingRequest->event_date->format('Y-m-d') : null,
+                    'session' => $bookingRequest->session ?: 'evening',
+                    'type' => 'wedding', // booking request type 'booking' maps to 'wedding'
+                    'status' => 'waiting for deposit', // Default status for wedding bookings
+                    'account_created' => $accountCreated,
+                    'password' => $password,
+                    'customer_name' => $user->name,
+                    'customer_email' => $user->email,
+                ]
+            ]);
+
+            return redirect()->route('staff.bookings.create')
+                ->with('success', 'Booking request approved. Please review and finalize the booking details below.')
+                ->with('info', $accountCreated ? 'A new user account has been created for the customer.' : null);
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'An error occurred while processing the booking request: ' . $e->getMessage());
         }
     }
 

@@ -13,6 +13,32 @@
             <a href="{{ route('staff.bookings.index') }}" class="text-primary hover:underline">Back to Bookings</a>
         </div>
         
+        @php
+            $bookingRequestData = session('booking_request_data');
+        @endphp
+        
+        @if($bookingRequestData)
+        <!-- Booking Request Information -->
+        <div class="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-blue-800 font-medium">Creating booking from approved booking request</p>
+                    <p class="text-sm text-blue-700 mt-1">
+                        Customer: <strong>{{ $bookingRequestData['customer_name'] }}</strong> ({{ $bookingRequestData['customer_email'] }})
+                        @if($bookingRequestData['account_created'])
+                            <br><span class="text-green-700 font-medium">✓ New user account created</span>
+                        @endif
+                    </p>
+                </div>
+            </div>
+        </div>
+        @endif
+        
         <div class="mt-8 bg-white rounded-lg shadow overflow-hidden">
             <div class="p-6">
                 @if($errors->any())
@@ -29,6 +55,10 @@
                 <form action="{{ route('staff.bookings.store') }}" method="POST">
                     @csrf
                     
+                    @if($bookingRequestData)
+                        <input type="hidden" name="booking_request_id" value="{{ $bookingRequestData['booking_request_id'] }}">
+                    @endif
+                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- User Selection -->
                         <div>
@@ -36,7 +66,10 @@
                             <select id="user_id" name="user_id" required class="form-input @error('user_id') border-red-500 @enderror">
                                 <option value="">-- Select Customer --</option>
                                 @foreach($users as $user)
-                                    <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
+                                    <option value="{{ $user->id }}" {{ 
+                                        ($bookingRequestData && $bookingRequestData['user_id'] == $user->id) || 
+                                        old('user_id') == $user->id ? 'selected' : '' 
+                                    }}>
                                         {{ $user->name }} ({{ $user->email }})
                                     </option>
                                 @endforeach
@@ -50,7 +83,10 @@
                             <select id="venue_id" name="venue_id" required class="form-input @error('venue_id') border-red-500 @enderror">
                                 <option value="">-- Select Venue --</option>
                                 @foreach($venues as $venue)
-                                    <option value="{{ $venue->id }}" {{ old('venue_id') == $venue->id ? 'selected' : '' }}>
+                                    <option value="{{ $venue->id }}" {{ 
+                                        ($bookingRequestData && $bookingRequestData['venue_id'] == $venue->id) || 
+                                        old('venue_id') == $venue->id ? 'selected' : '' 
+                                    }}>
                                         {{ $venue->name }}
                                     </option>
                                 @endforeach
@@ -63,15 +99,17 @@
                             <select id="package_id" name="package_id" class="form-input @error('package_id') border-red-500 @enderror">
                                 <option value="">-- Select Package (Optional) --</option>
                                 @foreach($packages as $package)
-    <option 
-        value="{{ $package->id }}" 
-        data-venue-id="{{ $package->venue_id }}"
-        {{ old('package_id') == $package->id ? 'selected' : '' }}
-    >
-        {{ $package->name }} ({{ $package->venue->name }})
-    </option>
-@endforeach
-
+                                    <option 
+                                        value="{{ $package->id }}" 
+                                        data-venue-id="{{ $package->venue_id }}"
+                                        {{ 
+                                            ($bookingRequestData && $bookingRequestData['package_id'] == $package->id) || 
+                                            old('package_id') == $package->id ? 'selected' : '' 
+                                        }}
+                                    >
+                                        {{ $package->name }} ({{ $package->venue->name }})
+                                    </option>
+                                @endforeach
                             </select>
                             <p class="text-sm text-gray-500 mt-1">Available packages will be filtered based on selected venue</p>
                         </div>
@@ -89,15 +127,25 @@
                         <!-- Booking Date -->
                         <div>
                             <label for="booking_date" class="block text-dark font-medium mb-1">Booking Date <span class="text-red-500">*</span></label>
-                            <input type="date" id="booking_date" name="booking_date" value="{{ old('booking_date') }}" required class="form-input @error('booking_date') border-red-500 @enderror" min="{{ date('Y-m-d', strtotime('+1 day')) }}">
+                            <input type="date" id="booking_date" name="booking_date" value="{{ 
+                                $bookingRequestData['booking_date'] ?? old('booking_date') 
+                            }}" required class="form-input @error('booking_date') border-red-500 @enderror" min="{{ date('Y-m-d', strtotime('+1 day')) }}">
+                            <p class="text-sm text-gray-500 mt-1" id="booking-date-help">Select the date for this booking</p>
                         </div>
                         
                         <!-- Session Selection -->
                         <div>
                             <label for="session" class="block text-dark font-medium mb-1">Session <span class="text-red-500">*</span></label>
                             <select id="session" name="session" required class="form-input @error('session') border-red-500 @enderror">
-                                <option value="morning" {{ old('session') == 'morning' ? 'selected' : '' }}>Morning</option>
-                                <option value="evening" {{ old('session') == 'evening' ? 'selected' : '' }}>Evening</option>
+                                <option value="morning" {{ 
+                                    ($bookingRequestData && $bookingRequestData['session'] == 'morning') || 
+                                    old('session') == 'morning' ? 'selected' : '' 
+                                }}>Morning</option>
+                                <option value="evening" {{ 
+                                    ($bookingRequestData && $bookingRequestData['session'] == 'evening') || 
+                                    old('session') == 'evening' || 
+                                    (!$bookingRequestData && !old('session')) ? 'selected' : '' 
+                                }}>Evening</option>
                             </select>
                         </div>
                         
@@ -105,9 +153,19 @@
                         <div>
                             <label for="type" class="block text-dark font-medium mb-1">Booking Type <span class="text-red-500">*</span></label>
                             <select id="type" name="type" required class="form-input @error('type') border-red-500 @enderror">
-                                <option value="wedding" {{ old('type') == 'wedding' ? 'selected' : '' }}>Wedding</option>
-                                <option value="viewing" {{ old('type') == 'viewing' ? 'selected' : '' }}>Venue Viewing</option>
-                                <option value="reservation" {{ old('type') == 'reservation' ? 'selected' : '' }}>Reservation</option>
+                                <option value="wedding" {{ 
+                                    ($bookingRequestData && $bookingRequestData['type'] == 'wedding') || 
+                                    old('type') == 'wedding' || 
+                                    (!$bookingRequestData && !old('type')) ? 'selected' : '' 
+                                }}>Wedding</option>
+                                <option value="viewing" {{ 
+                                    ($bookingRequestData && $bookingRequestData['type'] == 'viewing') || 
+                                    old('type') == 'viewing' ? 'selected' : '' 
+                                }}>Venue Viewing</option>
+                                <option value="reservation" {{ 
+                                    ($bookingRequestData && $bookingRequestData['type'] == 'reservation') || 
+                                    old('type') == 'reservation' ? 'selected' : '' 
+                                }}>Reservation</option>
                             </select>
                         </div>
                         
@@ -115,11 +173,27 @@
                         <div>
                             <label for="status" class="block text-dark font-medium mb-1">Status <span class="text-red-500">*</span></label>
                             <select id="status" name="status" required class="form-input @error('status') border-red-500 @enderror">
-                                <option value="ongoing" {{ old('status') == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
-                                <option value="waiting for deposit" {{ old('status') == 'waiting for deposit' ? 'selected' : '' }}>Waiting for Deposit</option>
-                                <option value="pending_verification" {{ old('status') == 'pending_verification' ? 'selected' : '' }}>Pending Verification</option>
-                                <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                                <option value="cancelled" {{ old('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                <option value="ongoing" {{ 
+                                    ($bookingRequestData && $bookingRequestData['status'] == 'ongoing') || 
+                                    old('status') == 'ongoing' ? 'selected' : '' 
+                                }}>Ongoing</option>
+                                <option value="waiting for deposit" {{ 
+                                    ($bookingRequestData && $bookingRequestData['status'] == 'waiting for deposit') || 
+                                    old('status') == 'waiting for deposit' || 
+                                    (!$bookingRequestData && !old('status')) ? 'selected' : '' 
+                                }}>Waiting for Deposit</option>
+                                <option value="pending_verification" {{ 
+                                    ($bookingRequestData && $bookingRequestData['status'] == 'pending_verification') || 
+                                    old('status') == 'pending_verification' ? 'selected' : '' 
+                                }}>Pending Verification</option>
+                                <option value="completed" {{ 
+                                    ($bookingRequestData && $bookingRequestData['status'] == 'completed') || 
+                                    old('status') == 'completed' ? 'selected' : '' 
+                                }}>Completed</option>
+                                <option value="cancelled" {{ 
+                                    ($bookingRequestData && $bookingRequestData['status'] == 'cancelled') || 
+                                    old('status') == 'cancelled' ? 'selected' : '' 
+                                }}>Cancelled</option>
                             </select>
                         </div>
                         
@@ -167,9 +241,41 @@ document.addEventListener('DOMContentLoaded', function() {
     const priceSelect = document.getElementById('price_id');
     const priceContainer = document.getElementById('price-selection-container');
     const packageOptions = Array.from(packageSelect.options);
+    const typeSelect = document.getElementById('type');
+    const bookingDateInput = document.getElementById('booking_date');
+    const sessionSelect = document.getElementById('session');
+    const dateHelpText = document.getElementById('booking-date-help');
 
-    const oldPackageId = "{{ old('package_id') }}";
-    const oldPriceId = "{{ old('price_id') }}";
+    const oldPackageId = "{{ $bookingRequestData['package_id'] ?? old('package_id') }}";
+    const oldPriceId = "{{ $bookingRequestData['price_id'] ?? old('price_id') }}";
+    
+    // Date validation function
+    function updateDateValidation() {
+        const selectedType = typeSelect.value;
+        const today = new Date();
+        let minDate;
+        let helpText;
+        
+        if (selectedType === 'reservation' || selectedType === 'wedding') {
+            // For reservations and wedding bookings, require at least 6 months advance booking
+            minDate = new Date(today.getFullYear(), today.getMonth() + 6, today.getDate());
+            helpText = 'Booking date must be at least 6 months from today for reservations and wedding bookings';
+        } else {
+            // For viewing, require at least 1 day advance booking
+            minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+            helpText = 'Select the date for this booking';
+        }
+        
+        // Format date for input min attribute (YYYY-MM-DD)
+        const formattedMinDate = minDate.toISOString().split('T')[0];
+        bookingDateInput.setAttribute('min', formattedMinDate);
+        dateHelpText.textContent = helpText;
+        
+        // Clear the date if it's now invalid
+        if (bookingDateInput.value && new Date(bookingDateInput.value) < minDate) {
+            bookingDateInput.value = '';
+        }
+    }
 
     function filterPackages() {
         const venueId = venueSelect.value;
@@ -251,9 +357,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    const bookingDateInput = document.getElementById('booking_date');
-    const sessionSelect = document.getElementById('session');
-
     bookingDateInput.addEventListener('change', checkAvailability);
     sessionSelect.addEventListener('change', checkAvailability);
 
@@ -262,6 +365,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (oldPackageId) {
         updatePriceOptions(oldPackageId, oldPriceId);
     }
+
+    // Update date validation on type change
+    typeSelect.addEventListener('change', updateDateValidation);
+    updateDateValidation();
 });
 </script>
 @endpush

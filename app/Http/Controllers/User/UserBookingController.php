@@ -89,15 +89,15 @@ class UserBookingController extends Controller
                 ->with('error', 'Only reservations can be confirmed.');
         }
         
-        // Validate package selection
+        // Validate package selection and payment option
         $validator = $request->validate([
             'package_id' => 'required|exists:packages,id',
             'price_id' => 'nullable|exists:prices,id',
+            'payment_option' => 'required|in:deposit,full',
         ]);
 
-        // Update the booking type to wedding and status to waiting for deposit
+        // Update the booking type to wedding and status based on payment option
         $booking->type = 'wedding';
-        $booking->status = 'waiting for deposit';
         $booking->package_id = $request->package_id;
         
         // Save the price_id if provided
@@ -105,10 +105,21 @@ class UserBookingController extends Controller
             $booking->price_id = $request->price_id;
         }
         
+        // Set status based on payment option
+        if ($request->payment_option === 'full') {
+            $booking->status = 'waiting for full payment';
+        } else {
+            $booking->status = 'waiting for deposit';
+        }
+        
         $booking->save();
 
+        $message = $request->payment_option === 'full' 
+            ? 'Your reservation has been confirmed and converted to a wedding booking. Please proceed with the full payment to secure your date.'
+            : 'Your reservation has been confirmed and converted to a wedding booking. Please proceed with the deposit payment to secure your date.';
+
         return redirect()->route('user.bookings.show', $booking)
-            ->with('success', 'Your reservation has been confirmed and converted to a wedding booking. Please proceed with the deposit payment to secure your date.');
+            ->with('success', $message);
     }
 
     /**

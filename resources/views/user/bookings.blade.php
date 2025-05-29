@@ -169,7 +169,7 @@
                                         View Details
                                     </a>
                                     
-                                    @if($booking->type === 'reservation' && $booking->status !== 'cancelled')
+                                    @if($booking->type === 'reservation' && $booking->status !== 'cancelled' && $booking->status !== 'completed' && ($booking->package_id !== null))
                                     <div class="mt-2 flex space-x-1">
                                         <a href="{{ route('user.bookings.confirm.form', $booking) }}" class="inline-flex items-center px-2 py-1 text-xs bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -203,7 +203,7 @@
                                     class="form-input w-full pl-10 focus:ring-primary focus:border-primary"
                                 >
                             </div>
-                            <p class="text-sm text-gray-500 mt-1 ml-1">Tentative date for your event</p>
+                            <p class="text-sm text-gray-500 mt-1 ml-1" id="date-help-text">Tentative date for your event</p>
                         </div>
                         
                         <!-- Session Selection -->
@@ -391,6 +391,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const priceContainer = document.getElementById('price-selection-container');
     const packageOptions = Array.from(packageSelect.options);
     const formElements = document.querySelectorAll('.form-input');
+    const typeSelect = document.getElementById('type');
+    const eventDateInput = document.getElementById('event_date');
+    const dateHelpText = document.getElementById('date-help-text');
     
     // Form animation
     formElements.forEach(element => {
@@ -560,12 +563,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('event_date').addEventListener('change', checkAvailability);
+    
+    // Add event listener for booking type change
+    typeSelect.addEventListener('change', updateDateValidation);
 
     // Initialize form on page load
     filterPackages();
     if (oldPackageId) {
         updatePriceOptions(oldPackageId, oldPriceId);
     }
+    
+    // Initialize date validation
+    updateDateValidation();
     
     // Add CSS for fade-in animation
     const style = document.createElement('style');
@@ -579,6 +588,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     `;
     document.head.appendChild(style);
+
+    // Date validation function
+    function updateDateValidation() {
+        const selectedType = typeSelect.value;
+        const today = new Date();
+        let minDate;
+        let helpText;
+        
+        if (selectedType === 'reservation' || selectedType === 'booking') {
+            // For reservations and wedding bookings, require at least 6 months advance booking
+            minDate = new Date(today.getFullYear(), today.getMonth() + 6, today.getDate());
+            helpText = 'Event date must be at least 6 months from today for reservations and wedding bookings';
+        } else {
+            // For viewing and appointments, require at least 1 day advance booking
+            minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+            helpText = 'Tentative date for your event';
+        }
+        
+        // Format date for input min attribute (YYYY-MM-DD)
+        const formattedMinDate = minDate.toISOString().split('T')[0];
+        eventDateInput.setAttribute('min', formattedMinDate);
+        dateHelpText.textContent = helpText;
+        
+        // Clear the date if it's now invalid
+        if (eventDateInput.value && new Date(eventDateInput.value) < minDate) {
+            eventDateInput.value = '';
+        }
+    }
 });
 </script>
 @endpush

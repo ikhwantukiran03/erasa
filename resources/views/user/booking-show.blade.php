@@ -62,7 +62,7 @@
                 @endif
                 
                 <!-- Reservation Explanation -->
-                @if($booking->type === 'reservation' && $booking->status !== 'cancelled')
+                @if($booking->type === 'reservation' && $booking->status !== 'cancelled' && ($booking->package_id !== null))
                 <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4">
                     <div class="flex items-start">
                         <div class="flex-shrink-0">
@@ -191,10 +191,17 @@
                             @endif
                             
                             <!-- Reservation Action Buttons -->
-                            @if($booking->type === 'reservation' && $booking->status !== 'cancelled')
+                            @if($booking->type === 'reservation' && $booking->status !== 'cancelled' && $booking->status !== 'completed' && ($booking->package_id !== null))
                             <div class="flex flex-col sm:flex-row pt-4 border-t border-gray-200 mt-2">
                                 <dt class="text-sm font-medium text-gray-500 w-full sm:w-1/3">Actions</dt>
                                 <dd class="text-sm w-full sm:w-2/3 flex flex-col xs:flex-row gap-2">
+                                    <button type="button" id="showPackageDetailsBtn" class="w-full xs:w-auto inline-flex justify-center items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        View Package Options
+                                    </button>
+                                    
                                     <a href="{{ route('user.bookings.confirm.form', $booking) }}" class="w-full xs:w-auto inline-flex justify-center items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -483,8 +490,8 @@
                                 </div>
                                 <div>
                                     <p class="font-medium text-gray-800">Phone</p>
-                                    <p class="text-gray-600 mt-1">+60 123 456 789</p>
-                                    <a href="tel:+60123456789" class="text-primary text-sm font-medium hover:underline mt-2 inline-block">
+                                    <p class="text-gray-600 mt-1">013-331 4389</p>
+                                    <a href="tel:0133314389" class="text-primary text-sm font-medium hover:underline mt-2 inline-block">
                                         Call Now
                                     </a>
                                 </div>
@@ -498,8 +505,8 @@
                                 </div>
                                 <div>
                                     <p class="font-medium text-gray-800">Email</p>
-                                    <p class="text-gray-600 mt-1">info@enakrasa.com</p>
-                                    <a href="mailto:info@enakrasa.com" class="text-primary text-sm font-medium hover:underline mt-2 inline-block">
+                                    <p class="text-gray-600 mt-1">rasa.enak@gmail.com</p>
+                                    <a href="mailto:rasa.enak@gmail.com" class="text-primary text-sm font-medium hover:underline mt-2 inline-block">
                                         Send Message
                                     </a>
                                 </div>
@@ -635,15 +642,15 @@
                         <div class="space-y-3 text-sm">
                             <div class="flex">
                                 <span class="font-medium text-gray-700 w-40">Bank Name:</span>
-                                <span class="text-gray-800">Bank Negara Malaysia</span>
+                                <span class="text-gray-800">MAYBANK</span>
                             </div>
                             <div class="flex">
                                 <span class="font-medium text-gray-700 w-40">Account Name:</span>
-                                <span class="text-gray-800">Enak Rasa Wedding Hall Sdn Bhd</span>
+                                <span class="text-gray-800">KUMPULAN ENAK RASA SDN BHD</span>
                             </div>
                             <div class="flex">
                                 <span class="font-medium text-gray-700 w-40">Account Number:</span>
-                                <span class="text-gray-800 font-mono">1234-5678-9012</span>
+                                <span class="text-gray-800 font-mono">5624 0563 2039</span>
                             </div>
                             <div class="flex">
                                 <span class="font-medium text-gray-700 w-40">Reference:</span>
@@ -711,10 +718,10 @@
 
 <!-- Package Details for Reservation Confirmation Modal -->
 @if($booking->type === 'reservation' && $booking->status !== 'cancelled')
-<div id="packageDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
-    <div class="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+<div id="packageDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center p-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">Package Details</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Available Wedding Packages for {{ $booking->venue->name }}</h3>
             <button id="closePackageDetails" class="text-gray-500 hover:text-gray-700">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -722,11 +729,80 @@
             </button>
         </div>
         <div class="p-6">
-            <div id="packageContent" class="space-y-4">
-                <p class="text-center mb-4">Click the button below to proceed to the confirmation page where you can select a package for your reservation.</p>
-                <a href="{{ route('user.bookings.confirm.form', $booking) }}" class="block w-full bg-primary text-white text-center py-3 rounded hover:bg-primary-dark transition">
-                    Continue to Package Selection
-                </a>
+            <div id="packageContent" class="space-y-6">
+                @php
+                    $availablePackages = \App\Models\Package::where('venue_id', $booking->venue_id)->get();
+                @endphp
+                
+                @if($availablePackages->count() > 0)
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        @foreach($availablePackages as $package)
+                        <div class="border border-gray-200 rounded-lg p-4 hover:border-primary transition">
+                            <h4 class="font-semibold text-gray-800 text-lg mb-2">{{ $package->name }}</h4>
+                            <p class="text-gray-600 mb-4">{{ $package->description }}</p>
+                            
+                            <div class="mb-4">
+                                <h5 class="font-medium text-gray-800 mb-2">Package Includes:</h5>
+                                <div class="space-y-1">
+                                    @foreach($package->items as $item)
+                                    <div class="flex items-start space-x-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <div>
+                                            <span class="text-sm font-medium text-gray-800">{{ $item->item->name }}</span>
+                                            @if($item->description)
+                                                <p class="text-xs text-gray-600">{{ $item->description }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5 class="font-medium text-gray-800 mb-2">Pricing Options:</h5>
+                                <div class="space-y-1">
+                                    @foreach($package->prices as $price)
+                                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded text-sm">
+                                        <span>{{ $price->pax }} guests</span>
+                                        <span class="font-bold text-primary">RM {{ number_format($price->price, 2) }}</span>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <span class="text-lg font-bold text-primary">
+                                    @if($package->min_price == $package->max_price)
+                                        RM {{ number_format($package->min_price, 2) }}
+                                    @else
+                                        RM {{ number_format($package->min_price, 2) }} - RM {{ number_format($package->max_price, 2) }}
+                                    @endif
+                                </span>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    
+                    <div class="text-center pt-4 border-t border-gray-200">
+                        <p class="text-gray-600 mb-4">Ready to select a package and confirm your reservation?</p>
+                        <a href="{{ route('user.bookings.confirm.form', $booking) }}" class="inline-flex items-center bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Continue to Package Selection
+                        </a>
+                    </div>
+                @else
+                    <div class="text-center py-8">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                        <p class="text-gray-600">No packages are currently available for this venue.</p>
+                        <p class="text-sm text-gray-500 mt-2">Please contact our staff for custom arrangements.</p>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -735,19 +811,20 @@
 <script>
     // Package details modal functionality
     document.addEventListener('DOMContentLoaded', function() {
-        const confirmReservationBtn = document.querySelector('a[href="{{ route("user.bookings.confirm.form", $booking) }}"]');
+        const showPackageDetailsBtn = document.getElementById('showPackageDetailsBtn');
         const packageDetailsModal = document.getElementById('packageDetailsModal');
         const closePackageDetails = document.getElementById('closePackageDetails');
         
-        if (confirmReservationBtn && packageDetailsModal) {
-            confirmReservationBtn.addEventListener('click', function(e) {
-                e.preventDefault();
+        if (showPackageDetailsBtn && packageDetailsModal) {
+            showPackageDetailsBtn.addEventListener('click', function() {
                 packageDetailsModal.classList.remove('hidden');
             });
             
-            closePackageDetails.addEventListener('click', function() {
-                packageDetailsModal.classList.add('hidden');
-            });
+            if (closePackageDetails) {
+                closePackageDetails.addEventListener('click', function() {
+                    packageDetailsModal.classList.add('hidden');
+                });
+            }
             
             // Close modal when clicking outside
             packageDetailsModal.addEventListener('click', function(e) {

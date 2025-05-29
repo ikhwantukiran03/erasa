@@ -90,6 +90,7 @@
                         <div>
                             <label for="booking_date" class="block text-dark font-medium mb-1">Booking Date <span class="text-red-500">*</span></label>
                             <input type="date" id="booking_date" name="booking_date" value="{{ old('booking_date', $booking->booking_date->format('Y-m-d')) }}" required class="form-input @error('booking_date') border-red-500 @enderror">
+                            <p class="text-sm text-gray-500 mt-1" id="booking-date-help">Select the date for this booking</p>
                         </div>
                         
                         <!-- Session Selection -->
@@ -168,9 +169,38 @@ document.addEventListener('DOMContentLoaded', function() {
     const priceSelect = document.getElementById('price_id');
     const priceContainer = document.getElementById('price-selection-container');
     const packageOptions = Array.from(packageSelect.options);
+    const typeSelect = document.getElementById('type');
+    const bookingDateInput = document.getElementById('booking_date');
+    const sessionSelect = document.getElementById('session');
+    const dateHelpText = document.getElementById('booking-date-help');
 
     const oldPackageId = "{{ old('package_id') }}";
     const oldPriceId = "{{ old('price_id') }}";
+    
+    // Date validation function
+    function updateDateValidation() {
+        const selectedType = typeSelect.value;
+        const today = new Date();
+        let minDate;
+        let helpText;
+        
+        if (selectedType === 'reservation' || selectedType === 'wedding') {
+            // For reservations and wedding bookings, require at least 6 months advance booking
+            minDate = new Date(today.getFullYear(), today.getMonth() + 6, today.getDate());
+            helpText = 'Booking date must be at least 6 months from today for reservations and wedding bookings';
+        } else {
+            // For viewing, require at least 1 day advance booking
+            minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+            helpText = 'Select the date for this booking';
+        }
+        
+        // Format date for input min attribute (YYYY-MM-DD)
+        const formattedMinDate = minDate.toISOString().split('T')[0];
+        bookingDateInput.setAttribute('min', formattedMinDate);
+        dateHelpText.textContent = helpText;
+        
+        // Note: Don't clear existing date in edit mode to preserve current booking date
+    }
 
     function filterPackages() {
         const venueId = venueSelect.value;
@@ -252,17 +282,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    const bookingDateInput = document.getElementById('booking_date');
-    const sessionSelect = document.getElementById('session');
-
     bookingDateInput.addEventListener('change', checkAvailability);
     sessionSelect.addEventListener('change', checkAvailability);
+    typeSelect.addEventListener('change', updateDateValidation);
 
     // On load
     filterPackages();
     if (oldPackageId) {
         updatePriceOptions(oldPackageId, oldPriceId);
     }
+    updateDateValidation();
 });
 </script>
 @endpush

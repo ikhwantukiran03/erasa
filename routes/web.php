@@ -239,6 +239,11 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
     Route::get('/invoices/{booking}', [InvoiceController::class, 'showVerificationForm'])->name('invoices.show');
     Route::post('/invoices/{booking}/verify', [InvoiceController::class, 'verify'])->name('invoices.verify');
     
+    // New invoice management routes
+    Route::get('/invoices/{invoice}/quick-view', [InvoiceController::class, 'quickView'])->name('invoices.quick-view');
+    Route::post('/invoices/bulk-verify', [InvoiceController::class, 'bulkVerify'])->name('invoices.bulk-verify');
+    Route::post('/invoices/bulk-reject', [InvoiceController::class, 'bulkReject'])->name('invoices.bulk-reject');
+    
     // Customization Management Routes
     Route::get('/customizations', [StaffCustomizationController::class, 'index'])->name('customizations.index');
     Route::get('/customizations/{customization}', [StaffCustomizationController::class, 'show'])->name('customizations.show');

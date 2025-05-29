@@ -145,6 +145,25 @@
                     </div>
                     
                     <div class="space-y-6">
+                        @if($bookingRequest->type === 'booking')
+                        <!-- Special Notice for Booking Requests -->
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h4 class="text-sm font-medium text-blue-800">Wedding Booking Request</h4>
+                                    <p class="text-sm text-blue-700 mt-1">
+                                        When you approve this wedding booking request, you will be redirected to the booking creation form where you can review and finalize all details before creating the actual booking. This allows you to verify all information and choose the appropriate status.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                        
                         <!-- Approve Form -->
                         <div class="bg-green-50 p-5 rounded-lg border border-green-100">
                             <h3 class="font-semibold text-green-700 mb-3 flex items-center">
@@ -163,7 +182,11 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                                     </svg>
-                                    Approve Request
+                                    @if($bookingRequest->type === 'booking')
+                                        Approve & Create Booking
+                                    @else
+                                        Approve Request
+                                    @endif
                                 </button>
                             </form>
                         </div>

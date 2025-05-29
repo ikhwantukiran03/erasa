@@ -23,7 +23,9 @@ class Invoice extends Model
         'invoice_submitted_at',
         'invoice_verified_at',
         'invoice_verified_by',
+        'verified_by',
         'invoice_notes',
+        'admin_notes',
         'due_date',
         'status',
     ];
@@ -54,6 +56,14 @@ class Invoice extends Model
     public function verifier()
     {
         return $this->belongsTo(User::class, 'invoice_verified_by');
+    }
+
+    /**
+     * Get the user who verified the invoice (alternative relationship name).
+     */
+    public function verifiedBy()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 
     /**

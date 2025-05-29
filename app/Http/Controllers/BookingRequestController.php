@@ -41,7 +41,7 @@ class BookingRequestController extends Controller
             'venue_id' => ['nullable', 'exists:venues,id'],
             'package_id' => ['nullable', 'exists:packages,id'],
             'price_id' => ['nullable', 'exists:prices,id'], // Add price_id validation
-            'event_date' => ['nullable', 'date', 'after:today'],
+            'event_date' => ['nullable', 'date'],
             'message' => ['required', 'string'],
         ]);
 
@@ -49,6 +49,29 @@ class BookingRequestController extends Controller
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
+        }
+
+        // Additional validation for event date based on booking type
+        if ($request->event_date) {
+            $eventDate = \Carbon\Carbon::parse($request->event_date);
+            $today = \Carbon\Carbon::today();
+            
+            if (in_array($request->type, ['reservation', 'booking'])) {
+                // For reservations and wedding bookings, require at least 6 months advance booking
+                $minimumDate = $today->copy()->addMonths(6);
+                if ($eventDate->lessThan($minimumDate)) {
+                    return redirect()->back()
+                        ->withErrors(['event_date' => 'For reservations and wedding bookings, the event date must be at least 6 months from today.'])
+                        ->withInput();
+                }
+            } else {
+                // For viewing and appointments, require at least 1 day advance booking
+                if ($eventDate->lessThanOrEqualTo($today)) {
+                    return redirect()->back()
+                        ->withErrors(['event_date' => 'The event date must be after today.'])
+                        ->withInput();
+                }
+            }
         }
 
         // Validate price_id belongs to the selected package

@@ -171,6 +171,13 @@
             document.getElementById('closeModal').addEventListener('click', function() {
                 document.getElementById('bookingModal').classList.add('hidden');
             });
+            
+            // Close modal when clicking outside
+            document.getElementById('bookingModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                }
+            });
         });
 
         function initializeCalendar() {
