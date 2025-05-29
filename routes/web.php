@@ -27,6 +27,7 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\Staff\TicketController as StaffTicketController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\ChatbotController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -45,12 +46,6 @@ Route::get('/booking-request', [BookingRequestController::class, 'create'])->nam
 Route::post('/booking-request', [BookingRequestController::class, 'store'])->name('booking-requests.store');
 Route::get('/booking-request/confirmation', [BookingRequestController::class, 'confirmation'])->name('booking-requests.confirmation');
 Route::get('/my-requests', [BookingRequestController::class, 'myRequests'])->name('booking-requests.my-requests');
-
-// Chatbot Routes
-Route::get('/chatbot', [App\Http\Controllers\ChatbotController::class, 'index'])->name('chatbot.index');
-Route::post('/chatbot/query', [App\Http\Controllers\ChatbotController::class, 'query'])->name('chatbot.query');
-Route::post('/chatbot/clear-conversation', [App\Http\Controllers\ChatbotController::class, 'clearConversation'])->name('chatbot.clear');
-Route::get('/chatbot/conversation-history', [App\Http\Controllers\ChatbotController::class, 'getConversationHistory'])->name('chatbot.history');
 
 // Booking Calendar Route 
 Route::get('/booking-calendar', [App\Http\Controllers\BookingCalendarController::class, 'index'])->name('booking.calendar');
@@ -355,6 +350,12 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
 // Promotion routes for users
 Route::get('/promotions', [PromotionController::class, 'index'])->name('promotions.index');
 Route::get('/promotions/{promotion}', [PromotionController::class, 'show'])->name('promotions.show');
+
+// Chatbot Routes
+Route::get('/chatbot', [ChatbotController::class, 'index'])->name('chatbot.index');
+Route::post('/chatbot/query', [ChatbotController::class, 'query'])->name('chatbot.query');
+Route::post('/chatbot/clear-conversation', [ChatbotController::class, 'clearConversation'])->name('chatbot.clear');
+Route::get('/chatbot/conversation-history', [ChatbotController::class, 'getConversationHistory'])->name('chatbot.history');
 
 
     

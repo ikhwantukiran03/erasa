@@ -19,13 +19,13 @@ class DeepSeekService
 
     public function __construct()
     {
-        // Use environment variables for security
-        $this->apiKey = env('DEEPSEEK_API_KEY');
-        $this->apiUrl = env('DEEPSEEK_API_URL', 'https://openrouter.ai/api/v1/chat/completions');
-        $this->model = env('DEEPSEEK_MODEL', 'deepseek/deepseek-r1');
-        $this->temperature = (float) env('DEEPSEEK_TEMPERATURE', 0.7);
-        $this->maxTokens = (int) env('DEEPSEEK_MAX_TOKENS', 300);
-        $this->debug = env('CHATBOT_DEBUG', false);
+        // Use environment variables with fallback for security
+        $this->apiKey = env('DEEPSEEK_API_KEY') ?: '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';
+        $this->apiUrl = env('DEEPSEEK_API_URL') ?: 'https://openrouter.ai/api/v1/chat/completions';
+        $this->model = env('DEEPSEEK_MODEL') ?: 'deepseek/deepseek-r1';
+        $this->temperature = (float) (env('DEEPSEEK_TEMPERATURE') ?: 0.7);
+        $this->maxTokens = (int) (env('DEEPSEEK_MAX_TOKENS') ?: 300);
+        $this->debug = env('CHATBOT_DEBUG') ?: false;
     }
 
     /**
@@ -122,8 +122,8 @@ BUSINESS INFORMATION:
 SERVICES & POLICIES:
 - We offer complete wedding packages including venue, catering, and decorations
 - Deposit required: 30% of total package price
-- Full payment due: 2 weeks before event
-- Cancellation policy: 80% refund for 30+ days notice, 50% for 15-29 days, no refund for <15 days
+- Full payment due: 1 month before event
+- Cancellation policy: No refund after deposit paid
 - We provide halal-certified catering with traditional Malay and international cuisine
 - Custom decorations and themes available
 - Wedding card creation services available
@@ -316,6 +316,7 @@ Remember: You're helping couples plan their special day, so be enthusiastic and 
      */
     public function isEnabled(): bool
     {
-        return env('CHATBOT_USE_AI', false) && !empty($this->apiKey);
+        // Enable AI if we have an API key (either from env or fallback)
+        return !empty($this->apiKey) && (env('CHATBOT_USE_AI', true) !== false);
     }
 } 
