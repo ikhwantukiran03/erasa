@@ -106,4 +106,60 @@ class EmailService
             return false;
         }
     }
+
+    /**
+     * Send invoice verification email.
+     *
+     * @param string $to The recipient's email address
+     * @param array $invoiceData Invoice and booking information
+     * @return bool Whether the email was sent successfully
+     */
+    public function sendInvoiceVerificationEmail($to, $invoiceData)
+    {
+        $subject = "✅ Payment Verified - Enak Rasa Wedding Hall";
+        
+        try {
+            $staffConfig = $this->getStaffEmailConfig();
+            
+            Mail::send('emails.invoice-verified', $invoiceData, function ($mail) use ($to, $subject, $staffConfig) {
+                $mail->to($to)
+                     ->subject($subject)
+                     ->from($staffConfig['address'], $staffConfig['name']);
+            });
+
+            Log::info("Invoice verification email sent to {$to} successfully.");
+            return true;
+        } catch (\Exception $e) {
+            Log::error("Failed to send invoice verification email: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Send invoice rejection email.
+     *
+     * @param string $to The recipient's email address
+     * @param array $invoiceData Invoice and booking information
+     * @return bool Whether the email was sent successfully
+     */
+    public function sendInvoiceRejectionEmail($to, $invoiceData)
+    {
+        $subject = "❌ Payment Rejected - Action Required - Enak Rasa Wedding Hall";
+        
+        try {
+            $staffConfig = $this->getStaffEmailConfig();
+            
+            Mail::send('emails.invoice-rejected', $invoiceData, function ($mail) use ($to, $subject, $staffConfig) {
+                $mail->to($to)
+                     ->subject($subject)
+                     ->from($staffConfig['address'], $staffConfig['name']);
+            });
+
+            Log::info("Invoice rejection email sent to {$to} successfully.");
+            return true;
+        } catch (\Exception $e) {
+            Log::error("Failed to send invoice rejection email: " . $e->getMessage());
+            return false;
+        }
+    }
 } 
