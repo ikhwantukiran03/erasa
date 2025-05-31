@@ -16,10 +16,28 @@ class UserController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::paginate(10);
-        return view('admin.users.index', compact('users'));
+        $search = $request->get('search', '');
+        $role = $request->get('role', '');
+        
+        $query = User::query();
+        
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%')
+                  ->orWhere('whatsapp', 'like', '%' . $search . '%');
+            });
+        }
+        
+        if ($role) {
+            $query->where('role', $role);
+        }
+        
+        $users = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
+        
+        return view('admin.users.index', compact('users', 'search', 'role'));
     }
 
     /**

@@ -79,11 +79,9 @@
                 <nav class="hidden md:flex items-center space-x-8">
                     <a href="#home" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Home</a>
                     <a href="#gallery" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Gallery</a>
-                    <a href="{{ route('promotions.index') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Promotions</a>
                     <a href="{{ route('booking.calendar') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Calendar</a>
                     <a href="{{ route('public.venues') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Packages</a>
                     <a href="{{ route('wedding-cards.index') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Wedding Cards</a>
-                    <a href="{{ route('public.feedback') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Feedback</a>
                     
                     @guest
                         <div class="flex items-center space-x-3 ml-2">
@@ -125,10 +123,9 @@
             <nav class="flex flex-col divide-y divide-gray-100">
                 <a href="#home" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Home</a>
                 <a href="#gallery" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Gallery</a>
-                <a href="#calendar" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Calendar</a>
+                
                 <a href="{{ route('booking.calendar') }}" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Calendar</a>
                 <a href="{{ route('public.venues') }}" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Packages</a>
-                <a href="{{ route('public.feedback') }}" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Feedback</a>
                 
                 @guest
                     <div class="flex flex-col space-y-2 p-4">
@@ -147,6 +144,86 @@
             </nav>
         </div>
     </header>
+
+    <!-- Promotional Banner -->
+    @if($activePromotions->isNotEmpty())
+    <div class="bg-gradient-to-r from-primary to-primary-dark text-white py-3 relative overflow-hidden" id="promo-banner">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4 flex-1">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                        </svg>
+                        <span class="font-semibold text-sm">Special Offer:</span>
+                    </div>
+                    
+                    <!-- Promotion Carousel -->
+                    <div class="flex-1 overflow-hidden">
+                        <div class="promotion-slider flex transition-transform duration-500 ease-in-out" id="promotion-slider">
+                            @foreach($activePromotions as $promotion)
+                                <div class="promotion-slide flex-shrink-0 w-full flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-sm">{{ $promotion->title }}</span>
+                                        <span class="bg-white text-primary px-2 py-1 rounded-full text-xs font-bold">{{ $promotion->discount }}% OFF</span>
+                                        <span class="text-xs opacity-90">Valid until {{ $promotion->end_date->format('M d, Y') }}</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        @auth
+                                            <a href="{{ route('booking-requests.create', ['promotion' => $promotion->id]) }}" 
+                                               class="bg-white text-primary px-3 py-1 rounded-full text-xs font-medium hover:bg-gray-100 transition-colors">
+                                                Claim Now
+                                            </a>
+                                        @else
+                                            <a href="{{ route('login') }}" 
+                                               class="bg-white text-primary px-3 py-1 rounded-full text-xs font-medium hover:bg-gray-100 transition-colors">
+                                                Login to Claim
+                                            </a>
+                                        @endauth
+                                        <a href="{{ route('promotions.show', $promotion) }}" 
+                                           class="text-white hover:text-gray-200 text-xs underline">
+                                            Details
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation arrows (only show if more than 1 promotion) -->
+                @if($activePromotions->count() > 1)
+                <div class="flex items-center space-x-2 ml-4">
+                    <button onclick="previousPromotion()" class="text-white hover:text-gray-200 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button onclick="nextPromotion()" class="text-white hover:text-gray-200 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+                @endif
+                
+                <!-- Close button -->
+                <button onclick="closeBanner()" class="text-white hover:text-gray-200 transition-colors ml-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Animated background elements -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute -top-4 -right-4 w-8 h-8 bg-white opacity-10 rounded-full animate-bounce"></div>
+            <div class="absolute top-2 left-1/4 w-2 h-2 bg-white opacity-20 rounded-full animate-pulse"></div>
+            <div class="absolute bottom-1 right-1/3 w-3 h-3 bg-white opacity-15 rounded-full animate-bounce" style="animation-delay: 0.5s;"></div>
+        </div>
+    </div>
+    @endif
 
     <!-- Hero Section -->
     <section class="hero-bg min-h-screen flex items-center justify-center text-white" id="home">
@@ -285,52 +362,78 @@
         </div>
     </section>
 
-    <!-- Calendar Section -->
-    <section class="py-20 bg-gray-50" id="calendar">
-    <div class="container mx-auto px-4">
-        <div class="text-center mb-12" data-aos="fade-up">
-            <h2 class="text-3xl md:text-4xl font-display font-bold text-dark mb-4">Booking Calendar</h2>
-            <div class="w-24 h-1 bg-primary mx-auto"></div>
-            <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Check our availability calendar to see open dates for your wedding, viewing, or reservation.</p>
-        </div>
-        
-        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden" data-aos="fade-up">
-            <div class="bg-primary p-10 text-white flex items-center justify-center text-center">
-                <div class="w-full">
-                    <h3 class="text-2xl font-display font-bold mb-4">Plan Your Special Day</h3>
-                    <p class="mb-6">Our interactive calendar helps you view all bookings and available dates to plan your event effectively.</p>
-                    <ul class="space-y-3 mb-8">
-                        <li class="flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            See all upcoming bookings
-                        </li>
-                        <li class="flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            Filter by venue location
-                        </li>
-                        <li class="flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            Find the perfect date for your event
-                        </li>
-                    </ul>
-                    <a href="{{ route('booking.calendar') }}" class="inline-flex items-center bg-white text-primary px-6 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors duration-300">
-                        <span>View Calendar</span>
+    <!-- Customer Feedback Section -->
+    <section class="py-20 bg-gray-50" id="feedback">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-dark mb-4">What Our Couples Say</h2>
+                <div class="w-24 h-1 bg-primary mx-auto"></div>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Read testimonials from couples who celebrated their special day with us.</p>
+            </div>
+            
+            @if($topFeedback->isNotEmpty())
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                    @foreach($topFeedback as $feedback)
+                        <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
+                            <!-- Rating Stars -->
+                            <div class="flex items-center mb-4">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <svg class="w-5 h-5 {{ $i <= $feedback->rating ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                @endfor
+                                <span class="ml-2 text-sm text-gray-600">({{ $feedback->rating }}/5)</span>
+                            </div>
+                            
+                            <!-- Feedback Comment -->
+                            <p class="text-gray-700 mb-4 italic">"{{ $feedback->comment }}"</p>
+                            
+                            <!-- Customer Info -->
+                            <div class="border-t pt-4">
+                                <div class="flex items-center">
+                                    <div class="bg-primary rounded-full w-10 h-10 flex items-center justify-center text-white font-semibold">
+                                        {{ substr($feedback->booking->user->name, 0, 1) }}
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="font-semibold text-gray-900">{{ $feedback->booking->user->name }}</p>
+                                        <p class="text-sm text-gray-500">
+                                            @if($feedback->booking->venue)
+                                                {{ $feedback->booking->venue->name }} • 
+                                            @endif
+                                            {{ $feedback->created_at->format('M Y') }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                
+                <!-- View All Feedback Link -->
+                <div class="text-center mt-10" data-aos="fade-up" data-aos-delay="500">
+                    <a href="{{ route('public.feedback') }}" class="inline-flex items-center bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-opacity-90 transition-colors duration-300">
+                        <span>View All Feedback</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
                     </a>
                 </div>
-            </div>
+            @else
+                <div class="text-center py-12" data-aos="fade-up">
+                    <div class="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Be Our First Review!</h3>
+                        <p class="text-gray-600 mb-4">We're excited to serve you and would love to hear about your experience.</p>
+                        <a href="{{ route('booking-requests.create') }}" class="inline-flex items-center bg-primary text-white px-4 py-2 rounded-full font-medium hover:bg-opacity-90 transition-colors duration-300">
+                            Book Your Event
+                        </a>
+                    </div>
+                </div>
+            @endif
         </div>
-    </div>
-</section>
-
+    </section>
 
     <!-- Booking CTA Section -->
     <section class="py-20 bg-cover bg-center bg-no-repeat text-white" id="booking" 
@@ -562,6 +665,76 @@
                     }
                 });
             });
+        });
+    </script>
+    
+    <!-- Promotional Banner JavaScript -->
+    <script>
+        // Promotional Banner Functionality
+        let currentPromotionIndex = 0;
+        const promotionSlider = document.getElementById('promotion-slider');
+        const totalPromotions = {{ $activePromotions->count() ?? 0 }};
+        
+        function nextPromotion() {
+            if (totalPromotions <= 1) return;
+            
+            currentPromotionIndex = (currentPromotionIndex + 1) % totalPromotions;
+            updatePromotionSlider();
+        }
+        
+        function previousPromotion() {
+            if (totalPromotions <= 1) return;
+            
+            currentPromotionIndex = (currentPromotionIndex - 1 + totalPromotions) % totalPromotions;
+            updatePromotionSlider();
+        }
+        
+        function updatePromotionSlider() {
+            if (promotionSlider) {
+                const translateX = -currentPromotionIndex * 100;
+                promotionSlider.style.transform = `translateX(${translateX}%)`;
+            }
+        }
+        
+        function closeBanner() {
+            const banner = document.getElementById('promo-banner');
+            if (banner) {
+                banner.style.transform = 'translateY(-100%)';
+                banner.style.opacity = '0';
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 300);
+                
+                // Store in localStorage to remember user preference
+                localStorage.setItem('promoBannerClosed', 'true');
+                localStorage.setItem('promoBannerClosedTime', new Date().getTime().toString());
+            }
+        }
+        
+        // Auto-rotate promotions every 5 seconds if there are multiple
+        if (totalPromotions > 1) {
+            setInterval(nextPromotion, 5000);
+        }
+        
+        // Check if user previously closed the banner
+        document.addEventListener('DOMContentLoaded', function() {
+            const bannerClosed = localStorage.getItem('promoBannerClosed');
+            const banner = document.getElementById('promo-banner');
+            
+            if (bannerClosed === 'true' && banner) {
+                // Check if 24 hours have passed since closing
+                const lastClosed = localStorage.getItem('promoBannerClosedTime');
+                const now = new Date().getTime();
+                
+                if (lastClosed && (now - parseInt(lastClosed)) > 24 * 60 * 60 * 1000) {
+                    // 24 hours have passed, show banner again
+                    localStorage.removeItem('promoBannerClosed');
+                    localStorage.removeItem('promoBannerClosedTime');
+                } else {
+                    // Still within 24 hours, keep banner hidden
+                    banner.style.display = 'none';
+                }
+            }
         });
     </script>
 </body>

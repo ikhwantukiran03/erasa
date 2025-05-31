@@ -14,10 +14,26 @@ class VenueController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        $venues = Venue::all();
-        return view('admin.venues.index', compact('venues'));
+        $search = $request->get('search', '');
+        
+        $query = Venue::query();
+        
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%')
+                  ->orWhere('address_line_1', 'like', '%' . $search . '%')
+                  ->orWhere('address_line_2', 'like', '%' . $search . '%')
+                  ->orWhere('city', 'like', '%' . $search . '%')
+                  ->orWhere('state', 'like', '%' . $search . '%');
+            });
+        }
+        
+        $venues = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
+        
+        return view('admin.venues.index', compact('venues', 'search'));
     }
 
     /**

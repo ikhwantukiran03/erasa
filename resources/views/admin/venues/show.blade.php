@@ -7,7 +7,7 @@
 <div class="relative h-[400px] bg-gray-900">
     <!-- Featured Image - display a featured gallery image if available -->
     @php
-        $featuredImage = $venue->galleries()->where('is_featured', true)->first();
+        $featuredImage = $venue->galleries()->featured()->first();
     @endphp
     
     @if($featuredImage)

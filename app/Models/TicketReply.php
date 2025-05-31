@@ -17,7 +17,7 @@ class TicketReply extends Model
     ];
 
     protected $casts = [
-        'is_staff_reply' => 'boolean',
+        'is_staff_reply' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

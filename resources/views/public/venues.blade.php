@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- Venues Hero Section -->
-<div class="bg-gradient-to-r from-primary/20 to-secondary/30 py-16">
+<div class="bg-gradient-to-r from-primary/20 to-secondary/30 py-6">
     <div class="container mx-auto px-4 text-center">
         <h1 class="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-primary mb-4" data-aos="fade-up">Our Beautiful Wedding Venues</h1>
         <p class="text-gray-700 md:text-lg max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">Discover the perfect setting for your special day with our selection of elegant and versatile venues</p>
@@ -60,11 +60,13 @@
             </div>
         @endif
 
+        
+
         <!-- All Venues Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             @foreach($venues as $venue)
                 @php
-                    $venueImage = \App\Models\Gallery::where('venue_id', $venue->id)->where('is_featured', true)->first();
+                    $venueImage = \App\Models\Gallery::where('venue_id', $venue->id)->featured()->first();
                     if (!$venueImage) {
                         $venueImage = \App\Models\Gallery::where('venue_id', $venue->id)->first();
                     }
@@ -168,7 +170,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
                     <!-- Venue Image -->
                     @php
-                        $featuredImage = $galleries->where('is_featured', true)->first();
+                        $featuredImage = $galleries->where('is_featured', 1)->first();
                     @endphp
                     <div class="h-[450px] overflow-hidden">
                         @if($featuredImage)

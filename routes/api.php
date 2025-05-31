@@ -19,4 +19,7 @@ use App\Http\Controllers\Api\BookingCalendarApiController;
 Route::get('/calendar-data', [BookingCalendarApiController::class, 'getCalendarData']);
 Route::get('/upcoming-bookings', [BookingCalendarApiController::class, 'getUpcomingBookings']);
 Route::get('/venues', [BookingCalendarApiController::class, 'getVenues']);
+Route::get('/customers', [BookingCalendarApiController::class, 'getCustomers']);
+Route::get('/packages', [BookingCalendarApiController::class, 'getPackages']);
 Route::get('/check-availability', [BookingCalendarApiController::class, 'checkAvailability']);
+Route::post('/quick-booking', [BookingCalendarApiController::class, 'createQuickBooking']);

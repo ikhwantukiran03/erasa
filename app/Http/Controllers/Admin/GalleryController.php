@@ -45,32 +45,53 @@ class GalleryController extends Controller
                 ->with('error', 'You do not have permission to access this resource.'); 
         }
         
+        $search = $request->get('search', '');
+        $venue_id = $request->get('venue_id', '');
+        $featured = $request->get('featured', '');
+        
         // Base query for galleries
         $query = Gallery::with('venue');
         
+        // Filter by search term
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%')
+                  ->orWhereHas('venue', function($venueQuery) use ($search) {
+                      $venueQuery->where('name', 'like', '%' . $search . '%');
+                  });
+            });
+        }
+        
         // Filter by venue if requested
-        if ($request->has('venue_id') && $request->venue_id) {
-            $query->where('venue_id', $request->venue_id);
+        if ($venue_id) {
+            $query->where('venue_id', $venue_id);
+        }
+        
+        // Filter by featured status
+        if ($featured !== '') {
+            $query->where('is_featured', '=', (int)$featured);
         }
         
         // Get galleries with sorting
         $galleries = $query->orderBy('venue_id')
                            ->orderBy('display_order')
                            ->orderBy('created_at', 'desc')
-                           ->get();
+                           ->paginate(12)
+                           ->appends($request->query());
         
         // Get venues for the filter dropdown
         $venues = Venue::orderBy('name')->get();
         
         // Calculate some statistics
         $stats = [
-            'total' => $galleries->count(),
-            'local' => $galleries->where('source', 'local')->count(),
-            'external' => $galleries->where('source', 'external')->count(),
-            'featured' => $galleries->where('is_featured', true)->count(),
+            'total' => Gallery::count(),
+            'local' => Gallery::where('source', 'local')->count(),
+            'external' => Gallery::where('source', 'external')->count(),
+            'featured' => Gallery::where('is_featured', '=', 1)->count(),
         ];
         
-        return view('admin.galleries.index', compact('galleries', 'venues', 'stats'));
+        return view('admin.galleries.index', compact('galleries', 'venues', 'stats', 'search', 'venue_id', 'featured'));
     }
 
     /**

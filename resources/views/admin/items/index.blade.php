@@ -54,12 +54,12 @@
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h2 class="text-lg font-semibold text-gray-800">All Items</h2>
                     <div class="mt-3 md:mt-0 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-                        <form action="{{ route('admin.items.index') }}" method="GET" class="flex">
+                        <form action="{{ route('admin.items.index') }}" method="GET" class="flex flex-col sm:flex-row gap-3">
                             <div class="relative">
                                 <input 
                                     type="text" 
                                     name="search" 
-                                    value="{{ request('search') }}" 
+                                    value="{{ $search ?? '' }}" 
                                     placeholder="Search items..." 
                                     class="form-input pr-10 w-full md:w-64"
                                 >
@@ -69,9 +69,29 @@
                                     </svg>
                                 </button>
                             </div>
+                            
+                            <select 
+                                name="category" 
+                                class="form-input w-full sm:w-48" 
+                                onchange="this.form.submit()"
+                            >
+                                <option value="">All Categories</option>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->id }}" {{ ($category ?? '') == $cat->id ? 'selected' : '' }}>
+                                        {{ $cat->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            
+                            @if(($search ?? false) || ($category ?? false))
+                                <a href="{{ route('admin.items.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition flex items-center">
+                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    Clear
+                                </a>
+                            @endif
                         </form>
-                        
-                        
                     </div>
                 </div>
             </div>

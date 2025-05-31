@@ -97,9 +97,10 @@
                         <div>
                             <label for="session" class="block text-dark font-medium mb-1">Session <span class="text-red-500">*</span></label>
                             <select id="session" name="session" required class="form-input @error('session') border-red-500 @enderror">
-                                <option value="morning" {{ old('session', $booking->session) == 'morning' ? 'selected' : '' }}>Morning</option>
-                                <option value="evening" {{ old('session', $booking->session) == 'evening' ? 'selected' : '' }}>Evening</option>
+                                <option value="morning" {{ old('session', $booking->session) == 'morning' ? 'selected' : '' }}>Morning Session (11:00 AM - 4:00 PM)</option>
+                                <option value="evening" {{ old('session', $booking->session) == 'evening' ? 'selected' : '' }}>Evening Session (7:00 PM - 11:00 PM)</option>
                             </select>
+                            <p class="text-sm text-gray-500 mt-1">Morning: 11AM-4PM (5 hours) | Evening: 7PM-11PM (4 hours)</p>
                         </div>
                         
                         <!-- Booking Type -->

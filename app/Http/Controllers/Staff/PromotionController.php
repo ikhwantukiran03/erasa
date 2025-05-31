@@ -17,10 +17,22 @@ class PromotionController extends Controller
         $this->cloudinaryService = $cloudinaryService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $promotions = Promotion::orderBy('created_at', 'desc')->get();
-        return view('staff.promotions.index', compact('promotions'));
+        $search = $request->get('search', '');
+        
+        $query = Promotion::query();
+        
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            });
+        }
+        
+        $promotions = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
+        
+        return view('staff.promotions.index', compact('promotions', 'search'));
     }
 
     public function create()

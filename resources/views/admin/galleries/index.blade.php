@@ -37,11 +37,22 @@
         <div class="bg-white rounded-lg shadow-sm mb-6 p-5">
             <form action="{{ route('admin.galleries.index') }}" method="GET" class="flex flex-wrap items-end gap-4">
                 <div class="flex-grow max-w-xs">
+                    <label for="search" class="block text-sm font-medium text-gray-600 mb-1">Search</label>
+                    <input 
+                        type="text" 
+                        id="search" 
+                        name="search" 
+                        value="{{ $search ?? '' }}" 
+                        placeholder="Search by title, description, or venue..." 
+                        class="w-full rounded-md border-gray-300 focus:border-primary"
+                    >
+                </div>
+                <div class="flex-grow max-w-xs">
                     <label for="venue_filter" class="block text-sm font-medium text-gray-600 mb-1">Filter by Venue</label>
                     <select id="venue_filter" name="venue_id" class="w-full rounded-md border-gray-300 focus:border-primary">
                         <option value="">All Venues</option>
-                        @foreach(\App\Models\Venue::orderBy('name')->get() as $venue)
-                            <option value="{{ $venue->id }}" {{ request('venue_id') == $venue->id ? 'selected' : '' }}>{{ $venue->name }}</option>
+                        @foreach($venues as $venue)
+                            <option value="{{ $venue->id }}" {{ ($venue_id ?? '') == $venue->id ? 'selected' : '' }}>{{ $venue->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -49,13 +60,16 @@
                     <label for="featured_filter" class="block text-sm font-medium text-gray-600 mb-1">Featured Status</label>
                     <select id="featured_filter" name="featured" class="w-full rounded-md border-gray-300 focus:border-primary">
                         <option value="">All Images</option>
-                        <option value="1" {{ request('featured') == '1' ? 'selected' : '' }}>Featured Only</option>
+                        <option value="1" {{ ($featured ?? '') == '1' ? 'selected' : '' }}>Featured Only</option>
+                        <option value="0" {{ ($featured ?? '') === '0' ? 'selected' : '' }}>Not Featured</option>
                     </select>
                 </div>
                 <div class="flex space-x-2">
-                    
-                    @if(request('venue_id') || request('featured'))
-                        <a href="{{ route('admin.galleries.index') }}" class="text-primary hover:underline py-2">Clear Filter</a>
+                    <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition">
+                        Search
+                    </button>
+                    @if(($search ?? false) || ($venue_id ?? false) || ($featured ?? '') !== '')
+                        <a href="{{ route('admin.galleries.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition">Clear</a>
                     @endif
                 </div>
             </form>
@@ -195,8 +209,8 @@
         <div class="mt-6 flex justify-end">
             <div class="text-sm text-gray-500">
                 Showing {{ $galleries->count() }} {{ Str::plural('image', $galleries->count()) }}
-                @if($galleries->where('is_featured', true)->count() > 0)
-                ({{ $galleries->where('is_featured', true)->count() }} featured)
+                @if($galleries->where('is_featured', 1)->count() > 0)
+                ({{ $galleries->where('is_featured', 1)->count() }} featured)
                 @endif
             </div>
         </div>

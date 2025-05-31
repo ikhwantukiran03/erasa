@@ -14,15 +14,27 @@ class CategoryController extends Controller
      *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         if (!auth()->user()->isAdmin()) {
             return redirect()->route('dashboard')
                 ->with('error', 'You do not have permission to access this resource.');
         }
         
-        $categories = Category::withCount('items')->paginate(10);
-        return view('admin.categories.index', compact('categories'));
+        $search = $request->get('search', '');
+        
+        $query = Category::withCount('items');
+        
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            });
+        }
+        
+        $categories = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
+        
+        return view('admin.categories.index', compact('categories', 'search'));
     }
 
     /**

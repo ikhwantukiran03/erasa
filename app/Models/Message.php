@@ -16,7 +16,8 @@ class Message extends Model
     ];
 
     protected $casts = [
-        'is_staff_reply' => 'boolean',
+        'read_at' => 'datetime',
+        'is_staff_reply' => 'integer',
     ];
 
     public function user()

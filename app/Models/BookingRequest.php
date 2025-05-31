@@ -22,10 +22,10 @@ class BookingRequest extends Model
         'status',
         'user_id',
         'package_id',
-        'price_id', // Add price_id to fillable
+        'price_id',
         'venue_id',
         'event_date',
-        'session', // Added the session field
+        'session',
         'message',
         'admin_notes',
         'handled_by',

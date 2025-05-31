@@ -74,7 +74,7 @@
                             <p class="text-sm text-blue-800 font-medium">Reservation Information</p>
                             <p class="text-sm text-blue-700 mt-1">
                                 You have a preliminary reservation for {{ $booking->venue->name }} on {{ $booking->booking_date->format('l, F d, Y') }} 
-                                ({{ $booking->session === 'morning' ? 'Morning' : 'Evening' }} Session).
+                                ({{ $booking->session === 'morning' ? 'Morning Session (11:00 AM - 4:00 PM)' : 'Evening Session (7:00 PM - 11:00 PM)' }}).
                                 To confirm this reservation, please click the "Confirm Reservation" button below.
                                 Once confirmed, you will need to proceed with a deposit payment to secure your booking.
                                 @if($booking->expiry_date)
@@ -166,14 +166,14 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                                             </svg>
-                                            Morning Session
+                                            Morning Session (11:00 AM - 4:00 PM)
                                         </span>
                                     @else
                                         <span class="inline-flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                                             </svg>
-                                            Evening Session
+                                            Evening Session (7:00 PM - 11:00 PM)
                                         </span>
                                     @endif
                                 </dd>

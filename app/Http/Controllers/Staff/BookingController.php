@@ -28,6 +28,7 @@ class BookingController extends Controller
         }
 
         $status = $request->get('status', '');
+        $search = $request->get('search', '');
         
         $query = Booking::with(['venue', 'package', 'user', 'handler']);
         
@@ -35,9 +36,27 @@ class BookingController extends Controller
             $query->where('status', $status);
         }
         
-        $bookings = $query->orderBy('created_at', 'desc')->paginate(10);
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('id', 'like', '%' . $search . '%')
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', '%' . $search . '%')
+                               ->orWhere('email', 'like', '%' . $search . '%')
+                               ->orWhere('whatsapp', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('venue', function($venueQuery) use ($search) {
+                      $venueQuery->where('name', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('package', function($packageQuery) use ($search) {
+                      $packageQuery->where('name', 'like', '%' . $search . '%');
+                  })
+                  ->orWhere('type', 'like', '%' . $search . '%');
+            });
+        }
+        
+        $bookings = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
 
-        return view('staff.bookings.index', compact('bookings', 'status'));
+        return view('staff.bookings.index', compact('bookings', 'status', 'search'));
     }
 
     /**

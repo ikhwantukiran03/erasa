@@ -24,6 +24,7 @@ class StaffCustomizationController extends Controller
         }
 
         $status = $request->get('status', 'pending');
+        $search = $request->get('search', '');
         
         $query = Customization::with(['booking.user', 'packageItem.item.category']);
         
@@ -41,9 +42,25 @@ class StaffCustomizationController extends Controller
                 // No filter, show all
         }
         
-        $customizations = $query->orderBy('created_at', 'desc')->get();
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('customization', 'like', '%' . $search . '%')
+                  ->orWhereHas('booking.user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', '%' . $search . '%')
+                               ->orWhere('email', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('packageItem.item', function($itemQuery) use ($search) {
+                      $itemQuery->where('name', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('packageItem.item.category', function($categoryQuery) use ($search) {
+                      $categoryQuery->where('name', 'like', '%' . $search . '%');
+                  });
+            });
+        }
+        
+        $customizations = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
 
-        return view('staff.customizations.index', compact('customizations', 'status'));
+        return view('staff.customizations.index', compact('customizations', 'status', 'search'));
     }
 
     /**

@@ -50,7 +50,7 @@ class TicketController extends Controller
         $ticket->replies()->create([
             'user_id' => Auth::id(),
             'message' => $validated['message'],
-            'is_staff_reply' => true,
+            'is_staff_reply' => 1,
         ]);
 
         // Update ticket status to in_progress if it was open

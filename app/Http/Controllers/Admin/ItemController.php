@@ -15,15 +15,36 @@ class ItemController extends Controller
      *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         if (!auth()->user()->isAdmin()) {
             return redirect()->route('dashboard')
                 ->with('error', 'You do not have permission to access this resource.');
         }
         
-        $items = Item::with('category')->paginate(10);
-        return view('admin.items.index', compact('items'));
+        $search = $request->get('search', '');
+        $category = $request->get('category', '');
+        
+        $query = Item::with('category');
+        
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%')
+                  ->orWhereHas('category', function($categoryQuery) use ($search) {
+                      $categoryQuery->where('name', 'like', '%' . $search . '%');
+                  });
+            });
+        }
+        
+        if ($category) {
+            $query->where('category_id', $category);
+        }
+        
+        $items = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
+        $categories = Category::orderBy('name')->get();
+        
+        return view('admin.items.index', compact('items', 'search', 'category', 'categories'));
     }
 
     /**

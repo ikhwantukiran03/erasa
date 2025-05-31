@@ -32,13 +32,52 @@
             @endif
             
             <div class="p-6">
+                <!-- Search Form -->
+                <div class="mb-6">
+                    <form action="{{ route('staff.bookings.index') }}" method="GET" class="flex flex-col sm:flex-row gap-4">
+                        <div class="flex-1">
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    name="search" 
+                                    value="{{ $search ?? '' }}" 
+                                    placeholder="Search by customer name, email, venue, package, or booking ID..." 
+                                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                >
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="status" value="{{ $status ?? '' }}">
+                        <div class="flex gap-2">
+                            <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-opacity-90 transition flex items-center">
+                                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                Search
+                            </button>
+                            @if($search ?? false)
+                                <a href="{{ route('staff.bookings.index', ['status' => $status ?? '']) }}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition flex items-center">
+                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    Clear
+                                </a>
+                            @endif
+                        </div>
+                    </form>
+                </div>
+
                 <!-- Filter options -->
                 <div class="mb-6 flex flex-wrap gap-4">
-                    <a href="{{ route('staff.bookings.index') }}" class="px-4 py-2 {{ request('status') ? 'bg-gray-200 text-gray-700' : 'bg-primary text-white' }} rounded-full text-sm hover:bg-opacity-90 transition">All</a>
-                    <a href="{{ route('staff.bookings.index', ['status' => 'ongoing']) }}" class="px-4 py-2 {{ request('status') == 'ongoing' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Ongoing</a>
-                    <a href="{{ route('staff.bookings.index', ['status' => 'waiting for deposit']) }}" class="px-4 py-2 {{ request('status') == 'waiting for deposit' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Waiting for Deposit</a>
-                    <a href="{{ route('staff.bookings.index', ['status' => 'completed']) }}" class="px-4 py-2 {{ request('status') == 'completed' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Completed</a>
-                    <a href="{{ route('staff.bookings.index', ['status' => 'cancelled']) }}" class="px-4 py-2 {{ request('status') == 'cancelled' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Cancelled</a>
+                    <a href="{{ route('staff.bookings.index', ['search' => $search ?? '']) }}" class="px-4 py-2 {{ request('status') ? 'bg-gray-200 text-gray-700' : 'bg-primary text-white' }} rounded-full text-sm hover:bg-opacity-90 transition">All</a>
+                    <a href="{{ route('staff.bookings.index', ['status' => 'ongoing', 'search' => $search ?? '']) }}" class="px-4 py-2 {{ request('status') == 'ongoing' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Ongoing</a>
+                    <a href="{{ route('staff.bookings.index', ['status' => 'waiting for deposit', 'search' => $search ?? '']) }}" class="px-4 py-2 {{ request('status') == 'waiting for deposit' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Waiting for Deposit</a>
+                    <a href="{{ route('staff.bookings.index', ['status' => 'completed', 'search' => $search ?? '']) }}" class="px-4 py-2 {{ request('status') == 'completed' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Completed</a>
+                    <a href="{{ route('staff.bookings.index', ['status' => 'cancelled', 'search' => $search ?? '']) }}" class="px-4 py-2 {{ request('status') == 'cancelled' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-full text-sm hover:bg-gray-300 hover:bg-opacity-90 transition">Cancelled</a>
                 </div>
 
                 @if($bookings->count() > 0)

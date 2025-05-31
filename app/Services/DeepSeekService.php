@@ -145,7 +145,7 @@ BUSINESS INFORMATION:
 
 SERVICES & POLICIES:
 - We offer complete wedding packages including venue, catering, and decorations
-- Deposit required: 30% of total package price
+- Deposit required: RM3000
 - Full payment due: 1 month before event
 - Cancellation policy: No refund after deposit paid
 - We provide halal-certified catering with traditional Malay and international cuisine

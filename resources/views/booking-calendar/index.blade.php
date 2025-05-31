@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('head')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+@endsection
+
 @section('content')
 <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
@@ -36,6 +40,22 @@
         }
         .fc-daygrid-day:hover {
             background-color: #f8fafc;
+            cursor: pointer;
+        }
+        .fc-daygrid-day.fc-day-future:hover {
+            background-color: #e0f2fe;
+            cursor: pointer;
+        }
+        .fc-daygrid-day.fc-day-future:hover .fc-daygrid-day-number {
+            color: #0277bd;
+            font-weight: 600;
+        }
+        .fc-daygrid-day.fc-day-past {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+        .fc-daygrid-day.fc-day-past .fc-daygrid-day-number {
+            color: #9e9e9e;
         }
         .fc-event {
             border-radius: 0.375rem !important;
@@ -116,12 +136,32 @@
                             <div class="w-4 h-4 bg-orange-500 rounded-full"></div>
                             <span class="text-sm text-gray-600">Reservation</span>
                         </div>
+                        
+                        <!-- Session Timing Info -->
+                        <div class="border-l border-gray-300 pl-4">
+                            <div class="text-xs text-gray-500 space-y-1">
+                                <div><strong>Morning:</strong> 11AM-4PM</div>
+                                <div><strong>Evening:</strong> 7PM-11PM</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Calendar Container -->
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <!-- Calendar Instructions -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 p-4">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-blue-800 text-sm font-medium">
+                            💡 <strong>Tip:</strong> Click on any future date in the calendar to create a booking for that date. The booking form will open with your selected date pre-filled.
+                        </p>
+                    </div>
+                </div>
+                
                 <div id="calendar" class="p-6"></div>
             </div>
 
@@ -159,13 +199,11 @@
             loadVenues();
             loadBookings();
             updateStats();
-            loadUpcomingBookings();
 
             // Event listeners
             document.getElementById('refreshBtn').addEventListener('click', function() {
                 loadBookings();
                 updateStats();
-                loadUpcomingBookings();
             });
 
             document.getElementById('closeModal').addEventListener('click', function() {
@@ -196,9 +234,32 @@
                 eventClick: function(info) {
                     showBookingDetails(info.event);
                 },
+                dateClick: function(info) {
+                    // Handle date click for booking request form redirection
+                    const clickedDate = new Date(info.date);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    if (clickedDate >= today) {
+                        // Build URL with date and venue parameters
+                        let url = '/booking-request?event_date=' + info.dateStr;
+                        
+                        // Add venue_id if a specific venue is filtered
+                        if (currentVenueFilter !== 'all') {
+                            url += '&venue_id=' + currentVenueFilter;
+                        }
+                        
+                        // Redirect to booking request form
+                        window.location.href = url;
+                    } else {
+                        alert('Cannot book dates in the past. Please select a future date.');
+                    }
+                },
                 eventDisplay: 'block',
                 dayMaxEvents: 3,
-                moreLinkClick: 'popover'
+                moreLinkClick: 'popover',
+                selectable: true,
+                selectMirror: true
             });
             calendar.render();
         }

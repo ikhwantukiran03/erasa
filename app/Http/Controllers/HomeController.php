@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gallery;
+use App\Models\Feedback;
+use App\Models\Promotion;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -44,6 +46,21 @@ class HomeController extends Controller
             }
         }
         
-        return view('home', compact('galleryImages'));
+        // Get top 5 published feedback with highest ratings
+        $topFeedback = Feedback::where('status', 'published')
+            ->with(['booking.user', 'booking.venue'])
+            ->orderBy('rating', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+        
+        // Get active promotions for banner
+        $activePromotions = Promotion::where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->orderBy('created_at', 'desc')
+            ->take(3) // Limit to 3 promotions for banner rotation
+            ->get();
+        
+        return view('home', compact('galleryImages', 'topFeedback', 'activePromotions'));
     }
 }

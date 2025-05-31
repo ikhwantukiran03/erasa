@@ -213,7 +213,7 @@
                 
                 @foreach($otherVenues as $venue)
                     @php
-                        $venueImage = \App\Models\Gallery::where('venue_id', $venue->id)->where('is_featured', true)->first();
+                        $venueImage = \App\Models\Gallery::where('venue_id', $venue->id)->featured()->first();
                         if (!$venueImage) {
                             $venueImage = \App\Models\Gallery::where('venue_id', $venue->id)->first();
                         }

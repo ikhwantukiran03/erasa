@@ -41,6 +41,7 @@ class StaffBookingRequestController extends Controller
         }
 
         $status = $request->get('status', 'pending');
+        $search = $request->get('search', '');
         
         $query = BookingRequest::with(['venue', 'package', 'user', 'handler']);
         
@@ -61,9 +62,24 @@ class StaffBookingRequestController extends Controller
                 // No filter, show all
         }
         
-        $bookingRequests = $query->orderBy('created_at', 'desc')->paginate(10);
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%')
+                  ->orWhere('whatsapp_no', 'like', '%' . $search . '%')
+                  ->orWhere('type', 'like', '%' . $search . '%')
+                  ->orWhereHas('venue', function($venueQuery) use ($search) {
+                      $venueQuery->where('name', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('package', function($packageQuery) use ($search) {
+                      $packageQuery->where('name', 'like', '%' . $search . '%');
+                  });
+            });
+        }
+        
+        $bookingRequests = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
 
-        return view('staff.requests.index', compact('bookingRequests', 'status'));
+        return view('staff.requests.index', compact('bookingRequests', 'status', 'search'));
     }
 
     /**

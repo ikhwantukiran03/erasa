@@ -26,6 +26,15 @@ class Gallery extends Model
         'source',
      ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'is_featured' => 'boolean',
+    ];
+
         /**
         * Get the venue that owns the gallery.
         */
@@ -34,4 +43,11 @@ class Gallery extends Model
             return $this->belongsTo(Venue::class);
         }
 
+    /**
+     * Scope a query to only include featured galleries.
+     */
+    public function scopeFeatured($query)
+    {
+        return $query->whereRaw('is_featured = true');
+    }
 }
