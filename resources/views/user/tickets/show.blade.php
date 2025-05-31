@@ -100,16 +100,16 @@
                                 <div class="flex items-center space-x-2 mb-1">
                                     <p class="text-xs font-medium {{ $reply->is_staff_reply ? 'text-blue-600' : 'text-primary' }}">
                                         {{ $reply->user->name }}
-                                        @if($reply->is_staff_reply)
+                                            @if($reply->is_staff_reply)
                                             <span class="text-xs text-gray-500">(Staff)</span>
-                                        @endif
+                                            @endif
                                     </p>
                                     <span class="text-xs text-gray-500">{{ $reply->created_at->format('H:i') }}</span>
                                 </div>
                                 <div class="rounded-2xl px-4 py-2 {{ $reply->is_staff_reply ? 'bg-gray-100 text-gray-800' : 'bg-primary text-white' }}">
                                     <p class="text-sm">{{ $reply->message }}</p>
-                                </div>
-                            </div>
+                                        </div>
+                                    </div>
                             @if(!$reply->is_staff_reply)
                                 <div class="flex-shrink-0">
                                     <div class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">

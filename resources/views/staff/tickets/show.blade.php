@@ -10,9 +10,9 @@
                 <div class="flex items-center space-x-4">
                     <a href="{{ route('staff.tickets.index') }}" class="text-primary hover:underline">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                    </a>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+        </a>
                     <h1 class="text-3xl font-display font-bold text-primary">{{ $ticket->title }}</h1>
                 </div>
                 <div class="flex items-center space-x-4 mt-2">
@@ -32,8 +32,8 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
+            </div>
+        </div>
 
 <div class="bg-gray-50 py-10">
     <div class="container mx-auto px-4">
@@ -78,9 +78,9 @@
                                 <div class="flex items-center space-x-2 mb-1">
                                     <p class="text-xs font-medium {{ $reply->is_staff_reply ? 'text-primary' : 'text-blue-600' }}">
                                         {{ $reply->user->name }}
-                                        @if($reply->is_staff_reply)
+                                @if($reply->is_staff_reply)
                                             <span class="text-xs text-gray-500">(Staff)</span>
-                                        @endif
+                                @endif
                                     </p>
                                     <span class="text-xs text-gray-500">{{ $reply->created_at->format('H:i') }}</span>
                                 </div>
@@ -95,7 +95,7 @@
                                             {{ substr($reply->user->name, 0, 1) }}
                                         </span>
                                     </div>
-                                </div>
+                            </div>
                             @endif
                         </div>
                     </div>
@@ -106,7 +106,7 @@
             @if($ticket->status !== 'closed')
                 <div class="mt-6 bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
                     <form action="{{ route('staff.tickets.reply', $ticket) }}" method="POST" class="p-4">
-                        @csrf
+                    @csrf
                         <div class="flex items-end space-x-4">
                             <div class="flex-1">
                                 <textarea name="message" id="message" rows="1" 
@@ -115,14 +115,14 @@
                                 @error('message')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
-                            </div>
+                    </div>
                             <button type="submit" class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-primary text-white hover:bg-opacity-90 transition-colors shadow-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                                 </svg>
-                            </button>
-                        </div>
-                    </form>
+                        </button>
+                    </div>
+                </form>
                 </div>
             @else
                 <div class="mt-6 bg-gray-50 rounded-xl p-6 text-center">

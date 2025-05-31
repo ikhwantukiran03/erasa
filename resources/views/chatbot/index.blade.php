@@ -155,7 +155,7 @@
                             <p class="text-sm text-gray-600">Start your booking</p>
                         </div>
                     </a>
-                    <a href="{{ route('public.feedback') }}" class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <a href="{{ route('user.chat.index') }}" class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                         <div class="bg-primary rounded-lg p-2 mr-3">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0c0 .993-.241 1.929-.668 2.754l-1.524-1.525a3.997 3.997 0 00.078-2.183l1.562-1.562C17.756 8.249 18 9.1 18 10zm-5.165 3.913l1.58 1.58A5.98 5.98 0 0110 16a5.98 5.98 0 01-4.415-1.507l1.58-1.58A3.996 3.996 0 0010 14c.657 0 1.267-.164 1.835-.087zm-6.748-1.159l1.562 1.562A3.996 3.996 0 006 10c0-.993.241-1.929.668-2.754l1.524 1.525a3.997 3.997 0 00-.078 2.183zM10 6a3.996 3.996 0 00-1.835.087L6.587 4.509A5.98 5.98 0 0110 4c1.657 0 3.157.672 4.243 1.757L12.835 7.165A3.996 3.996 0 0010 6z" clip-rule="evenodd" />
@@ -163,7 +163,7 @@
                         </div>
                         <div>
                             <h4 class="font-medium text-dark">Contact Us</h4>
-                            <p class="text-sm text-gray-600">Get personal assistance</p>
+                            <p class="text-sm text-gray-600">Chat with our staff</p>
                         </div>
                     </a>
                 </div>

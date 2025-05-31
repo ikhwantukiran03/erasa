@@ -462,8 +462,11 @@
                 </div>
                 
                 <div class="border-t border-gray-200 p-3">
-                    <a href="{{ route('chatbot.index') }}" class="block w-full text-center py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
+                    <a href="{{ route('chatbot.index') }}" class="block w-full text-center py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors mb-2">
                         Full Chat Assistant
+                    </a>
+                    <a href="{{ route('user.chat.index') }}" class="block w-full text-center py-2 px-4 bg-secondary text-dark rounded-lg hover:bg-opacity-90 transition-colors">
+                        Chat with Staff
                     </a>
                 </div>
             </div>

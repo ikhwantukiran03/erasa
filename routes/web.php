@@ -28,6 +28,8 @@ use App\Http\Controllers\Staff\TicketController as StaffTicketController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\User\ChatController;
+use App\Http\Controllers\Staff\ChatController as StaffChatController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -302,6 +304,11 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
         }
         return app()->make(App\Http\Controllers\Staff\PromotionController::class)->destroy($promotion);
     })->name('promotions.destroy');
+
+    // Staff Chat Routes
+    Route::get('/chat', [App\Http\Controllers\Staff\ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{user}', [App\Http\Controllers\Staff\ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{user}/send', [App\Http\Controllers\Staff\ChatController::class, 'send'])->name('chat.send');
 });
 
 // User Routes for Bookings and Booking Requests
@@ -350,6 +357,10 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
         Route::post('/{ticket}/reply', [TicketController::class, 'reply'])->name('reply');
         Route::patch('/{ticket}/status', [TicketController::class, 'updateStatus'])->name('update-status');
     });
+
+    // User Chat Routes
+    Route::get('/chat', [App\Http\Controllers\User\ChatController::class, 'index'])->name('chat.index');
+    Route::post('/chat/send', [App\Http\Controllers\User\ChatController::class, 'send'])->name('chat.send');
 });
 
 // Promotion routes for users
