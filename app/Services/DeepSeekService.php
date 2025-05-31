@@ -20,7 +20,7 @@ class DeepSeekService
     public function __construct()
     {
         // Use environment variables with fallback for security
-        $this->apiKey = env('DEEPSEEK_API_KEY') ?: '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';
+        $this->apiKey = env('DEEPSEEK_API_KEY') ?: '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';
         $this->apiUrl = env('DEEPSEEK_API_URL') ?: 'https://openrouter.ai/api/v1/chat/completions';
         $this->model = env('DEEPSEEK_MODEL') ?: 'deepseek/deepseek-r1';
         $this->temperature = (float) (env('DEEPSEEK_TEMPERATURE') ?: 0.7);
@@ -33,76 +33,100 @@ class DeepSeekService
      */
     public function generateResponse(string $userMessage): array
     {
-        try {
-            // Get business context
-            $businessContext = $this->getBusinessContext();
-            
-            // Create system prompt with business information
-            $systemPrompt = $this->createSystemPrompt($businessContext);
-            
-            // Prepare the request payload
-            $payload = [
-                'model' => $this->model,
-                'messages' => [
-                    [
-                        'role' => 'system',
-                        'content' => $systemPrompt
-                    ],
-                    [
-                        'role' => 'user',
-                        'content' => $userMessage
-                    ]
-                ],
-                'temperature' => $this->temperature,
-                'max_tokens' => $this->maxTokens,
-                'stream' => false
-            ];
+        // Always attempt AI response - no fallbacks
+        $businessContext = $this->getBusinessContext();
+        $systemPrompt = $this->createSystemPrompt($businessContext);
 
-            if ($this->debug) {
-                Log::info('DeepSeek API Request:', $payload);
-            }
+        $messages = [
+            [
+                'role' => 'system',
+                'content' => $systemPrompt
+            ],
+            [
+                'role' => 'user',
+                'content' => $userMessage
+            ]
+        ];
 
-            // Make API request to DeepSeek via OpenRouter
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
-                'Content-Type' => 'application/json',
-                'HTTP-Referer' => 'https://enakrasa.com',
-                'X-Title' => 'Enak Rasa Wedding Hall Chatbot',
-            ])->timeout(30)->post($this->apiUrl, $payload);
+        $payload = [
+            'model' => $this->model,
+            'messages' => $messages,
+            'temperature' => $this->temperature,
+            'max_tokens' => $this->maxTokens,
+            'stream' => false
+        ];
 
-            if (!$response->successful()) {
-                throw new Exception('DeepSeek API request failed: ' . $response->body());
-            }
-
-            $responseData = $response->json();
-            
-            if ($this->debug) {
-                Log::info('DeepSeek API Response:', $responseData);
-            }
-
-            if (!isset($responseData['choices'][0]['message']['content'])) {
-                throw new Exception('Invalid response format from DeepSeek API');
-            }
-
-            $aiResponse = $responseData['choices'][0]['message']['content'];
-            
-            // Determine relevant links based on the response content
-            $links = $this->generateRelevantLinks($userMessage, $aiResponse);
-
-            return [
-                'text' => $aiResponse,
-                'source' => 'ai',
-                'links' => $links,
-                'model_used' => $this->model,
-                'tokens_used' => $responseData['usage']['total_tokens'] ?? null
-            ];
-
-        } catch (Exception $e) {
-            Log::error('DeepSeek API Error: ' . $e->getMessage());
-            
-            // Fallback to basic response if AI fails
-            return $this->getFallbackResponse($userMessage);
+        if ($this->debug) {
+            Log::info('DeepSeek API Request:', $payload);
         }
+
+        // Make API request with retries
+        $response = $this->makeAPIRequest($payload);
+        
+        if (!$response->successful()) {
+            throw new Exception('DeepSeek API request failed: ' . $response->body());
+        }
+
+        $responseData = $response->json();
+        
+        if (!isset($responseData['choices'][0]['message']['content'])) {
+            throw new Exception('Invalid response format from DeepSeek API');
+        }
+
+        $aiResponse = $responseData['choices'][0]['message']['content'];
+
+        // Determine relevant links based on the response content
+        $links = $this->generateRelevantLinks($userMessage, $aiResponse);
+
+        return [
+            'text' => $aiResponse,
+            'source' => 'ai',
+            'links' => $links,
+            'model_used' => $this->model,
+            'tokens_used' => $responseData['usage']['total_tokens'] ?? null
+        ];
+    }
+
+    /**
+     * Make API request with retry logic
+     */
+    private function makeAPIRequest(array $payload, int $retries = 3): \Illuminate\Http\Client\Response
+    {
+        $lastException = null;
+        
+        for ($i = 0; $i < $retries; $i++) {
+            try {
+                $response = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $this->apiKey,
+                    'Content-Type' => 'application/json',
+                    'HTTP-Referer' => 'https://enakrasa.com',
+                    'X-Title' => 'Enak Rasa Wedding Hall Chatbot',
+                ])->timeout(30)->post($this->apiUrl, $payload);
+
+                if ($response->successful()) {
+                    return $response;
+                }
+                
+                // If not successful, log and continue to retry
+                Log::warning("DeepSeek API attempt " . ($i + 1) . " failed: " . $response->body());
+                
+            } catch (Exception $e) {
+                $lastException = $e;
+                Log::warning("DeepSeek API attempt " . ($i + 1) . " exception: " . $e->getMessage());
+            }
+            
+            // Wait before retry (exponential backoff)
+            if ($i < $retries - 1) {
+                sleep(pow(2, $i));
+            }
+        }
+        
+        // If all retries failed, throw the last exception or create a new one
+        if ($lastException) {
+            throw $lastException;
+        }
+        
+        throw new Exception('All API retry attempts failed');
     }
 
     /**
@@ -223,100 +247,79 @@ Remember: You're helping couples plan their special day, so be enthusiastic and 
     }
 
     /**
-     * Fallback response when AI is unavailable
-     */
-    private function getFallbackResponse(string $userMessage): array
-    {
-        return [
-            'text' => "I apologize, but I'm experiencing some technical difficulties right now. However, I'd be happy to help you with your wedding planning needs! Please feel free to:\n\n• Browse our wedding packages and venues\n• Contact our staff directly for personalized assistance\n• Check our calendar for availability\n\nOur team is available Monday to Sunday, 9 AM - 6 PM to help make your special day perfect! 💕",
-            'source' => 'fallback',
-            'links' => [
-                ['text' => 'View Packages', 'url' => route('public.venues')],
-                ['text' => 'Contact Staff', 'url' => route('public.feedback')],
-                ['text' => 'Check Calendar', 'url' => route('booking.calendar')]
-            ]
-        ];
-    }
-
-    /**
      * Generate conversation context for follow-up messages
      */
     public function generateContextualResponse(array $conversationHistory, string $newMessage): array
     {
-        try {
-            $businessContext = $this->getBusinessContext();
-            $systemPrompt = $this->createSystemPrompt($businessContext);
+        $businessContext = $this->getBusinessContext();
+        $systemPrompt = $this->createSystemPrompt($businessContext);
 
-            // Build conversation messages
-            $messages = [
-                [
-                    'role' => 'system',
-                    'content' => $systemPrompt
-                ]
-            ];
+        // Build conversation messages
+        $messages = [
+            [
+                'role' => 'system',
+                'content' => $systemPrompt
+            ]
+        ];
 
-            // Add conversation history (limit to last 6 messages to stay within token limits)
-            $recentHistory = array_slice($conversationHistory, -6);
-            foreach ($recentHistory as $message) {
-                $messages[] = [
-                    'role' => $message['role'],
-                    'content' => $message['content']
-                ];
-            }
-
-            // Add new message
+        // Add conversation history (limit to last 6 messages to stay within token limits)
+        $recentHistory = array_slice($conversationHistory, -6);
+        foreach ($recentHistory as $message) {
             $messages[] = [
-                'role' => 'user',
-                'content' => $newMessage
+                'role' => $message['role'],
+                'content' => $message['content']
             ];
-
-            $payload = [
-                'model' => $this->model,
-                'messages' => $messages,
-                'temperature' => $this->temperature,
-                'max_tokens' => $this->maxTokens,
-                'stream' => false
-            ];
-
-            if ($this->debug) {
-                Log::info('DeepSeek Contextual API Request:', $payload);
-            }
-
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
-                'Content-Type' => 'application/json',
-                'HTTP-Referer' => 'https://enakrasa.com',
-                'X-Title' => 'Enak Rasa Wedding Hall Chatbot',
-            ])->timeout(30)->post($this->apiUrl, $payload);
-
-            if (!$response->successful()) {
-                throw new Exception('DeepSeek API request failed: ' . $response->body());
-            }
-
-            $responseData = $response->json();
-            $aiResponse = $responseData['choices'][0]['message']['content'];
-            $links = $this->generateRelevantLinks($newMessage, $aiResponse);
-
-            return [
-                'text' => $aiResponse,
-                'source' => 'ai',
-                'links' => $links,
-                'model_used' => $this->model,
-                'tokens_used' => $responseData['usage']['total_tokens'] ?? null
-            ];
-
-        } catch (Exception $e) {
-            Log::error('DeepSeek Contextual API Error: ' . $e->getMessage());
-            return $this->getFallbackResponse($newMessage);
         }
+
+        // Add new message
+        $messages[] = [
+            'role' => 'user',
+            'content' => $newMessage
+        ];
+
+        $payload = [
+            'model' => $this->model,
+            'messages' => $messages,
+            'temperature' => $this->temperature,
+            'max_tokens' => $this->maxTokens,
+            'stream' => false
+        ];
+
+        if ($this->debug) {
+            Log::info('DeepSeek Contextual API Request:', $payload);
+        }
+
+        $response = $this->makeAPIRequest($payload);
+
+        if (!$response->successful()) {
+            throw new Exception('DeepSeek API request failed: ' . $response->body());
+        }
+
+        $responseData = $response->json();
+        
+        if (!isset($responseData['choices'][0]['message']['content'])) {
+            throw new Exception('Invalid response format from DeepSeek API');
+        }
+        
+        $aiResponse = $responseData['choices'][0]['message']['content'];
+        $links = $this->generateRelevantLinks($newMessage, $aiResponse);
+
+        return [
+            'text' => $aiResponse,
+            'source' => 'ai',
+            'links' => $links,
+            'model_used' => $this->model,
+            'tokens_used' => $responseData['usage']['total_tokens'] ?? null
+        ];
     }
 
     /**
-     * Check if AI is enabled
+     * Check if AI is enabled - always return true to force AI usage
      */
     public function isEnabled(): bool
     {
-        // Enable AI if we have an API key (either from env or fallback)
-        return !empty($this->apiKey) && (env('CHATBOT_USE_AI', true) !== false);
+        // Always return true to ensure AI is used
+        // Only return false if there's absolutely no API key
+        return !empty($this->apiKey);
     }
 } 

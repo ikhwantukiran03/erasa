@@ -7,18 +7,27 @@ return [
     |--------------------------------------------------------------------------
     |
     | This file contains configuration options for the wedding hall chatbot
-    | functionality including FAQ responses and behavior settings.
+    | functionality. The chatbot is configured to use AI-only responses.
     |
     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Configuration
+    |--------------------------------------------------------------------------
+    */
+    'ai_enabled' => true, // Always use AI
+    'ai_only' => true,    // Never use preset responses
+    'force_ai' => true,   // Force AI even if there are issues
 
     /*
     |--------------------------------------------------------------------------
     | Chatbot Name and Identity
     |--------------------------------------------------------------------------
     */
-    'name' => 'Enak Rasa Assistant',
+    'name' => 'Enak Rasa AI Assistant',
     'greeting' => 'Welcome to Enak Rasa Wedding Hall! 🎉',
-    'description' => 'I\'m here to help you with any questions about our wedding packages, venues, booking process, and more.',
+    'description' => 'I\'m your AI-powered assistant here to help you with any questions about our wedding packages, venues, booking process, and more.',
 
     /*
     |--------------------------------------------------------------------------
@@ -26,9 +35,9 @@ return [
     |--------------------------------------------------------------------------
     */
     'contact' => [
-        'address' => '123 Wedding Street, Kuala Lumpur, Malaysia',
-        'phone' => '+60 123 456 789',
-        'email' => 'info@enakrasa.com',
+        'address' => 'No. 3, Jalan Lintang 1 Off Jalan Lintang, Kuala Lumpur, Malaysia',
+        'phone' => '013-331 4389',
+        'email' => 'rasa.enak@gmail.com',
         'hours' => 'Monday to Sunday, 9 AM - 6 PM',
     ],
 
@@ -50,7 +59,45 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Quick Questions
+    | AI Response Settings
+    |--------------------------------------------------------------------------
+    */
+    'ai_settings' => [
+        'max_retries' => 3,
+        'retry_delay' => 2, // seconds
+        'timeout' => 30,    // seconds
+        'temperature' => 0.7,
+        'max_tokens' => 300,
+        'model' => 'deepseek/deepseek-r1',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Response Settings
+    |--------------------------------------------------------------------------
+    */
+    'responses' => [
+        'max_packages_shown' => 5,
+        'max_venues_shown' => 5,
+        'default_currency' => 'RM',
+        'show_source_indicators' => true,
+        'conversation_history_limit' => 10,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Error Handling
+    |--------------------------------------------------------------------------
+    */
+    'error_handling' => [
+        'log_errors' => true,
+        'show_technical_errors' => false,
+        'fallback_to_contact' => true,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Quick Questions (AI will generate responses for these)
     |--------------------------------------------------------------------------
     */
     'quick_questions' => [
@@ -64,60 +111,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Suggested Questions
+    | Suggested Questions (AI will generate responses for these)
     |--------------------------------------------------------------------------
     */
     'suggested_questions' => [
         'How to book a wedding hall?',
         'What packages are available?',
         'Check venue availability',
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Response Settings
-    |--------------------------------------------------------------------------
-    */
-    'responses' => [
-        'max_packages_shown' => 3,
-        'max_venues_shown' => 3,
-        'default_currency' => 'RM',
-        'show_source_indicators' => true,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Keywords for Intent Recognition
-    |--------------------------------------------------------------------------
-    */
-    'keywords' => [
-        'booking' => ['book', 'booking', 'reserve', 'reservation', 'how to book'],
-        'packages' => ['package', 'packages', 'price', 'pricing', 'cost', 'available packages'],
-        'venues' => ['venue', 'venues', 'hall', 'location', 'capacity'],
-        'payment' => ['payment', 'pay', 'deposit', 'invoice', 'bank'],
-        'contact' => ['contact', 'phone', 'email', 'address', 'location', 'reach'],
-        'availability' => ['available', 'availability', 'calendar', 'date', 'schedule'],
-        'customization' => ['customize', 'customization', 'decoration', 'theme', 'special request'],
-        'cancellation' => ['cancel', 'cancellation', 'refund', 'change date'],
-        'catering' => ['food', 'catering', 'menu', 'cuisine', 'dietary'],
-        'account' => ['account', 'login', 'register', 'dashboard', 'profile'],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Error Messages
-    |--------------------------------------------------------------------------
-    */
-    'error_messages' => [
-        'general' => 'Sorry, I encountered an error. Please try again later or contact our staff directly.',
-        'empty_query' => 'Please ask me a question about our wedding hall services.',
-        'no_packages' => 'No packages are currently available. Please contact our staff for more information.',
-        'no_venues' => 'No venues are currently available. Please contact our staff for more information.',
-    ],
-
-    'contact_info' => [
-        'address' => 'No. 3, Jalan Lintang 1 Off Jalan Lintang, Kuala Lumpur, Malaysia',
-        'phone' => '013-331 4389',
-        'email' => 'rasa.enak@gmail.com',
     ],
 ];
