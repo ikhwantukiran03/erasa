@@ -114,4 +114,10 @@ return [
         'no_packages' => 'No packages are currently available. Please contact our staff for more information.',
         'no_venues' => 'No venues are currently available. Please contact our staff for more information.',
     ],
+
+    'contact_info' => [
+        'address' => 'No. 3, Jalan Lintang 1 Off Jalan Lintang, Kuala Lumpur, Malaysia',
+        'phone' => '013-331 4389',
+        'email' => 'rasa.enak@gmail.com',
+    ],
 ];

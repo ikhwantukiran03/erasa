@@ -53,7 +53,7 @@
                     <div class="mt-6">
                         <h3 class="text-xl font-semibold text-gray-800 mb-3">Contact Information</h3>
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            <p class="text-gray-700 mb-2"><span class="font-medium">Email:</span> info@enakrasa.com</p>
+                            <p class="text-gray-700 mb-2"><span class="font-medium">Email:</span> rasa.enak@gmail.com</p>
                             <p class="text-gray-700 mb-2"><span class="font-medium">Phone:</span> +62 812 3456 7890</p>
                         </div>
                     </div>

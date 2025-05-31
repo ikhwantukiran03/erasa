@@ -214,8 +214,8 @@
         <div class="contact-info">
             <strong>Need Help?</strong><br>
             If you have any questions about the rejection or need assistance with resubmission:<br><br>
-            📧 Email: info@enakrasa.com<br>
-            📞 Phone: +60 123 456 789<br>
+            📧 Email: rasa.enak@gmail.com<br>
+            📞 Phone: 013-331 4389<br>
             🌐 Website: {{ config('app.url') }}
         </div>
         
