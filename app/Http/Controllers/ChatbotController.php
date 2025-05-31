@@ -192,7 +192,7 @@ class ChatbotController extends Controller
         // Contact related questions
         if ($this->containsKeywords($query, ['contact', 'phone', 'email', 'address', 'location', 'reach'])) {
             return [
-                'text' => "Contact Enak Rasa Wedding Hall:\n\n📍 Address: 123 Wedding Street, Kuala Lumpur, Malaysia\n📞 Phone: +60 123 456 789\n📧 Email: info@enakrasa.com\n\nOur staff are available Monday to Sunday, 9 AM - 6 PM to assist with your wedding planning needs.",
+                'text' => "Contact Enak Rasa Wedding Hall:\n\n📍 Address: No. 3, Jalan Lintang 1 Off Jalan Lintang, Kuala Lumpur, Malaysia\n📞 Phone: 013-331 4389\n📧 Email: rasa.enak@gmail.com\n\nOur staff are available Monday to Sunday, 9 AM - 6 PM to assist with your wedding planning needs.",
                 'source' => 'faq',
                 'links' => [
                     ['text' => 'Send Feedback', 'url' => route('public.feedback')],

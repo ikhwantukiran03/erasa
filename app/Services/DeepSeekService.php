@@ -114,9 +114,9 @@ class DeepSeekService
 
 BUSINESS INFORMATION:
 - Name: Enak Rasa Wedding Hall
-- Location: 123 Wedding Street, Kuala Lumpur, Malaysia
-- Phone: +60 123 456 789
-- Email: info@enakrasa.com
+- Location: No. 3, Jalan Lintang 1 Off Jalan Lintang, Kuala Lumpur, Malaysia
+- Phone: 013-331 4389
+- Email: rasa.enak@gmail.com
 - Operating Hours: Monday to Sunday, 9 AM - 6 PM
 
 SERVICES & POLICIES:

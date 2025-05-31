@@ -95,7 +95,7 @@
                     <svg class="h-5 w-5 text-primary mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p>Have questions? Contact our support team at <a href="mailto:support@enakrasa.com" class="text-primary hover:underline">support@enakrasa.com</a> or call <a href="tel:+60123456789" class="text-primary hover:underline">+60 12-345 6789</a></p>
+                    <p>Have questions? Contact our support team at <a href="mailto:rasa.enak@gmail.com" class="text-primary hover:underline">rasa.enak@gmail.com</a> or call <a href="tel:+60133314389" class="text-primary hover:underline">013-331 4389</a></p>
                 </div>
             </div>
         </div>
