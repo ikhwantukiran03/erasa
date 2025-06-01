@@ -100,7 +100,10 @@
                                             <option value="rejected">Reject Feedback</option>
                                         </select>
                                     </div>
-
+                                </form>
+                            @endif
+                        </div>
+                    </div>
 
                     <!-- Additional Information -->
                     <div>

@@ -13,12 +13,12 @@ class FeedbackController extends Controller
     {
         // Check if booking is completed
         if ($booking->status !== 'completed') {
-            return back()->with('error', 'You can only submit feedback for completed bookings.');
+            return redirect()->route('dashboard')->with('error', 'You can only submit feedback for completed bookings.');
         }
 
         // Check if user already submitted feedback
         if ($booking->feedback()->exists()) {
-            return back()->with('error', 'You have already submitted feedback for this booking.');
+            return redirect()->route('dashboard')->with('error', 'You have already submitted feedback for this booking.');
         }
 
         $validated = $request->validate([
@@ -40,12 +40,12 @@ class FeedbackController extends Controller
     {
         // Check if booking is completed
         if ($booking->status !== 'completed') {
-            return back()->with('error', 'You can only submit feedback for completed bookings.');
+            return redirect()->route('dashboard')->with('error', 'You can only submit feedback for completed bookings.');
         }
 
         // Check if user already submitted feedback
         if ($booking->feedback()->exists()) {
-            return back()->with('error', 'You have already submitted feedback for this booking.');
+            return redirect()->route('dashboard')->with('error', 'You have already submitted feedback for this booking.');
         }
 
         return view('bookings.feedback', compact('booking'));
@@ -71,12 +71,10 @@ class FeedbackController extends Controller
     {
         $validated = $request->validate([
             'status' => 'required|in:published,rejected',
-            'admin_notes' => 'nullable|string|max:500',
         ]);
 
         $feedback->update([
             'status' => $validated['status'],
-            'admin_notes' => $validated['admin_notes'],
             'published_at' => $validated['status'] === 'published' ? now() : null,
         ]);
 

@@ -13,14 +13,21 @@
                 </div>
 
                 @if(session('success'))
-                    <div class="mx-6 mt-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded">
-                        <div class="flex">
-                            <svg class="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    <div id="thankYouModal" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
+                        <div class="bg-white rounded-xl shadow-lg p-8 max-w-sm w-full text-center">
+                            <svg class="h-12 w-12 text-green-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span>{{ session('success') }}</span>
+                            <h3 class="text-xl font-semibold mb-2">Thank You!</h3>
+                            <p class="text-gray-700 mb-4">{{ session('success') }}</p>
+                            <p class="text-gray-500 text-sm">You will be redirected to your dashboard shortly.</p>
                         </div>
                     </div>
+                    <script>
+                        setTimeout(function() {
+                            window.location.href = '{{ route('dashboard') }}';
+                        }, 2500);
+                    </script>
                 @endif
 
                 @if($errors->any())
