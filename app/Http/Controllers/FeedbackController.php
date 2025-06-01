@@ -33,7 +33,7 @@ class FeedbackController extends Controller
             'status' => 'pending'
         ]);
 
-        return redirect()->route('user.bookings.index')->with('success', 'Thank you for your feedback! It will be reviewed by our team.');
+        return redirect()->route('user.bookings')->with('success', 'Thank you for your feedback! It will be reviewed by our team.');
     }
 
     public function create(Booking $booking)
