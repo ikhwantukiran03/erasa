@@ -291,6 +291,31 @@ class InvoiceController extends Controller
             'invoice_notes' => $request->staff_notes,
         ]);
 
+        // Update booking status based on payment verification
+        if ($request->action === 'verify') {
+            if ($invoice->type === 'full_payment') {
+                // Full payment verified - keep booking as ongoing
+                if ($booking->status === 'waiting for deposit' || $booking->status === 'waiting for full payment') {
+                    $booking->update(['status' => 'ongoing']);
+                }
+            } elseif ($invoice->type === 'deposit') {
+                // Deposit verified - mark booking as ongoing (if not already)
+                if ($booking->status === 'waiting for deposit') {
+                    $booking->update(['status' => 'ongoing']);
+                }
+            } elseif ($invoice->type === 'balance') {
+                // Balance payment verified - keep booking as ongoing
+                if ($booking->status !== 'ongoing') {
+                    $booking->update(['status' => 'ongoing']);
+                }
+            } elseif ($invoice->type === 'second_deposit') {
+                // Second deposit verified - keep booking as ongoing
+                if ($booking->status !== 'ongoing') {
+                    $booking->update(['status' => 'ongoing']);
+                }
+            }
+        }
+
         // Send email notification if payment is verified
         if ($request->action === 'verify') {
             try {
@@ -557,9 +582,27 @@ class InvoiceController extends Controller
                     'verified_by' => auth()->id(),
                 ]);
 
-                // Update booking status if this is a deposit
-                if ($invoice->type === 'deposit') {
-                    $invoice->booking->update(['status' => 'ongoing']);
+                // Update booking status based on payment verification
+                if ($invoice->type === 'full_payment') {
+                    // Full payment verified - keep booking as ongoing
+                    if ($invoice->booking->status === 'waiting for deposit' || $invoice->booking->status === 'waiting for full payment') {
+                        $invoice->booking->update(['status' => 'ongoing']);
+                    }
+                } elseif ($invoice->type === 'deposit') {
+                    // Deposit verified - mark booking as ongoing (if not already)
+                    if ($invoice->booking->status === 'waiting for deposit') {
+                        $invoice->booking->update(['status' => 'ongoing']);
+                    }
+                } elseif ($invoice->type === 'balance') {
+                    // Balance payment verified - keep booking as ongoing
+                    if ($invoice->booking->status !== 'ongoing') {
+                        $invoice->booking->update(['status' => 'ongoing']);
+                    }
+                } elseif ($invoice->type === 'second_deposit') {
+                    // Second deposit verified - keep booking as ongoing
+                    if ($invoice->booking->status !== 'ongoing') {
+                        $invoice->booking->update(['status' => 'ongoing']);
+                    }
                 }
 
                 // Send email notification

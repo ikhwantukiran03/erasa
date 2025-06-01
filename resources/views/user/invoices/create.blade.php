@@ -375,76 +375,27 @@
                         @endphp
                         
                         <div class="space-y-6">
-                            <!-- Deposit Payment -->
-                            <div class="relative pb-6 border-l-2 border-gray-200">
-                                @php
-                                    $depositInvoice = $invoices->where('type', 'deposit')->first();
-                                    $statusColor = '';
-                                    $statusIcon = '';
-                                    
-                                    if($depositInvoice) {
-                                        if($depositInvoice->status === 'verified') {
+                            @php
+                                $fullPaymentInvoice = $invoices->where('type', 'full_payment')->first();
+                                $hasFullPayment = $fullPaymentInvoice && in_array($fullPaymentInvoice->status, ['pending', 'verified']);
+                            @endphp
+                            
+                            @if($hasFullPayment)
+                                <!-- Full Payment Display -->
+                                <div class="relative">
+                                    @php
+                                        $statusColor = '';
+                                        $statusIcon = '';
+                                        
+                                        if($fullPaymentInvoice->status === 'verified') {
                                             $statusColor = 'bg-green-500';
                                             $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
-                                        } elseif($depositInvoice->status === 'pending') {
+                                        } elseif($fullPaymentInvoice->status === 'pending') {
                                             $statusColor = 'bg-yellow-500';
                                             $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
                                         } else {
                                             $statusColor = 'bg-red-500';
                                             $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
-                                        }
-                                    } else {
-                                        $statusColor = 'bg-gray-300';
-                                        $statusIcon = '1';
-                                    }
-                                @endphp
-                                
-                                <div class="absolute left-0 mt-0.5 -ml-3.5 h-7 w-7 rounded-full {{ $statusColor }} flex items-center justify-center border-4 border-white shadow-sm">
-                                    {!! $statusIcon !!}
-                                </div>
-                                
-                                <div class="ml-6">
-                                    <h3 class="font-bold text-gray-800 flex items-center">
-                                        Deposit
-                                        <span class="ml-2 px-2 py-0.5 bg-primary bg-opacity-10 text-primary rounded-full text-xs font-bold">
-                                            @if($booking->type === 'wedding')
-                                                RM 3,000
-                                            @else
-                                                RM {{ number_format($totalAmount * 0.50, 2) }}
-                                            @endif
-                                        </span>
-                                    </h3>
-                                    <p class="text-sm text-gray-600 mt-1">Due: Immediately</p>
-                                    @if($depositInvoice)
-                                        <p class="mt-1 text-sm {{ $depositInvoice->status === 'verified' ? 'text-green-600' : ($depositInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
-                                            {{ $depositInvoice->status === 'verified' ? 'Verified' : ($depositInvoice->status === 'pending' ? 'Pending Verification' : 'Rejected - Please resubmit') }}
-                                        </p>
-                                    @endif
-                                </div>
-                            </div>
-                            
-                            @if($booking->type === 'wedding')
-                                <!-- Second Deposit (Wedding Only) -->
-                                <div class="relative pb-6 border-l-2 border-gray-200">
-                                    @php
-                                        $secondDepositInvoice = $invoices->where('type', 'second_deposit')->first();
-                                        $statusColor = '';
-                                        $statusIcon = '';
-                                        
-                                        if($secondDepositInvoice) {
-                                            if($secondDepositInvoice->status === 'verified') {
-                                                $statusColor = 'bg-green-500';
-                                                $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
-                                            } elseif($secondDepositInvoice->status === 'pending') {
-                                                $statusColor = 'bg-yellow-500';
-                                                $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
-                                            } else {
-                                                $statusColor = 'bg-red-500';
-                                                $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
-                                            }
-                                        } else {
-                                            $statusColor = 'bg-gray-300';
-                                            $statusIcon = '2';
                                         }
                                     @endphp
                                     
@@ -454,80 +405,231 @@
                                     
                                     <div class="ml-6">
                                         <h3 class="font-bold text-gray-800 flex items-center">
-                                            Second Deposit (50%)
-                                            <span class="ml-2 px-2 py-0.5 bg-primary bg-opacity-10 text-primary rounded-full text-xs font-bold">
-                                                RM {{ number_format($totalAmount * 0.50, 2) }}
+                                            Full Payment (100%)
+                                            <span class="ml-2 px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs font-bold">
+                                                RM {{ number_format($totalAmount, 2) }}
                                             </span>
                                         </h3>
-                                        <p class="text-sm text-gray-600 mt-1">Due: {{ $paymentSchedule['second_deposit']->format('M d, Y') }}</p>
-                                        <div class="inline-flex items-center mt-1 px-2 py-1 bg-orange-50 border border-orange-100 rounded-md text-xs text-orange-600">
+                                        <p class="text-sm text-gray-600 mt-1">Complete payment for entire booking</p>
+                                        <div class="inline-flex items-center mt-1 px-2 py-1 bg-green-50 border border-green-100 rounded-md text-xs text-green-600">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
-                                            Recommended 6 months before event
+                                            Full payment covers entire booking amount
                                         </div>
-                                        @if($secondDepositInvoice)
-                                            <p class="mt-1 text-sm {{ $secondDepositInvoice->status === 'verified' ? 'text-green-600' : ($secondDepositInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
-                                                {{ $secondDepositInvoice->status === 'verified' ? 'Verified' : ($secondDepositInvoice->status === 'pending' ? 'Pending Verification' : 'Rejected - Please resubmit') }}
+                                        @if($fullPaymentInvoice)
+                                            <p class="mt-1 text-sm {{ $fullPaymentInvoice->status === 'verified' ? 'text-green-600' : ($fullPaymentInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
+                                                {{ $fullPaymentInvoice->status === 'verified' ? 'Verified - Payment Complete' : ($fullPaymentInvoice->status === 'pending' ? 'Pending Verification' : 'Rejected - Please resubmit') }}
                                             </p>
                                         @endif
                                     </div>
                                 </div>
-                            @endif
-                            
-                            <!-- Balance Payment -->
-                            <div class="relative">
+                            @else
+                                <!-- Regular Payment Schedule -->
                                 @php
+                                    $depositInvoice = $invoices->where('type', 'deposit')->first();
+                                    $secondDepositInvoice = $invoices->where('type', 'second_deposit')->first();
                                     $balanceInvoice = $invoices->where('type', 'balance')->first();
-                                    $statusColor = '';
-                                    $statusIcon = '';
                                     
-                                    if($balanceInvoice) {
-                                        if($balanceInvoice->status === 'verified') {
-                                            $statusColor = 'bg-green-500';
-                                            $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
-                                        } elseif($balanceInvoice->status === 'pending') {
-                                            $statusColor = 'bg-yellow-500';
-                                            $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
-                                        } else {
-                                            $statusColor = 'bg-red-500';
-                                            $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
-                                        }
-                                    } else {
-                                        $statusColor = 'bg-gray-300';
-                                        $statusIcon = $booking->type === 'wedding' ? '3' : '2';
-                                    }
+                                    // Check if all payments are completed
+                                    $allPaymentsCompleted = $depositInvoice && $depositInvoice->status === 'verified' &&
+                                                          (!$booking->type === 'wedding' || ($secondDepositInvoice && $secondDepositInvoice->status === 'verified')) &&
+                                                          $balanceInvoice && $balanceInvoice->status === 'verified';
                                 @endphp
                                 
-                                <div class="absolute left-0 mt-0.5 -ml-3.5 h-7 w-7 rounded-full {{ $statusColor }} flex items-center justify-center border-4 border-white shadow-sm">
-                                    {!! $statusIcon !!}
-                                </div>
-                                
-                                <div class="ml-6">
-                                    <h3 class="font-bold text-gray-800 flex items-center">
-                                        Balance Payment
-                                        <span class="ml-2 px-2 py-0.5 bg-primary bg-opacity-10 text-primary rounded-full text-xs font-bold">
-                                            @if($booking->type === 'wedding')
-                                                RM {{ number_format($totalAmount - 3000 - ($totalAmount * 0.50), 2) }}
-                                            @else
-                                                RM {{ number_format($totalAmount * 0.50, 2) }}
+                                @if($allPaymentsCompleted)
+                                    <!-- All Payments Completed Display -->
+                                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                                        <div class="flex items-center">
+                                            <div class="h-4 w-4 rounded-full bg-green-500 mr-3"></div>
+                                            <div>
+                                                <span class="font-semibold text-green-800">All Payments Completed</span>
+                                                <span class="ml-2 font-bold text-green-900">RM {{ number_format($invoices->where('status', 'verified')->sum('amount'), 2) }}</span>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-green-700 mt-2">All required payments have been verified</p>
+                                        <div class="mt-3 space-y-1 text-xs text-green-600">
+                                            @if($depositInvoice)
+                                                <p>✓ Deposit: RM {{ number_format($depositInvoice->amount, 2) }}</p>
                                             @endif
-                                        </span>
-                                    </h3>
-                                    <p class="text-sm text-gray-600 mt-1">Due: {{ $paymentSchedule['balance']->format('M d, Y') }}</p>
-                                    <div class="inline-flex items-center mt-1 px-2 py-1 bg-blue-50 border border-blue-100 rounded-md text-xs text-blue-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Recommended {{ $booking->type === 'wedding' ? '1 month' : '1 week' }} before event
+                                            @if($secondDepositInvoice)
+                                                <p>✓ Second Deposit: RM {{ number_format($secondDepositInvoice->amount, 2) }}</p>
+                                            @endif
+                                            @if($balanceInvoice)
+                                                <p>✓ Balance: RM {{ number_format($balanceInvoice->amount, 2) }}</p>
+                                            @endif
+                                        </div>
                                     </div>
-                                    @if($balanceInvoice)
-                                        <p class="mt-1 text-sm {{ $balanceInvoice->status === 'verified' ? 'text-green-600' : ($balanceInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
-                                            {{ $balanceInvoice->status === 'verified' ? 'Verified' : ($balanceInvoice->status === 'pending' ? 'Pending Verification' : 'Rejected - Please resubmit') }}
-                                        </p>
+                                @else
+                                    <!-- Individual Payment Items -->
+                                    @if(!$depositInvoice || $depositInvoice->status !== 'verified')
+                                        <!-- Deposit Payment -->
+                                        <div class="relative pb-6 border-l-2 border-gray-200">
+                                            @php
+                                                $statusColor = '';
+                                                $statusIcon = '';
+                                                
+                                                if($depositInvoice) {
+                                                    if($depositInvoice->status === 'verified') {
+                                                        $statusColor = 'bg-green-500';
+                                                        $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
+                                                    } elseif($depositInvoice->status === 'pending') {
+                                                        $statusColor = 'bg-yellow-500';
+                                                        $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+                                                    } else {
+                                                        $statusColor = 'bg-red-500';
+                                                        $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
+                                                    }
+                                                } else {
+                                                    $statusColor = 'bg-gray-300';
+                                                    $statusIcon = '1';
+                                                }
+                                            @endphp
+                                            
+                                            <div class="absolute left-0 mt-0.5 -ml-3.5 h-7 w-7 rounded-full {{ $statusColor }} flex items-center justify-center border-4 border-white shadow-sm">
+                                                {!! $statusIcon !!}
+                                            </div>
+                                            
+                                            <div class="ml-6">
+                                                <h3 class="font-bold text-gray-800 flex items-center">
+                                                    Deposit
+                                                    <span class="ml-2 px-2 py-0.5 bg-primary bg-opacity-10 text-primary rounded-full text-xs font-bold">
+                                                        @if($depositInvoice)
+                                                            RM {{ number_format($depositInvoice->amount, 2) }}
+                                                        @else
+                                                            @if($booking->type === 'wedding')
+                                                                RM 3,000
+                                                            @else
+                                                                RM {{ number_format($totalAmount * 0.50, 2) }}
+                                                            @endif
+                                                        @endif
+                                                    </span>
+                                                </h3>
+                                                <p class="text-sm text-gray-600 mt-1">Due: Immediately</p>
+                                                @if($depositInvoice)
+                                                    <p class="mt-1 text-sm {{ $depositInvoice->status === 'verified' ? 'text-green-600' : ($depositInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
+                                                        {{ $depositInvoice->status === 'verified' ? 'Verified' : ($depositInvoice->status === 'pending' ? 'Pending Verification' : 'Rejected - Please resubmit') }}
+                                                    </p>
+                                                @endif
+                                            </div>
+                                        </div>
                                     @endif
-                                </div>
-                            </div>
+                                    
+                                    @if($booking->type === 'wedding' && (!$secondDepositInvoice || $secondDepositInvoice->status !== 'verified'))
+                                        <!-- Second Deposit (Wedding Only) -->
+                                        <div class="relative pb-6 border-l-2 border-gray-200">
+                                            @php
+                                                $statusColor = '';
+                                                $statusIcon = '';
+                                                
+                                                if($secondDepositInvoice) {
+                                                    if($secondDepositInvoice->status === 'verified') {
+                                                        $statusColor = 'bg-green-500';
+                                                        $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
+                                                    } elseif($secondDepositInvoice->status === 'pending') {
+                                                        $statusColor = 'bg-yellow-500';
+                                                        $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+                                                    } else {
+                                                        $statusColor = 'bg-red-500';
+                                                        $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
+                                                    }
+                                                } else {
+                                                    $statusColor = 'bg-gray-300';
+                                                    $statusIcon = '2';
+                                                }
+                                            @endphp
+                                            
+                                            <div class="absolute left-0 mt-0.5 -ml-3.5 h-7 w-7 rounded-full {{ $statusColor }} flex items-center justify-center border-4 border-white shadow-sm">
+                                                {!! $statusIcon !!}
+                                            </div>
+                                            
+                                            <div class="ml-6">
+                                                <h3 class="font-bold text-gray-800 flex items-center">
+                                                    Second Deposit (50%)
+                                                    <span class="ml-2 px-2 py-0.5 bg-primary bg-opacity-10 text-primary rounded-full text-xs font-bold">
+                                                        @if($secondDepositInvoice)
+                                                            RM {{ number_format($secondDepositInvoice->amount, 2) }}
+                                                        @else
+                                                            RM {{ number_format($totalAmount * 0.50, 2) }}
+                                                        @endif
+                                                    </span>
+                                                </h3>
+                                                <p class="text-sm text-gray-600 mt-1">Due: {{ $paymentSchedule['second_deposit']->format('M d, Y') }}</p>
+                                                <div class="inline-flex items-center mt-1 px-2 py-1 bg-orange-50 border border-orange-100 rounded-md text-xs text-orange-600">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    Recommended 6 months before event
+                                                </div>
+                                                @if($secondDepositInvoice)
+                                                    <p class="mt-1 text-sm {{ $secondDepositInvoice->status === 'verified' ? 'text-green-600' : ($secondDepositInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
+                                                        {{ $secondDepositInvoice->status === 'verified' ? 'Verified' : ($secondDepositInvoice->status === 'pending' ? 'Pending Verification' : 'Rejected - Please resubmit') }}
+                                                    </p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endif
+                                    
+                                    @if(!$balanceInvoice || $balanceInvoice->status !== 'verified')
+                                        <!-- Balance Payment -->
+                                        <div class="relative">
+                                            @php
+                                                $statusColor = '';
+                                                $statusIcon = '';
+                                                
+                                                if($balanceInvoice) {
+                                                    if($balanceInvoice->status === 'verified') {
+                                                        $statusColor = 'bg-green-500';
+                                                        $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
+                                                    } elseif($balanceInvoice->status === 'pending') {
+                                                        $statusColor = 'bg-yellow-500';
+                                                        $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+                                                    } else {
+                                                        $statusColor = 'bg-red-500';
+                                                        $statusIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
+                                                    }
+                                                } else {
+                                                    $statusColor = 'bg-gray-300';
+                                                    $statusIcon = $booking->type === 'wedding' ? '3' : '2';
+                                                }
+                                            @endphp
+                                            
+                                            <div class="absolute left-0 mt-0.5 -ml-3.5 h-7 w-7 rounded-full {{ $statusColor }} flex items-center justify-center border-4 border-white shadow-sm">
+                                                {!! $statusIcon !!}
+                                            </div>
+                                            
+                                            <div class="ml-6">
+                                                <h3 class="font-bold text-gray-800 flex items-center">
+                                                    Balance Payment
+                                                    <span class="ml-2 px-2 py-0.5 bg-primary bg-opacity-10 text-primary rounded-full text-xs font-bold">
+                                                        @if($balanceInvoice)
+                                                            RM {{ number_format($balanceInvoice->amount, 2) }}
+                                                        @else
+                                                            @if($booking->type === 'wedding')
+                                                                RM {{ number_format($totalAmount - 3000 - ($totalAmount * 0.50), 2) }}
+                                                            @else
+                                                                RM {{ number_format($totalAmount * 0.50, 2) }}
+                                                            @endif
+                                                        @endif
+                                                    </span>
+                                                </h3>
+                                                <p class="text-sm text-gray-600 mt-1">Due: {{ $paymentSchedule['balance']->format('M d, Y') }}</p>
+                                                <div class="inline-flex items-center mt-1 px-2 py-1 bg-blue-50 border border-blue-100 rounded-md text-xs text-blue-600">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    Recommended {{ $booking->type === 'wedding' ? '1 month' : '1 week' }} before event
+                                                </div>
+                                                @if($balanceInvoice)
+                                                    <p class="mt-1 text-sm {{ $balanceInvoice->status === 'verified' ? 'text-green-600' : ($balanceInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
+                                                        {{ $balanceInvoice->status === 'verified' ? 'Verified' : ($balanceInvoice->status === 'pending' ? 'Pending Verification' : 'Rejected - Please resubmit') }}
+                                                    </p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endif
+                            @endif
                         </div>
                         
                         <!-- Bank Account Details -->

@@ -279,9 +279,12 @@
                                         </div>
                                         
                                         <div>
-                                            <label for="expiry_date" class="block text-dark font-medium mb-2">Expiry Date</label>
+                                            <label for="expiry_date" class="block text-dark font-medium mb-2">
+                                                Expiry Date
+                                                <span class="text-red-500 reservation-required" style="display: none;">*</span>
+                                            </label>
                                             <input type="date" id="expiry_date" name="expiry_date" value="{{ old('expiry_date', date('Y-m-d', strtotime('+7 days'))) }}" class="form-input w-full">
-                                            <p class="text-sm text-gray-500 mt-1">Date when booking expires if not confirmed (defaults to 7 days from today)</p>
+                                            <p class="text-sm text-gray-500 mt-1" id="expiry-date-help">Date when booking expires if not confirmed (defaults to 7 days from today)</p>
                                         </div>
                                     </div>
                                 </div>
@@ -447,6 +450,106 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
     })) !!};
 
+    // Check if this is from an approved booking request
+    const isFromBookingRequest = {{ $bookingRequestData ? 'true' : 'false' }};
+    let formSubmitted = false;
+    
+    // Prevent leaving the page if from booking request and form not submitted
+    if (isFromBookingRequest) {
+        // Add beforeunload event listener
+        window.addEventListener('beforeunload', function(e) {
+            if (!formSubmitted) {
+                const message = 'You have an approved booking request that needs to be completed. Are you sure you want to leave without finishing the booking creation?';
+                e.preventDefault();
+                e.returnValue = message;
+                return message;
+            }
+        });
+        
+        // Add click listeners to navigation links
+        document.addEventListener('click', function(e) {
+            if (!formSubmitted) {
+                const link = e.target.closest('a');
+                if (link && link.href && !link.href.includes('#') && !link.classList.contains('allow-navigation')) {
+                    e.preventDefault();
+                    showNavigationWarning(link.href);
+                }
+            }
+        });
+        
+        // Show warning banner
+        showBookingRequestWarning();
+    }
+    
+    // Mark form as submitted when form is actually submitted
+    document.getElementById('bookingForm').addEventListener('submit', function() {
+        formSubmitted = true;
+    });
+    
+    function showBookingRequestWarning() {
+        const warningBanner = document.createElement('div');
+        warningBanner.id = 'booking-request-warning';
+        warningBanner.className = 'fixed top-0 left-0 right-0 bg-orange-500 text-white p-3 z-50 shadow-lg';
+        warningBanner.innerHTML = `
+            <div class="container mx-auto flex items-center justify-between">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.962-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    <span class="font-medium">⚠️ Complete Booking Required - You must finish creating this booking from the approved request</span>
+                </div>
+                <button onclick="this.parentElement.parentElement.style.display='none'" class="text-white hover:text-gray-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        `;
+        document.body.insertBefore(warningBanner, document.body.firstChild);
+        
+        // Adjust page padding to account for warning banner
+        document.body.style.paddingTop = '60px';
+    }
+    
+    function showNavigationWarning(targetUrl) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+                <div class="flex items-center mb-4">
+                    <svg class="w-8 h-8 text-orange-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.962-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-gray-800">Incomplete Booking</h3>
+                </div>
+                <p class="text-gray-600 mb-6">
+                    You have an approved booking request that needs to be completed. Leaving now will require you to manually create the booking later.
+                </p>
+                <div class="flex space-x-3">
+                    <button onclick="continueNavigation('${targetUrl}')" class="flex-1 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                        Leave Anyway
+                    </button>
+                    <button onclick="closeModal()" class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+                        Stay & Complete
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    window.continueNavigation = function(url) {
+        formSubmitted = true; // Allow navigation
+        window.location.href = url;
+    };
+    
+    window.closeModal = function() {
+        const modal = document.querySelector('.fixed.inset-0.bg-black');
+        if (modal) {
+            modal.remove();
+        }
+    };
+
     // Elements
     const userSelect = document.getElementById('user_id');
     const venueSelect = document.getElementById('venue_id');
@@ -471,6 +574,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize
     updateDateValidation();
+    updateExpiryDateRequirement();
     updateSummary();
     setDefaultExpiryDate();
     
@@ -496,6 +600,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     typeSelect.addEventListener('change', () => {
         updateDateValidation();
+        updateExpiryDateRequirement();
         updateSummary();
     });
     statusSelect.addEventListener('change', updateSummary);
@@ -606,6 +711,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function updateExpiryDateRequirement() {
+        const selectedType = typeSelect.value;
+        const expiryDateInput = document.getElementById('expiry_date');
+        const expiryDateHelp = document.getElementById('expiry-date-help');
+        const requiredIndicator = document.querySelector('.reservation-required');
+        
+        if (selectedType === 'reservation') {
+            // Show required indicator for reservations
+            if (requiredIndicator) {
+                requiredIndicator.style.display = 'inline';
+            }
+            if (expiryDateInput) {
+                expiryDateInput.setAttribute('required', 'required');
+            }
+            if (expiryDateHelp) {
+                expiryDateHelp.textContent = 'Date when booking expires if not confirmed (required for reservations)';
+                expiryDateHelp.className = 'text-sm text-red-600 mt-1';
+            }
+        } else {
+            // Hide required indicator for other booking types
+            if (requiredIndicator) {
+                requiredIndicator.style.display = 'none';
+            }
+            if (expiryDateInput) {
+                expiryDateInput.removeAttribute('required');
+            }
+            if (expiryDateHelp) {
+                expiryDateHelp.textContent = 'Date when booking expires if not confirmed (optional - defaults to 7 days from today)';
+                expiryDateHelp.className = 'text-sm text-gray-500 mt-1';
+            }
+        }
+    }
+
     function resetSessionOptions() {
         const sessionContainer = document.getElementById('session-container');
         const noSessionsMessage = document.getElementById('no-sessions-message');
@@ -701,6 +839,7 @@ document.addEventListener('DOMContentLoaded', function() {
         Promise.all([
             fetch(morningUrl).then(response => {
                 console.log('Morning response status:', response.status);
+                console.log('Morning response headers:', response.headers);
                 if (!response.ok) {
                     throw new Error(`Morning API call failed: ${response.status} ${response.statusText}`);
                 }
@@ -708,15 +847,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }),
             fetch(eveningUrl).then(response => {
                 console.log('Evening response status:', response.status);
+                console.log('Evening response headers:', response.headers);
                 if (!response.ok) {
                     throw new Error(`Evening API call failed: ${response.status} ${response.statusText}`);
                 }
                 return response.json();
             })
         ]).then(([morningData, eveningData]) => {
+            console.log('=== DETAILED AVAILABILITY CHECK RESULTS ===');
             console.log('Morning data:', morningData);
             console.log('Evening data:', eveningData);
             console.log('Morning available:', morningData.available, 'Evening available:', eveningData.available);
+            console.log('Date:', date, 'Venue ID:', venueId);
+            console.log('Morning URL called:', morningUrl);
+            console.log('Evening URL called:', eveningUrl);
+            console.log('=== END DETAILED RESULTS ===');
+            
             updateSessionOptions(morningData.available, eveningData.available);
         }).catch(error => {
             console.error('Availability check failed:', error);

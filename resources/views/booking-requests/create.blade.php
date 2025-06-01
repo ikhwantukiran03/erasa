@@ -823,7 +823,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (response.ok) {
                 const data = await response.json();
-                updateSessionAvailability(data.unavailable_sessions || []);
+                const unavailableSessions = data.unavailable_sessions || [];
+                
+                // Always update session availability, even if no sessions are unavailable
+                updateSessionAvailability(unavailableSessions);
             } else {
                 console.error('Failed to check availability');
                 if (currentStep === 6 || document.querySelector('#step-6.active')) {
@@ -839,98 +842,88 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updateSessionAvailability(unavailableSessions) {
-        const morningSession = document.getElementById('session-morning');
-        const eveningSession = document.getElementById('session-evening');
+        const sessionContainer = document.querySelector('#step-6 .grid.grid-cols-1.md\\:grid-cols-2');
         
-        // Only proceed if session elements exist (we're on step 6)
-        if (!morningSession || !eveningSession) {
+        // Only proceed if session container exists (we're on step 6)
+        if (!sessionContainer) {
             return;
         }
         
-        const morningCard = morningSession.closest('.session-card');
-        const eveningCard = eveningSession.closest('.session-card');
-        
-        // Reset all sessions to available state
-        [morningCard, eveningCard].forEach(card => {
-            if (card) {
-                card.style.display = 'block';
-                card.classList.remove('opacity-50', 'cursor-not-allowed');
-                const label = card.querySelector('label');
-                if (label) label.classList.remove('cursor-not-allowed');
-                const input = card.querySelector('input');
-                if (input) input.disabled = false;
-            }
-        });
-        
-        // Hide unavailable sessions
-        unavailableSessions.forEach(session => {
-            if (session === 'morning' && morningCard) {
-                morningCard.style.display = 'none';
-                morningSession.checked = false;
-            } else if (session === 'evening' && eveningCard) {
-                eveningCard.style.display = 'none';
-                eveningSession.checked = false;
-            }
-        });
-        
         // If all sessions are unavailable, show message
         if (unavailableSessions.length === 2) {
-            const sessionContainer = document.querySelector('#step-6 .grid.grid-cols-1.md\\:grid-cols-2');
-            if (sessionContainer) {
-                sessionContainer.innerHTML = `
-                    <div class="col-span-2 text-center py-8">
-                        <div class="bg-red-50 border border-red-200 rounded-lg p-6">
-                            <svg class="w-12 h-12 mx-auto text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.962-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
-            </svg>
-                            <h3 class="text-lg font-semibold text-red-800 mb-2">No Available Sessions</h3>
-                            <p class="text-red-600">Both morning and evening sessions are already booked for this date and venue. Please select a different date or venue.</p>
-                        </div>
+            sessionContainer.innerHTML = `
+                <div class="col-span-2 text-center py-8">
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+                        <svg class="w-12 h-12 mx-auto text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.962-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-red-800 mb-2">No Available Sessions</h3>
+                        <p class="text-red-600">Both morning and evening sessions are already booked for this date and venue. Please select a different date or venue.</p>
                     </div>
-                `;
-            }
+                </div>
+            `;
+            return;
         }
+        
+        // Restore the original session options first
+        showAllSessions();
+        
+        // Then hide unavailable sessions
+        unavailableSessions.forEach(session => {
+            const sessionElement = document.getElementById(`session-${session}`);
+            const sessionCard = sessionElement?.closest('.session-card');
+            
+            if (sessionCard) {
+                sessionCard.style.display = 'none';
+                sessionElement.checked = false;
+            }
+        });
     }
     
     function showAllSessions() {
         const sessionContainer = document.querySelector('#step-6 .grid.grid-cols-1.md\\:grid-cols-2');
-        if (sessionContainer) {
-            sessionContainer.innerHTML = `
-                <div class="session-card">
-                    <input type="radio" id="session-morning" name="session" value="morning" class="sr-only">
-                    <label for="session-morning" class="block p-4 bg-white border-2 border-gray-200 rounded-lg cursor-pointer hover:border-primary transition-colors">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mr-3">
-                                <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-800">Morning Session</h3>
-                                <p class="text-sm text-gray-600">11:00 AM - 4:00 PM</p>
-                            </div>
-                        </div>
-                    </label>
-                </div>
-                
-                <div class="session-card">
-                    <input type="radio" id="session-evening" name="session" value="evening" class="sr-only">
-                    <label for="session-evening" class="block p-4 bg-white border-2 border-gray-200 rounded-lg cursor-pointer hover:border-primary transition-colors">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-800">Evening Session</h3>
-                                <p class="text-sm text-gray-600">7:00 PM - 11:00 PM</p>
-                            </div>
-                        </div>
-                    </label>
-                </div>
-            `;
+        if (!sessionContainer) {
+            return;
         }
+        
+        // Get currently selected session to preserve it
+        const currentlySelected = document.querySelector('input[name="session"]:checked')?.value;
+        
+        sessionContainer.innerHTML = `
+            <div class="session-card">
+                <input type="radio" id="session-morning" name="session" value="morning" class="sr-only" ${currentlySelected === 'morning' ? 'checked' : ''}>
+                <label for="session-morning" class="block p-4 bg-white border-2 border-gray-200 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Morning Session</h3>
+                            <p class="text-sm text-gray-600">11:00 AM - 4:00 PM</p>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            
+            <div class="session-card">
+                <input type="radio" id="session-evening" name="session" value="evening" class="sr-only" ${currentlySelected === 'evening' || !currentlySelected ? 'checked' : ''}>
+                <label for="session-evening" class="block p-4 bg-white border-2 border-gray-200 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Evening Session</h3>
+                            <p class="text-sm text-gray-600">7:00 PM - 11:00 PM</p>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        `;
     }
     
     function updatePackages() {

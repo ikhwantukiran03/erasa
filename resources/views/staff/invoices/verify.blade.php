@@ -133,40 +133,130 @@
                             } else {
                                 $balanceDate = $eventDate->copy()->subWeek();
                             }
+                            
+                            // Check if full payment exists
+                            $fullPaymentInvoice = $invoices->where('type', 'full_payment')->first();
+                            $hasFullPayment = $fullPaymentInvoice && in_array($fullPaymentInvoice->status, ['pending', 'verified']);
                         @endphp
                         
-                        <div class="space-y-3 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Deposit:</span>
-                                <span class="font-medium">
-                                    @if($booking->type === 'wedding')
-                                        RM 3,000
-                                    @else
-                                        RM {{ number_format($totalAmount * 0.50, 2) }} (50%)
-                                    @endif
-                                </span>
+                        @if($hasFullPayment)
+                            <!-- Full Payment Display -->
+                            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                                <div class="flex items-center">
+                                    <div class="h-4 w-4 rounded-full {{ $fullPaymentInvoice->status === 'verified' ? 'bg-green-500' : ($fullPaymentInvoice->status === 'pending' ? 'bg-yellow-500' : 'bg-red-500') }} mr-3"></div>
+                                    <div>
+                                        <span class="font-semibold text-green-800">Full Payment (100%)</span>
+                                        <span class="ml-2 font-bold text-green-900">RM {{ number_format($fullPaymentInvoice->amount, 2) }}</span>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-green-700 mt-2">
+                                    Status: {{ $fullPaymentInvoice->status === 'verified' ? 'Verified - Payment Complete' : ($fullPaymentInvoice->status === 'pending' ? 'Pending Verification' : 'Rejected') }}
+                                </p>
+                                <p class="text-xs text-green-600 mt-1">Complete payment covers entire booking amount</p>
                             </div>
-                            
-                            @if($booking->type === 'wedding')
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Second Deposit:</span>
-                                    <span class="font-medium">RM {{ number_format($totalAmount * 0.50, 2) }} (50%)</span>
-                                </div>
-                                <div class="text-xs text-gray-500 ml-4">Due: {{ $secondDepositDate->format('M d, Y') }}</div>
+                        @else
+                            <!-- Regular Payment Schedule -->
+                            @php
+                                $depositInvoice = $invoices->where('type', 'deposit')->first();
+                                $secondDepositInvoice = $invoices->where('type', 'second_deposit')->first();
+                                $balanceInvoice = $invoices->where('type', 'balance')->first();
                                 
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Balance:</span>
-                                    <span class="font-medium">RM {{ number_format($totalAmount - 3000 - ($totalAmount * 0.50), 2) }}</span>
+                                // Check if all payments are completed
+                                $allPaymentsCompleted = $depositInvoice && $depositInvoice->status === 'verified' &&
+                                                      (!$booking->type === 'wedding' || ($secondDepositInvoice && $secondDepositInvoice->status === 'verified')) &&
+                                                      $balanceInvoice && $balanceInvoice->status === 'verified';
+                            @endphp
+                            
+                            @if($allPaymentsCompleted)
+                                <!-- All Payments Completed Display -->
+                                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                                    <div class="flex items-center">
+                                        <div class="h-4 w-4 rounded-full bg-green-500 mr-3"></div>
+                                        <div>
+                                            <span class="font-semibold text-green-800">All Payments Completed</span>
+                                            <span class="ml-2 font-bold text-green-900">RM {{ number_format($invoices->where('status', 'verified')->sum('amount'), 2) }}</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-green-700 mt-2">All required payments have been verified</p>
+                                    <div class="mt-3 space-y-1 text-xs text-green-600">
+                                        @if($depositInvoice)
+                                            <p>✓ Deposit: RM {{ number_format($depositInvoice->amount, 2) }}</p>
+                                        @endif
+                                        @if($secondDepositInvoice)
+                                            <p>✓ Second Deposit: RM {{ number_format($secondDepositInvoice->amount, 2) }}</p>
+                                        @endif
+                                        @if($balanceInvoice)
+                                            <p>✓ Balance: RM {{ number_format($balanceInvoice->amount, 2) }}</p>
+                                        @endif
+                                    </div>
                                 </div>
-                                <div class="text-xs text-gray-500 ml-4">Due: {{ $balanceDate->format('M d, Y') }}</div>
                             @else
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Balance:</span>
-                                    <span class="font-medium">RM {{ number_format($totalAmount * 0.50, 2) }} (50%)</span>
+                                <!-- Individual Payment Schedule -->
+                                <div class="space-y-3 text-sm">
+                                    @if(!$depositInvoice || $depositInvoice->status !== 'verified')
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Deposit:</span>
+                                            <span class="font-medium">
+                                                @if($depositInvoice)
+                                                    RM {{ number_format($depositInvoice->amount, 2) }}
+                                                    <span class="text-xs {{ $depositInvoice->status === 'verified' ? 'text-green-600' : ($depositInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
+                                                        ({{ ucfirst($depositInvoice->status) }})
+                                                    </span>
+                                                @else
+                                                    @if($booking->type === 'wedding')
+                                                        RM 3,000
+                                                    @else
+                                                        RM {{ number_format($totalAmount * 0.50, 2) }} (50%)
+                                                    @endif
+                                                @endif
+                                            </span>
+                                        </div>
+                                    @endif
+                                    
+                                    @if($booking->type === 'wedding' && (!$secondDepositInvoice || $secondDepositInvoice->status !== 'verified'))
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Second Deposit:</span>
+                                            <span class="font-medium">
+                                                @if($secondDepositInvoice)
+                                                    RM {{ number_format($secondDepositInvoice->amount, 2) }}
+                                                    <span class="text-xs {{ $secondDepositInvoice->status === 'verified' ? 'text-green-600' : ($secondDepositInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
+                                                        ({{ ucfirst($secondDepositInvoice->status) }})
+                                                    </span>
+                                                @else
+                                                    RM {{ number_format($totalAmount * 0.50, 2) }} (50%)
+                                                @endif
+                                            </span>
+                                        </div>
+                                        @if(!$secondDepositInvoice)
+                                            <div class="text-xs text-gray-500 ml-4">Due: {{ $secondDepositDate->format('M d, Y') }}</div>
+                                        @endif
+                                    @endif
+                                    
+                                    @if(!$balanceInvoice || $balanceInvoice->status !== 'verified')
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Balance:</span>
+                                            <span class="font-medium">
+                                                @if($balanceInvoice)
+                                                    RM {{ number_format($balanceInvoice->amount, 2) }}
+                                                    <span class="text-xs {{ $balanceInvoice->status === 'verified' ? 'text-green-600' : ($balanceInvoice->status === 'pending' ? 'text-yellow-600' : 'text-red-600') }}">
+                                                        ({{ ucfirst($balanceInvoice->status) }})
+                                                    </span>
+                                                @else
+                                                    @if($booking->type === 'wedding')
+                                                        RM {{ number_format($totalAmount - 3000 - ($totalAmount * 0.50), 2) }}
+                                                    @else
+                                                        RM {{ number_format($totalAmount * 0.50, 2) }} (50%)
+                                                    @endif
+                                                @endif
+                                            </span>
+                                        </div>
+                                        @if(!$balanceInvoice)
+                                            <div class="text-xs text-gray-500 ml-4">Due: {{ $balanceDate->format('M d, Y') }}</div>
+                                        @endif
+                                    @endif
                                 </div>
-                                <div class="text-xs text-gray-500 ml-4">Due: {{ $balanceDate->format('M d, Y') }}</div>
                             @endif
-                        </div>
+                        @endif
                     </div>
                 </div>
             </div>

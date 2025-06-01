@@ -296,6 +296,109 @@
                             </button>
                         </h3>
                         
+                        <!-- Package Customization Section - Always show for wedding bookings with packages -->
+                        @if($booking->status === 'ongoing')
+                        <div class="mb-6">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                                <h4 class="text-md font-semibold text-gray-800 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    Package Items Customization
+                                </h4>
+                                <div class="mt-2 sm:mt-0 flex gap-2">
+                                    <a href="{{ route('user.customizations.index', $booking) }}" class="inline-flex items-center bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 transition-colors shadow-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                                        </svg>
+                                        View My Requests
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                                <p class="text-gray-700 text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 inline-block mr-1.5 -mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                    </svg>
+                                    Click on any package item below to request customization, or use the "View My Requests" button to see your existing customization requests.
+                                </p>
+                            </div>
+                            
+                            <!-- Quick Access to Package Items for Customization -->
+                            @if($booking->package && $booking->package->packageItems && $booking->package->packageItems->count() > 0)
+                            <div class="bg-white p-4 rounded-lg border border-gray-200 mb-4">
+                                <h5 class="font-medium text-gray-800 mb-3 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                                    </svg>
+                                    Click any item to customize:
+                                </h5>
+                                
+                                @php
+                                    $packageItemsByCategory = $booking->package->packageItems->groupBy(function($item) {
+                                        return $item->item && $item->item->category ? $item->item->category->name : 'Uncategorized';
+                                    });
+                                @endphp
+                                
+                                <div class="space-y-4">
+                                    @foreach($packageItemsByCategory as $categoryName => $packageItems)
+                                        <div class="border border-gray-100 rounded-lg p-4 bg-gray-25 category-section">
+                                            <h6 class="font-medium text-gray-700 mb-3 flex items-center text-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                                </svg>
+                                                {{ $categoryName }}
+                                                <span class="ml-2 px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full text-xs">
+                                                    {{ $packageItems->count() }} {{ $packageItems->count() === 1 ? 'item' : 'items' }}
+                                                </span>
+                                            </h6>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                @foreach($packageItems as $packageItem)
+                                                    @if($booking->status === 'ongoing')
+                                                    <a href="{{ route('user.customizations.create', [$booking, $packageItem]) }}" 
+                                                       class="customization-item block p-3 bg-white rounded border border-gray-200 hover:bg-blue-50 hover:border-blue-300 transition-colors group shadow-sm">
+                                                        <div class="flex items-center justify-between">
+                                                            <div class="flex-1">
+                                                                <span class="font-medium text-gray-800 group-hover:text-blue-800 text-sm">
+                                                                    {{ $packageItem->item ? $packageItem->item->name : 'Item not found' }}
+                                                                </span>
+                                                                @if($packageItem->description)
+                                                                    <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                                                                        {{ $packageItem->description }}
+                                                                    </div>
+                                                                @endif
+                                                                <div class="text-xs text-blue-600 mt-2 group-hover:text-blue-800 font-medium">
+                                                                    Click to customize →
+                                                                </div>
+                                                            </div>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 group-hover:text-blue-600 ml-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                                            </svg>
+                                                        </div>
+                                                    </a>
+                                                    @else
+                                                    <div class="p-3 bg-gray-50 rounded border border-gray-200 opacity-75">
+                                                        <span class="font-medium text-gray-600 text-sm">
+                                                            {{ $packageItem->item ? $packageItem->item->name : 'Item not found' }}
+                                                        </span>
+                                                        @if($packageItem->description)
+                                                            <div class="text-xs text-gray-500 mt-1">
+                                                                {{ $packageItem->description }}
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                        @endif
+                        
                         <div class="bg-gray-50 p-5 rounded-lg mb-6 package-info-details hidden">
                             <dl class="space-y-4">
                                 <div class="flex flex-col sm:flex-row">
@@ -351,36 +454,6 @@
                             </dl>
                         </div>
                         
-                        @if($booking->type === 'wedding' && $booking->status === 'ongoing' && $booking->package && $booking->package->packageItems && $booking->package->packageItems->count() > 0)
-                        <div class="md:col-span-2 border-t border-gray-200 pt-6">
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-                                <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    Package Items Customization
-                                </h3>
-                                <div class="mt-2 sm:mt-0">
-                                    <a href="{{ route('user.customizations.index', $booking) }}" class="inline-flex items-center text-sm text-primary hover:text-primary-dark transition">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                                        </svg>
-                                        View All Customization Requests
-                                    </a>
-                                </div>
-                            </div>
-                            
-                            <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg mb-4">
-                                <p class="text-gray-700 text-sm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500 inline-block mr-1.5 -mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                                    </svg>
-                                    Click on any item below to request customization for your wedding package
-                                </p>
-                            </div>
-                        </div>
-                        @endif
-                        
                         <!-- Package Items -->
                         @if($booking->package && $booking->package->packageItems && $booking->package->packageItems->count() > 0)
                         <div class="mt-6 col-span-3 package-info-details hidden">
@@ -408,16 +481,36 @@
                                         </h5>
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                             @foreach($packageItems as $packageItem)
-                                                <li class="text-gray-600 text-sm">
+                                                @if($booking->status === 'ongoing')
+                                                <a href="{{ route('user.customizations.create', [$booking, $packageItem]) }}" 
+                                                   class="block text-gray-600 text-sm p-2 bg-gray-50 rounded border hover:bg-blue-50 hover:border-blue-200 cursor-pointer transition-colors group">
+                                                    <span class="font-medium group-hover:text-blue-800">{{ $packageItem->item ? $packageItem->item->name : 'Item not found' }}</span>
+                                                    @if($packageItem->description)
+                                                        <br><span class="text-xs text-gray-500">{{ $packageItem->description }}</span>
+                                                    @endif
+                                                    <div class="text-xs text-blue-600 mt-1 group-hover:text-blue-800">Click to customize →</div>
+                                                </a>
+                                                @else
+                                                <div class="text-gray-600 text-sm p-2 bg-gray-50 rounded border">
                                                     <span class="font-medium">{{ $packageItem->item ? $packageItem->item->name : 'Item not found' }}</span>
                                                     @if($packageItem->description)
-                                                        - {{ $packageItem->description }}
+                                                        <br><span class="text-xs text-gray-500">{{ $packageItem->description }}</span>
                                                     @endif
-                                                </li>
+                                                </div>
+                                                @endif
                                             @endforeach
                                         </div>
                                     </div>
                                 @endforeach
+                            </div>
+                        </div>
+                        @else
+                        <div class="mt-6 col-span-3 package-info-details hidden">
+                            <div class="bg-gray-50 p-4 rounded-lg text-center">
+                                <p class="text-gray-600">No package items found for this package.</p>
+                                @if($booking->status === 'ongoing')
+                                <p class="text-sm text-gray-500 mt-2">Contact us to add items to your package.</p>
+                                @endif
                             </div>
                         </div>
                         @endif
@@ -670,6 +763,34 @@
         });
     });
 </script>
+
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.bg-gray-25 {
+    background-color: #fafafa;
+}
+
+/* Hover effects for category sections */
+.category-section:hover {
+    background-color: #f8fafc;
+}
+
+/* Smooth transitions for all interactive elements */
+.customization-item {
+    transition: all 0.2s ease-in-out;
+}
+
+.customization-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+</style>
 
 <!-- Package Details for Reservation Confirmation Modal -->
 @if($booking->type === 'reservation' && $booking->status !== 'cancelled')

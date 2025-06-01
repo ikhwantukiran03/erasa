@@ -147,15 +147,10 @@ class BookingCalendarApiController extends Controller
         
         $existingBooking = $bookingQuery->exists();
 
-        // Check if there's already a pending booking request (reservation or booking) for this venue, date and session
-        $existingRequest = BookingRequest::where('event_date', $date)
-            ->where('venue_id', $venueId)
-            ->where('session', $session)
-            ->whereIn('type', ['reservation', 'booking']) // Only check reservation and booking requests
-            ->whereIn('status', ['pending', 'approved'])
-            ->exists();
+        // Only check bookings table, not booking requests
+        $available = !$existingBooking;
         
-        return response()->json(['available' => !($existingBooking || $existingRequest)]);
+        return response()->json(['available' => $available]);
     }
 
     /**

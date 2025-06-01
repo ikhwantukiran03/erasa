@@ -207,9 +207,12 @@
                                         </div>
                                         
                                         <div>
-                                            <label for="expiry_date" class="block text-dark font-medium mb-2">Expiry Date</label>
+                                            <label for="expiry_date" class="block text-dark font-medium mb-2">
+                                                Expiry Date
+                                                <span class="text-red-500 reservation-required" style="display: none;">*</span>
+                                            </label>
                                             <input type="date" id="expiry_date" name="expiry_date" value="{{ old('expiry_date', $booking->expiry_date ? $booking->expiry_date->format('Y-m-d') : date('Y-m-d', strtotime('+7 days'))) }}" class="form-input w-full">
-                                            <p class="text-sm text-gray-500 mt-1">Date when booking expires if not confirmed (defaults to 7 days from today)</p>
+                                            <p class="text-sm text-gray-500 mt-1" id="expiry-date-help">Date when booking expires if not confirmed (defaults to 7 days from today)</p>
                                         </div>
                                     </div>
                                 </div>
@@ -307,6 +310,39 @@ document.addEventListener('DOMContentLoaded', function() {
         const formattedMinDate = minDate.toISOString().split('T')[0];
         bookingDateInput.setAttribute('min', formattedMinDate);
         if (dateHelpText) dateHelpText.textContent = helpText;
+    }
+
+    function updateExpiryDateRequirement() {
+        const selectedType = typeSelect.value;
+        const expiryDateInput = document.getElementById('expiry_date');
+        const expiryDateHelp = document.getElementById('expiry-date-help');
+        const requiredIndicator = document.querySelector('.reservation-required');
+        
+        if (selectedType === 'reservation') {
+            // Show required indicator for reservations
+            if (requiredIndicator) {
+                requiredIndicator.style.display = 'inline';
+            }
+            if (expiryDateInput) {
+                expiryDateInput.setAttribute('required', 'required');
+            }
+            if (expiryDateHelp) {
+                expiryDateHelp.textContent = 'Date when booking expires if not confirmed (required for reservations)';
+                expiryDateHelp.className = 'text-sm text-red-600 mt-1';
+            }
+        } else {
+            // Hide required indicator for other booking types
+            if (requiredIndicator) {
+                requiredIndicator.style.display = 'none';
+            }
+            if (expiryDateInput) {
+                expiryDateInput.removeAttribute('required');
+            }
+            if (expiryDateHelp) {
+                expiryDateHelp.textContent = 'Date when booking expires if not confirmed (optional - defaults to 7 days from today)';
+                expiryDateHelp.className = 'text-sm text-gray-500 mt-1';
+            }
+        }
     }
 
     function filterPackages() {
@@ -578,6 +614,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     bookingDateInput.addEventListener('change', checkAvailability);
     typeSelect.addEventListener('change', updateDateValidation);
+    typeSelect.addEventListener('change', updateExpiryDateRequirement);
 
     // Initialize
     filterPackages();
@@ -585,6 +622,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePriceOptions(oldPackageId, oldPriceId);
     }
     updateDateValidation();
+    updateExpiryDateRequirement();
     
     // Check availability on page load
     setTimeout(() => {

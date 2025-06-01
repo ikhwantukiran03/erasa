@@ -99,7 +99,7 @@ class BookingRequestController extends Controller
 
         // Additional validation for event date based on booking type
         if (in_array($request->type, ['reservation', 'booking']) && $request->venue_id && $request->event_date && $request->session) {
-            // Check existing confirmed bookings
+            // Check existing confirmed bookings only (not booking requests)
             $existingBooking = \App\Models\Booking::where('booking_date', $request->event_date)
                 ->where('venue_id', $request->venue_id)
                 ->where('session', $request->session)
@@ -107,15 +107,7 @@ class BookingRequestController extends Controller
                 ->where('status', '!=', 'cancelled')
                 ->exists();
 
-            // Check existing booking requests
-            $existingRequest = BookingRequest::where('event_date', $request->event_date)
-                ->where('venue_id', $request->venue_id)
-                ->where('session', $request->session)
-                ->whereIn('type', ['reservation', 'booking'])
-                ->whereIn('status', ['pending', 'approved'])
-                ->exists();
-
-            if ($existingBooking || $existingRequest) {
+            if ($existingBooking) {
                 $venue = Venue::find($request->venue_id);
                 $sessionTiming = $request->session === 'morning' ? '11:00 AM - 4:00 PM' : '7:00 PM - 11:00 PM';
                 $formattedDate = \Carbon\Carbon::parse($request->event_date)->format('F d, Y');
@@ -284,7 +276,7 @@ class BookingRequestController extends Controller
 
         // Check both morning and evening sessions
         foreach (['morning', 'evening'] as $session) {
-            // Check existing confirmed bookings
+            // Check existing confirmed bookings only (not booking requests)
             $existingBooking = \App\Models\Booking::where('booking_date', $eventDate)
                 ->where('venue_id', $venueId)
                 ->where('session', $session)
@@ -292,15 +284,7 @@ class BookingRequestController extends Controller
                 ->where('status', '!=', 'cancelled')
                 ->exists();
 
-            // Check existing booking requests
-            $existingRequest = BookingRequest::where('event_date', $eventDate)
-                ->where('venue_id', $venueId)
-                ->where('session', $session)
-                ->whereIn('type', ['reservation', 'booking'])
-                ->whereIn('status', ['pending', 'approved'])
-                ->exists();
-
-            if ($existingBooking || $existingRequest) {
+            if ($existingBooking) {
                 $unavailableSessions[] = $session;
             }
         }

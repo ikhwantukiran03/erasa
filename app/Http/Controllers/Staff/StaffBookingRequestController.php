@@ -192,6 +192,9 @@ class StaffBookingRequestController extends Controller
             $booking->handled_by = Auth::id();
             $booking->save();
 
+            // Auto-reject conflicting booking requests
+            $this->autoRejectConflictingRequests($booking, $bookingRequest->id);
+
             // Commit transaction
             \DB::commit();
 
@@ -424,5 +427,69 @@ class StaffBookingRequestController extends Controller
         }
 
         return view('staff.requests.show', compact('bookingRequest'));
+    }
+
+    /**
+     * Auto-reject conflicting booking requests.
+     *
+     * @param  \App\Models\Booking  $booking
+     * @param  int  $bookingRequestId
+     * @return void
+     */
+    private function autoRejectConflictingRequests(Booking $booking, $bookingRequestId)
+    {
+        try {
+            // Only auto-reject for wedding and reservation bookings
+            if (!in_array($booking->type, ['wedding', 'reservation'])) {
+                return;
+            }
+            
+            // Find conflicting booking requests (exclude the one that was just approved)
+            $conflictingRequests = BookingRequest::where('venue_id', $booking->venue_id)
+                ->where('event_date', $booking->booking_date)
+                ->where('session', $booking->session)
+                ->whereIn('type', ['wedding', 'booking', 'reservation'])
+                ->where('status', 'pending')
+                ->where('id', '!=', $bookingRequestId) // Exclude the approved request
+                ->get();
+            
+            if ($conflictingRequests->isEmpty()) {
+                return;
+            }
+            
+            foreach ($conflictingRequests as $request) {
+                // Update the booking request status
+                $request->status = 'rejected';
+                $request->admin_notes = 'This date and session has been booked by another customer. Please select a different date or session for your event.';
+                $request->handled_by = Auth::id();
+                $request->handled_at = now();
+                $request->save();
+                
+                // Send rejection email
+                $emailData = [
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'type' => $request->type,
+                    'venue' => $request->venue,
+                    'event_date' => $request->event_date,
+                    'session' => $request->session,
+                    'admin_notes' => $request->admin_notes,
+                    'reason' => 'conflict',
+                    'booking_date' => $booking->booking_date,
+                    'booking_session' => $booking->session,
+                ];
+                
+                try {
+                    $this->emailService->sendBookingRejectionEmail($request->email, $emailData);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send auto-rejection email for booking request ' . $request->id . ': ' . $e->getMessage());
+                }
+            }
+            
+            \Log::info('Auto-rejected ' . $conflictingRequests->count() . ' conflicting booking requests when approving request ' . $bookingRequestId);
+            
+        } catch (\Exception $e) {
+            \Log::error('Failed to auto-reject conflicting booking requests: ' . $e->getMessage());
+        }
     }
 }

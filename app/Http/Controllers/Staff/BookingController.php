@@ -91,7 +91,8 @@ class BookingController extends Controller
                 ->with('error', 'You do not have permission to access this resource.');
         }
         
-        $validator = Validator::make($request->all(), [
+        // Base validation rules
+        $rules = [
             'user_id' => ['required', 'exists:users,id'],
             'venue_id' => ['required', 'exists:venues,id'],
             'package_id' => ['nullable', 'exists:packages,id'],
@@ -99,9 +100,17 @@ class BookingController extends Controller
             'session' => ['required', 'in:morning,evening'],
             'type' => ['required', 'in:wedding,viewing,reservation'],
             'status' => ['required', 'in:waiting for deposit,ongoing,completed,cancelled,pending_verification'],
-            'expiry_date' => ['required', 'date', 'after:today'],
             'booking_request_id' => ['nullable', 'exists:booking_requests,id'],
-        ]);
+        ];
+        
+        // Add expiry_date validation only for reservation bookings
+        if ($request->type === 'reservation') {
+            $rules['expiry_date'] = ['required', 'date', 'after:today'];
+        } else {
+            $rules['expiry_date'] = ['nullable', 'date', 'after:today'];
+        }
+        
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return redirect()->back()
@@ -156,6 +165,9 @@ class BookingController extends Controller
             $booking->expiry_date = $request->expiry_date ?: \Carbon\Carbon::now()->addDays(7);
             $booking->handled_by = auth()->id();
             $booking->save();
+            
+            // Auto-reject conflicting booking requests
+            $this->autoRejectConflictingRequests($booking);
             
             // Handle booking request completion and email notification
             $bookingRequestData = session('booking_request_data');
@@ -276,7 +288,8 @@ class BookingController extends Controller
                 ->with('error', 'You do not have permission to access this resource.');
         }
         
-        $validator = Validator::make($request->all(), [
+        // Base validation rules
+        $rules = [
             'user_id' => ['required', 'exists:users,id'],
             'venue_id' => ['required', 'exists:venues,id'],
             'package_id' => ['nullable', 'exists:packages,id'],
@@ -284,8 +297,16 @@ class BookingController extends Controller
             'session' => ['required', 'in:morning,evening'],
             'type' => ['required', 'in:wedding,viewing,reservation'],
             'status' => ['required', 'in:waiting for deposit,ongoing,completed,cancelled,pending_verification'],
-            'expiry_date' => ['required', 'date', 'after:today'],
-        ]);
+        ];
+        
+        // Add expiry_date validation only for reservation bookings
+        if ($request->type === 'reservation') {
+            $rules['expiry_date'] = ['required', 'date', 'after:today'];
+        } else {
+            $rules['expiry_date'] = ['nullable', 'date', 'after:today'];
+        }
+        
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return redirect()->back()
@@ -402,6 +423,71 @@ class BookingController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'An error occurred while cancelling the booking: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Auto-reject conflicting booking requests.
+     *
+     * @param  \App\Models\Booking  $booking
+     * @return void
+     */
+    private function autoRejectConflictingRequests(Booking $booking)
+    {
+        try {
+            // Only auto-reject for wedding and reservation bookings
+            if (!in_array($booking->type, ['wedding', 'reservation'])) {
+                return;
+            }
+            
+            // Find conflicting booking requests
+            $conflictingRequests = BookingRequest::where('venue_id', $booking->venue_id)
+                ->where('event_date', $booking->booking_date)
+                ->where('session', $booking->session)
+                ->whereIn('type', ['wedding', 'booking', 'reservation'])
+                ->where('status', 'pending')
+                ->get();
+            
+            if ($conflictingRequests->isEmpty()) {
+                return;
+            }
+            
+            // Get email service
+            $emailService = app(\App\Services\EmailService::class);
+            
+            foreach ($conflictingRequests as $request) {
+                // Update the booking request status
+                $request->status = 'rejected';
+                $request->admin_notes = 'This date and session has been booked by another customer. Please select a different date or session for your event.';
+                $request->handled_by = auth()->id();
+                $request->handled_at = now();
+                $request->save();
+                
+                // Send rejection email
+                $emailData = [
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'type' => $request->type,
+                    'venue' => $request->venue,
+                    'event_date' => $request->event_date,
+                    'session' => $request->session,
+                    'admin_notes' => $request->admin_notes,
+                    'reason' => 'conflict',
+                    'booking_date' => $booking->booking_date,
+                    'booking_session' => $booking->session,
+                ];
+                
+                try {
+                    $emailService->sendBookingRejectionEmail($request->email, $emailData);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send auto-rejection email for booking request ' . $request->id . ': ' . $e->getMessage());
+                }
+            }
+            
+            \Log::info('Auto-rejected ' . $conflictingRequests->count() . ' conflicting booking requests for booking ' . $booking->id);
+            
+        } catch (\Exception $e) {
+            \Log::error('Failed to auto-reject conflicting booking requests: ' . $e->getMessage());
         }
     }
 }
