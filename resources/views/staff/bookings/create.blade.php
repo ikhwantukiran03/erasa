@@ -147,7 +147,10 @@
                                     (!$bookingRequestData && !old('session')) ? 'selected' : '' 
                                 }}>Evening Session (7:00 PM - 11:00 PM)</option>
                             </select>
-                            <p class="text-sm text-gray-500 mt-1">Morning: 11AM-4PM (5 hours) | Evening: 7PM-11PM (4 hours)</p>
+                            <p class="text-sm text-gray-500 mt-1" id="session-help">Morning: 11AM-4PM (5 hours) | Evening: 7PM-11PM (4 hours)</p>
+                            <div id="no-sessions-message" class="text-sm text-red-600 mt-1" style="display: none;">
+                                No sessions available for the selected date and venue. Please choose a different date.
+                            </div>
                         </div>
                         
                         <!-- Booking Type -->
@@ -246,6 +249,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const bookingDateInput = document.getElementById('booking_date');
     const sessionSelect = document.getElementById('session');
     const dateHelpText = document.getElementById('booking-date-help');
+    const sessionHelpText = document.getElementById('session-help');
+    const noSessionsMessage = document.getElementById('no-sessions-message');
 
     const oldPackageId = "{{ $bookingRequestData['package_id'] ?? old('package_id') }}";
     const oldPriceId = "{{ $bookingRequestData['price_id'] ?? old('price_id') }}";
@@ -323,21 +328,88 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function checkAvailability() {
         const date = bookingDateInput.value;
-        const session = sessionSelect.value;
         const venueId = venueSelect.value;
 
-        if (!date || !session || !venueId) return;
+        if (!date || !venueId) {
+            // Reset to show all sessions if no date or venue selected
+            resetSessionOptions();
+            return;
+        }
 
-        fetch(`/api/check-availability?date=${date}&session=${session}&venue_id=${venueId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (!data.available) {
-                    alert('This venue is already booked for the selected date and session.');
-                }
-            })
-            .catch(error => {
-                console.error('Availability check failed:', error);
-            });
+        // Check availability for both sessions
+        Promise.all([
+            fetch(`/api/check-availability?date=${date}&session=morning&venue_id=${venueId}`).then(r => r.json()),
+            fetch(`/api/check-availability?date=${date}&session=evening&venue_id=${venueId}`).then(r => r.json())
+        ]).then(([morningData, eveningData]) => {
+            updateSessionOptions(morningData.available, eveningData.available);
+        }).catch(error => {
+            console.error('Availability check failed:', error);
+            resetSessionOptions();
+        });
+    }
+
+    function updateSessionOptions(morningAvailable, eveningAvailable) {
+        const currentValue = sessionSelect.value;
+        sessionSelect.innerHTML = '';
+
+        if (morningAvailable) {
+            const morningOption = document.createElement('option');
+            morningOption.value = 'morning';
+            morningOption.textContent = 'Morning Session (11:00 AM - 4:00 PM)';
+            sessionSelect.appendChild(morningOption);
+        }
+
+        if (eveningAvailable) {
+            const eveningOption = document.createElement('option');
+            eveningOption.value = 'evening';
+            eveningOption.textContent = 'Evening Session (7:00 PM - 11:00 PM)';
+            sessionSelect.appendChild(eveningOption);
+        }
+
+        // If no sessions available
+        if (!morningAvailable && !eveningAvailable) {
+            const noOption = document.createElement('option');
+            noOption.value = '';
+            noOption.textContent = 'No sessions available';
+            noOption.disabled = true;
+            sessionSelect.appendChild(noOption);
+            noSessionsMessage.style.display = 'block';
+            sessionHelpText.style.display = 'none';
+        } else {
+            noSessionsMessage.style.display = 'none';
+            sessionHelpText.style.display = 'block';
+            
+            // Try to maintain the current selection if still available
+            if (currentValue && Array.from(sessionSelect.options).some(opt => opt.value === currentValue)) {
+                sessionSelect.value = currentValue;
+            } else {
+                // Select the first available option
+                sessionSelect.selectedIndex = 0;
+            }
+        }
+    }
+
+    function resetSessionOptions() {
+        const currentValue = sessionSelect.value;
+        sessionSelect.innerHTML = '';
+        
+        const morningOption = document.createElement('option');
+        morningOption.value = 'morning';
+        morningOption.textContent = 'Morning Session (11:00 AM - 4:00 PM)';
+        sessionSelect.appendChild(morningOption);
+        
+        const eveningOption = document.createElement('option');
+        eveningOption.value = 'evening';
+        eveningOption.textContent = 'Evening Session (7:00 PM - 11:00 PM)';
+        sessionSelect.appendChild(eveningOption);
+        
+        noSessionsMessage.style.display = 'none';
+        sessionHelpText.style.display = 'block';
+        
+        // Restore previous selection if valid
+        if (currentValue) {
+            sessionSelect.value = currentValue;
+        }
     }
 
     // Event Listeners
@@ -359,7 +431,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     bookingDateInput.addEventListener('change', checkAvailability);
-    sessionSelect.addEventListener('change', checkAvailability);
 
     // On load
     filterPackages();
@@ -370,6 +441,40 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update date validation on type change
     typeSelect.addEventListener('change', updateDateValidation);
     updateDateValidation();
+
+    // Update session help text based on selected date and venue
+    function updateSessionHelpText() {
+        const date = bookingDateInput.value;
+        const session = sessionSelect.value;
+        const venueId = venueSelect.value;
+
+        if (!date || !session || !venueId) {
+            sessionHelpText.textContent = 'Morning: 11AM-4PM (5 hours) | Evening: 7PM-11PM (4 hours)';
+            noSessionsMessage.style.display = 'none';
+            return;
+        }
+
+        fetch(`/api/check-availability?date=${date}&session=${session}&venue_id=${venueId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.available) {
+                    sessionHelpText.textContent = 'No sessions available for the selected date and venue. Please choose a different date.';
+                    noSessionsMessage.style.display = 'block';
+                } else {
+                    sessionHelpText.textContent = 'Morning: 11AM-4PM (5 hours) | Evening: 7PM-11PM (4 hours)';
+                    noSessionsMessage.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Session help text update failed:', error);
+            });
+    }
+
+    bookingDateInput.addEventListener('change', updateSessionHelpText);
+    sessionSelect.addEventListener('change', updateSessionHelpText);
+
+    // On load
+    updateSessionHelpText();
 });
 </script>
 @endpush

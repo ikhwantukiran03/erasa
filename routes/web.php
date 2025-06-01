@@ -48,6 +48,7 @@ Route::get('/booking-request', [BookingRequestController::class, 'create'])->nam
 Route::post('/booking-request', [BookingRequestController::class, 'store'])->name('booking-requests.store');
 Route::get('/booking-request/confirmation', [BookingRequestController::class, 'confirmation'])->name('booking-requests.confirmation');
 Route::get('/my-requests', [BookingRequestController::class, 'myRequests'])->name('booking-requests.my-requests');
+Route::post('/api/check-availability', [BookingRequestController::class, 'checkAvailability'])->name('booking-requests.check-availability');
 
 // Booking Calendar Route 
 Route::get('/booking-calendar', [App\Http\Controllers\BookingCalendarController::class, 'index'])->name('booking.calendar');
