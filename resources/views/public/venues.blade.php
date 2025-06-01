@@ -170,7 +170,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
                     <!-- Venue Image -->
                     @php
-                        $featuredImage = $galleries->where('is_featured', 1)->first();
+                        $featuredImage = $galleries->where('is_featured', true)->first();
                     @endphp
                     <div class="h-[450px] overflow-hidden">
                         @if($featuredImage)

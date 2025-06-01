@@ -209,8 +209,8 @@
         <div class="mt-6 flex justify-end">
             <div class="text-sm text-gray-500">
                 Showing {{ $galleries->count() }} {{ Str::plural('image', $galleries->count()) }}
-                @if($galleries->where('is_featured', 1)->count() > 0)
-                ({{ $galleries->where('is_featured', 1)->count() }} featured)
+                @if($galleries->where('is_featured', true)->count() > 0)
+                ({{ $galleries->where('is_featured', true)->count() }} featured)
                 @endif
             </div>
         </div>

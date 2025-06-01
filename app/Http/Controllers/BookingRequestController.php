@@ -22,7 +22,7 @@ class BookingRequestController extends Controller
     {
         // Get venues with their featured gallery images
         $venues = Venue::with(['galleries' => function($query) {
-            $query->where('is_featured', '1')->orWhere(function($q) {
+            $query->where('is_featured', true)->orWhere(function($q) {
                 $q->whereRaw('id = (SELECT MIN(id) FROM galleries g2 WHERE g2.venue_id = galleries.venue_id)');
             });
         }])->orderBy('name')->get();
@@ -30,7 +30,7 @@ class BookingRequestController extends Controller
         // Get packages with their venue, prices, and venue gallery images
         $packages = Package::with([
             'venue.galleries' => function($query) {
-                $query->where('is_featured', '1')->orWhere(function($q) {
+                $query->where('is_featured', true)->orWhere(function($q) {
                     $q->whereRaw('id = (SELECT MIN(id) FROM galleries g2 WHERE g2.venue_id = galleries.venue_id)');
                 });
             },

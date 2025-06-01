@@ -70,7 +70,11 @@ class GalleryController extends Controller
         
         // Filter by featured status
         if ($featured !== '') {
-            $query->where('is_featured', '=', (int)$featured);
+            if ($featured === '1') {
+                $query->whereRaw('is_featured = true');
+            } else {
+                $query->whereRaw('is_featured = false');
+            }
         }
         
         // Get galleries with sorting
@@ -88,7 +92,7 @@ class GalleryController extends Controller
             'total' => Gallery::count(),
             'local' => Gallery::where('source', 'local')->count(),
             'external' => Gallery::where('source', 'external')->count(),
-            'featured' => Gallery::where('is_featured', '=', 1)->count(),
+            'featured' => Gallery::whereRaw('is_featured = true')->count(),
         ];
         
         return view('admin.galleries.index', compact('galleries', 'venues', 'stats', 'search', 'venue_id', 'featured'));

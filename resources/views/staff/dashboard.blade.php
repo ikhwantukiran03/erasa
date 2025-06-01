@@ -206,7 +206,7 @@
                     <div class="ml-4">
                         <p class="text-sm text-gray-500">Unread Messages</p>
                         <p class="text-2xl font-semibold text-gray-800">
-                            {{ \App\Models\Message::whereNull('read_at')->where('is_staff_reply', false)->count() }}
+                            {{ \App\Models\Message::whereNull('read_at')->where('is_staff_reply', 0)->count() }}
                         </p>
                     </div>
                 </div>
