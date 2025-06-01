@@ -127,6 +127,15 @@ class Invoice extends Model
      */
     public function isOverdue()
     {
-        return $this->due_date && now()->gt($this->due_date) && !$this->isVerified();
+        // If no due date is set or invoice is already verified, it's not overdue
+        if (!$this->due_date || $this->isVerified()) {
+            return false;
+        }
+        
+        // Add 24-hour grace period to the due date
+        $gracePeriodEnd = $this->due_date->copy()->addDay();
+        
+        // Invoice is overdue only if current time is past the grace period
+        return now()->gt($gracePeriodEnd);
     }
 }

@@ -45,8 +45,12 @@
                                 #{{ $ticket->id }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ $ticket->user->name }}</div>
-                                <div class="text-sm text-gray-500">{{ $ticket->user->email }}</div>
+                                <div class="flex items-center">
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">{{ $ticket->user ? $ticket->user->name : 'User not found' }}</div>
+                                        <div class="text-sm text-gray-500">{{ $ticket->user ? $ticket->user->email : 'Email not available' }}</div>
+                                    </div>
+                                </div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm text-gray-900">{{ Str::limit($ticket->title, 50) }}</div>

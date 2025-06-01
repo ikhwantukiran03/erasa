@@ -26,7 +26,7 @@
                 <h2 class="text-xl font-display font-bold text-dark mb-4">Booking Summary</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <p class="text-gray-600">Venue: <span class="font-semibold text-gray-800">{{ $booking->venue->name }}</span></p>
+                        <p class="text-gray-600">Venue: <span class="font-semibold text-gray-800">{{ $booking->venue ? $booking->venue->name : 'Venue not found' }}</span></p>
                         <p class="text-gray-600 mt-2">Date: <span class="font-semibold text-gray-800">{{ $booking->booking_date->format('l, F d, Y') }}</span></p>
                         <p class="text-gray-600 mt-2">Session: 
                             <span class="font-semibold text-gray-800">
@@ -55,6 +55,7 @@
                                 <form action="{{ route('user.bookings.confirm', $booking) }}" method="POST" class="space-y-4">
                                     @csrf
                                     <input type="hidden" name="package_id" value="{{ $package->id }}">
+                                    <input type="hidden" name="payment_option" value="deposit">
                                     
                                     <div class="form-group">
                                         <label for="price_id_{{ $package->id }}" class="block text-sm font-medium text-gray-700 mb-2">Select Guest Count:</label>
@@ -76,6 +77,7 @@
                             <form action="{{ route('user.bookings.confirm', $booking) }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="package_id" value="{{ $package->id }}">
+                                <input type="hidden" name="payment_option" value="deposit">
                                 <button type="submit" class="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark transition">
                                     Select Package
                                 </button>

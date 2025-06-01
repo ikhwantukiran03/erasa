@@ -61,11 +61,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <p class="text-gray-600">Category:</p>
-                            <p class="font-medium text-gray-800">{{ $packageItem->item->category->name }}</p>
+                            <p class="font-medium text-gray-800">{{ $packageItem->item && $packageItem->item->category ? $packageItem->item->category->name : 'Category not found' }}</p>
                         </div>
                         <div>
                             <p class="text-gray-600">Item Name:</p>
-                            <p class="font-medium text-gray-800">{{ $packageItem->item->name }}</p>
+                            <p class="font-medium text-gray-800">{{ $packageItem->item ? $packageItem->item->name : 'Item not found' }}</p>
                         </div>
                         @if($packageItem->description)
                         <div class="md:col-span-2">

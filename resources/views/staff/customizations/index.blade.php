@@ -107,14 +107,14 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <div>
-                                                <div class="text-sm font-medium text-gray-900">{{ $customization->booking->user->name }}</div>
-                                                <div class="text-sm text-gray-500">{{ $customization->booking->user->email }}</div>
+                                                <div class="text-sm font-medium text-gray-900">{{ $customization->booking->user ? $customization->booking->user->name : 'User not found' }}</div>
+                                                <div class="text-sm text-gray-500">{{ $customization->booking->user ? $customization->booking->user->email : 'Email not available' }}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $customization->packageItem->item->name }}</div>
-                                        <div class="text-sm text-gray-500">{{ $customization->packageItem->item->category->name }}</div>
+                                        <div class="text-sm text-gray-900">{{ $customization->packageItem->item ? $customization->packageItem->item->name : 'Item not found' }}</div>
+                                        <div class="text-sm text-gray-500">{{ $customization->packageItem->item && $customization->packageItem->item->category ? $customization->packageItem->item->category->name : 'Category not found' }}</div>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
                                         {{ \Illuminate\Support\Str::limit($customization->customization, 50) }}

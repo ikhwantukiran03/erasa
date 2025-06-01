@@ -18,6 +18,7 @@ class UserBookingController extends Controller
     public function index()
     {
         $bookings = Booking::where('user_id', Auth::id())
+            ->with(['venue', 'package', 'user'])
             ->orderBy('created_at', 'desc')
             ->get();
             
@@ -32,6 +33,9 @@ class UserBookingController extends Controller
      */
     public function show(Booking $booking)
     {
+        // Load necessary relationships
+        $booking->load(['user', 'venue', 'package', 'handler']);
+        
         // Check if user owns the booking
         if ($booking->user_id !== Auth::id()) {
             return redirect()->route('user.bookings')
@@ -49,6 +53,9 @@ class UserBookingController extends Controller
      */
     public function confirmReservationForm(Booking $booking)
     {
+        // Load necessary relationships
+        $booking->load(['user', 'venue', 'package']);
+        
         // Check if user owns the booking
         if ($booking->user_id !== Auth::id()) {
             return redirect()->route('user.bookings')
@@ -63,6 +70,7 @@ class UserBookingController extends Controller
         
         // Get packages available for this venue
         $packages = Package::where('venue_id', $booking->venue_id)
+            ->with(['prices', 'packageItems.item.category'])
             ->get();
             
         return view('user.bookings.confirm', compact('booking', 'packages'));
@@ -77,6 +85,9 @@ class UserBookingController extends Controller
      */
     public function confirmReservation(Request $request, Booking $booking)
     {
+        // Load necessary relationships
+        $booking->load(['user', 'venue', 'package']);
+        
         // Check if user owns the booking
         if ($booking->user_id !== Auth::id()) {
             return redirect()->route('user.bookings')
@@ -130,6 +141,9 @@ class UserBookingController extends Controller
      */
     public function cancelBooking(Booking $booking)
     {
+        // Load necessary relationships
+        $booking->load(['user', 'venue', 'package']);
+        
         // Check if user owns the booking
         if ($booking->user_id !== Auth::id()) {
             return redirect()->route('user.bookings')

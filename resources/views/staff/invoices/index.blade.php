@@ -80,7 +80,7 @@
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Overdue Payments</p>
                         <p class="text-2xl font-semibold text-gray-900">
-                            {{ \App\Models\Invoice::pending()->where('due_date', '<', now())->count() }}
+                            {{ \App\Models\Invoice::pending()->whereNotNull('due_date')->where('due_date', '<', now()->subDay())->count() }}
                         </p>
                     </div>
                 </div>
@@ -209,15 +209,15 @@
                                                         <span class="ml-1 px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full">OVERDUE</span>
                                                     @endif
                                                 </div>
-                                                <div class="text-xs text-gray-500">{{ $invoice->booking->venue->name }}</div>
+                                                <div class="text-xs text-gray-500">{{ $invoice->booking->venue ? $invoice->booking->venue->name : 'Venue not found' }}</div>
                                                 <div class="text-xs text-gray-500">{{ $invoice->booking->booking_date->format('M d, Y') }} ({{ ucfirst($invoice->booking->session) }})</div>
                                                 <div class="text-xs text-gray-500">{{ ucfirst($invoice->booking->type) }} Event</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $invoice->booking->user->name }}</div>
-                                        <div class="text-xs text-gray-500">{{ $invoice->booking->user->email }}</div>
+                                        <div class="text-sm text-gray-900">{{ $invoice->booking->user ? $invoice->booking->user->name : 'User not found' }}</div>
+                                        <div class="text-xs text-gray-500">{{ $invoice->booking->user ? $invoice->booking->user->email : 'Email not available' }}</div>
                                         @if($invoice->booking->user->whatsapp)
                                         <div class="text-xs text-gray-500 flex items-center mt-1">
                                             {{ $invoice->booking->user->whatsapp }}
@@ -366,14 +366,14 @@
                                         <div class="flex items-center">
                                             <div>
                                                 <div class="text-sm font-medium text-gray-900">Booking #{{ $invoice->booking->id }}</div>
-                                                <div class="text-xs text-gray-500">{{ $invoice->booking->venue->name }}</div>
+                                                <div class="text-xs text-gray-500">{{ $invoice->booking->venue ? $invoice->booking->venue->name : 'Venue not found' }}</div>
                                                 <div class="text-xs text-gray-500">{{ $invoice->booking->booking_date->format('M d, Y') }}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $invoice->booking->user->name }}</div>
-                                        <div class="text-xs text-gray-500">{{ $invoice->booking->user->email }}</div>
+                                        <div class="text-sm text-gray-900">{{ $invoice->booking->user ? $invoice->booking->user->name : 'User not found' }}</div>
+                                        <div class="text-xs text-gray-500">{{ $invoice->booking->user ? $invoice->booking->user->email : 'Email not available' }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ 
@@ -482,12 +482,18 @@ function quickView(invoiceId) {
     
     // Load content via AJAX
     fetch(`/staff/invoices/${invoiceId}/quick-view`)
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();
+        })
         .then(html => {
             document.getElementById('quickViewContent').innerHTML = html;
         })
         .catch(error => {
-            document.getElementById('quickViewContent').innerHTML = '<p class="text-red-600">Error loading preview</p>';
+            console.error('Quick view error:', error);
+            document.getElementById('quickViewContent').innerHTML = '<p class="text-red-600">Error loading preview: ' + error.message + '</p>';
         });
 }
 
@@ -519,26 +525,51 @@ function bulkAction(action) {
 }
 
 function bulkVerify(invoiceIds) {
-    fetch('/staff/invoices/bulk-verify', {
+    console.log('Attempting to bulk verify invoices:', invoiceIds);
+    
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) {
+        alert('CSRF token not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    fetch('{{ route("staff.invoices.bulk-verify") }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-TOKEN': csrfToken.getAttribute('content')
         },
         body: JSON.stringify({ invoice_ids: invoiceIds })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data);
         if (data.success) {
+            alert(data.message);
             location.reload();
         } else {
             alert('Error: ' + data.message);
         }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        alert('Network error: ' + error.message + '. Please check the console for more details.');
     });
 }
 
 function bulkReject(invoiceIds, reason) {
-    fetch('/staff/invoices/bulk-reject', {
+    console.log('Attempting to bulk reject invoices:', invoiceIds, 'with reason:', reason);
+    
+    fetch('{{ route("staff.invoices.bulk-reject") }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -546,13 +577,27 @@ function bulkReject(invoiceIds, reason) {
         },
         body: JSON.stringify({ invoice_ids: invoiceIds, reason: reason })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Reject response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        return response.json();
+    })
     .then(data => {
+        console.log('Reject response data:', data);
         if (data.success) {
+            alert(data.message);
             location.reload();
         } else {
             alert('Error: ' + data.message);
         }
+    })
+    .catch(error => {
+        console.error('Reject fetch error:', error);
+        alert('Network error: ' + error.message + '. Please check the console for more details.');
     });
 }
 

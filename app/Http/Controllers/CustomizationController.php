@@ -32,6 +32,9 @@ class CustomizationController extends Controller
                 ->with('error', 'Only ongoing wedding bookings can be customized.');
         }
         
+        // Load necessary relationships
+        $packageItem->load(['item.category']);
+        
         // Check if the package item belongs to the booking's package
         $isValidPackageItem = $booking->package->packageItems()->where('id', $packageItem->id)->exists();
         if (!$isValidPackageItem) {
@@ -119,6 +122,8 @@ class CustomizationController extends Controller
                 ->with('error', 'This customization request cannot be edited because it has already been ' . $customization->status . '.');
         }
         
+        // Load necessary relationships
+        $customization->load(['packageItem.item.category']);
         $packageItem = $customization->packageItem;
         
         return view('user.customizations.edit', compact('booking', 'customization', 'packageItem'));
@@ -193,6 +198,15 @@ class CustomizationController extends Controller
             return redirect()->route('user.bookings.show', $booking)
                 ->with('error', 'This customization request does not belong to this booking.');
         }
+        
+        // Load necessary relationships including nested ones
+        $customization->load([
+            'booking.user', 
+            'booking.venue', 
+            'booking.package',
+            'packageItem.item.category',
+            'handler'
+        ]);
         
         $packageItem = $customization->packageItem;
         

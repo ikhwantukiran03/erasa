@@ -28,7 +28,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         <div>
                             <p class="text-sm text-gray-500">Venue</p>
-                            <p class="font-medium text-gray-800">{{ $booking->venue->name }}</p>
+                            <p class="font-medium text-gray-800">{{ $booking->venue ? $booking->venue->name : 'Venue not found' }}</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Date</p>
@@ -162,9 +162,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 name: "{{ $package->name }}",
                 description: "{{ $package->description }}",
                 items: [
-                    @foreach($package->items as $item)
+                    @foreach($package->packageItems as $item)
                         {
-                            name: "{{ $item->item->name }}",
+                            name: "{{ $item->item ? $item->item->name : 'Item not found' }}",
                             description: "{{ $item->description ?? '' }}"
                         },
                     @endforeach

@@ -56,6 +56,7 @@ Route::get('/booking-calendar', [App\Http\Controllers\BookingCalendarController:
 Route::get('/api/calendar-data', [BookingCalendarApiController::class, 'getCalendarData']);
 Route::get('/api/upcoming-bookings', [BookingCalendarApiController::class, 'getUpcomingBookings']);
 Route::get('/api/venues', [BookingCalendarApiController::class, 'getVenues']);
+Route::get('/api/check-availability', [BookingCalendarApiController::class, 'checkAvailability']);
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {

@@ -46,11 +46,13 @@
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach($customizations as $customization)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $customization->packageItem->item->name }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $customization->packageItem->item->category->name }}
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">
+                                            {{ $customization->packageItem->item ? $customization->packageItem->item->name : 'Item not found' }}
+                                        </div>
+                                        <div class="text-xs text-gray-500">
+                                            {{ $customization->packageItem->item && $customization->packageItem->item->category ? $customization->packageItem->item->category->name : 'Category not found' }}
+                                        </div>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
                                         {{ \Illuminate\Support\Str::limit($customization->customization, 50) }}

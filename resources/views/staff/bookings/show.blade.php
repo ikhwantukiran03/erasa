@@ -61,22 +61,26 @@
                             </dd>
                         </div>
                         
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Venue</dt>
-                            <dd class="mt-1 text-sm text-gray-900">
-                                {{ $booking->venue->name }}
-                            </dd>
-                        </div>
-                        
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Package</dt>
-                            <dd class="mt-1 text-sm text-gray-900">
-                                @if($booking->package)
-                                    {{ $booking->package->name }}
-                                @else
-                                    No package selected
-                                @endif
-                            </dd>
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <div class="h-10 w-10 rounded-full bg-primary bg-opacity-20 flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-lg font-medium text-gray-900">
+                                    {{ $booking->venue ? $booking->venue->name : 'Venue not found' }}
+                                </div>
+                                <div class="text-sm text-gray-500">
+                                    @if($booking->package)
+                                        {{ $booking->package->name }}
+                                    @else
+                                        No package selected
+                                    @endif
+                                </div>
+                            </div>
                         </div>
 
                         @if($booking->package && $booking->package->prices->count() > 0)
@@ -124,7 +128,7 @@
                         
                         @php
                             $packageItemsByCategory = $booking->package->packageItems->groupBy(function($item) {
-                                return $item->item->category->name;
+                                return $item->item && $item->item->category ? $item->item->category->name : 'Uncategorized';
                             });
                         @endphp
                         
@@ -135,7 +139,7 @@
                                     <ul class="pl-5 list-disc space-y-1">
                                         @foreach($packageItems as $packageItem)
                                             <li class="text-gray-600 text-sm">
-                                                <span class="font-medium">{{ $packageItem->item->name }}</span>
+                                                <span class="font-medium">{{ $packageItem->item ? $packageItem->item->name : 'Item not found' }}</span>
                                                 @if($packageItem->description)
                                                     - {{ $packageItem->description }}
                                                 @endif
@@ -219,43 +223,55 @@
                     <dl class="space-y-4">
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Name</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $booking->user->name }}</dd>
+                            <dd class="mt-1 text-sm text-gray-900">{{ $booking->user ? $booking->user->name : 'User not found' }}</dd>
                         </div>
                         
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Email</dt>
                             <dd class="mt-1 text-sm text-gray-900">
-                                <a href="mailto:{{ $booking->user->email }}" class="text-primary hover:underline">
-                                    {{ $booking->user->email }}
-                                </a>
+                                @if($booking->user)
+                                    <a href="mailto:{{ $booking->user->email }}" class="text-primary hover:underline">
+                                        {{ $booking->user->email }}
+                                    </a>
+                                @else
+                                    Email not available
+                                @endif
                             </dd>
                         </div>
                         
                         <div>
                             <dt class="text-sm font-medium text-gray-500">WhatsApp</dt>
                             <dd class="mt-1 text-sm text-gray-900 flex items-center">
-                                {{ $booking->user->whatsapp }}
-                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $booking->user->whatsapp) }}" target="_blank" class="ml-2 bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 inline-flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                                    </svg>
-                                    Chat
-                                </a>
+                                @if($booking->user && $booking->user->whatsapp)
+                                    {{ $booking->user->whatsapp }}
+                                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $booking->user->whatsapp) }}" target="_blank" class="ml-2 bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 inline-flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                                        </svg>
+                                        Chat
+                                    </a>
+                                @else
+                                    WhatsApp not available
+                                @endif
                             </dd>
                         </div>
                         
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Account Type</dt>
                             <dd class="mt-1 text-sm text-gray-900 capitalize">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $booking->user->role === 'admin' ? 'bg-purple-100 text-purple-800' : ($booking->user->role === 'staff' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800') }}">
-                                    {{ $booking->user->role }}
-                                </span>
+                                @if($booking->user)
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $booking->user->role === 'admin' ? 'bg-purple-100 text-purple-800' : ($booking->user->role === 'staff' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800') }}">
+                                        {{ $booking->user->role }}
+                                    </span>
+                                @else
+                                    Account type not available
+                                @endif
                             </dd>
                         </div>
                         
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Joined Date</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $booking->user->created_at->format('M d, Y') }}</dd>
+                            <dd class="mt-1 text-sm text-gray-900">{{ $booking->user ? $booking->user->created_at->format('M d, Y') : 'Date not available' }}</dd>
                         </div>
                     </dl>
                     
@@ -278,7 +294,7 @@
                                         <div class="flex justify-between items-start">
                                             <div>
                                                 <p class="text-sm font-medium text-gray-800">Booking #{{ $otherBooking->id }}</p>
-                                                <p class="text-xs text-gray-500">{{ $otherBooking->venue->name }} - {{ $otherBooking->booking_date->format('M d, Y') }}</p>
+                                                <p class="text-xs text-gray-500">{{ $otherBooking->venue ? $otherBooking->venue->name : 'Venue not found' }} - {{ $otherBooking->booking_date->format('M d, Y') }}</p>
                                             </div>
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                                 {{ $otherBooking->status === 'ongoing' ? 'bg-yellow-100 text-yellow-800' : 

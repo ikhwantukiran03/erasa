@@ -76,6 +76,15 @@ class StaffCustomizationController extends Controller
                 ->with('error', 'You do not have permission to access this resource.');
         }
 
+        // Load necessary relationships including nested ones
+        $customization->load([
+            'booking.user', 
+            'booking.venue', 
+            'booking.package',
+            'packageItem.item.category',
+            'handler'
+        ]);
+
         return view('staff.customizations.show', compact('customization'));
     }
 

@@ -98,8 +98,8 @@ class BookingController extends Controller
             'booking_date' => ['required', 'date'],
             'session' => ['required', 'in:morning,evening'],
             'type' => ['required', 'in:wedding,viewing,reservation'],
-            'status' => ['required', 'in:ongoing,completed,cancelled,waiting for deposit,pending_verification'],
-            'expiry_date' => ['nullable', 'date', 'after:booking_date'],
+            'status' => ['required', 'in:waiting for deposit,ongoing,completed,cancelled,pending_verification'],
+            'expiry_date' => ['required', 'date', 'after:today'],
             'booking_request_id' => ['nullable', 'exists:booking_requests,id'],
         ]);
 
@@ -152,7 +152,8 @@ class BookingController extends Controller
             $booking->session = $request->session;
             $booking->type = $request->type;
             $booking->status = $request->status;
-            $booking->expiry_date = $request->expiry_date;
+            // Set expiry date to 7 days from today (booking creation date)
+            $booking->expiry_date = $request->expiry_date ?: \Carbon\Carbon::now()->addDays(7);
             $booking->handled_by = auth()->id();
             $booking->save();
             
@@ -232,6 +233,9 @@ class BookingController extends Controller
                 ->with('error', 'You do not have permission to access this resource.');
         }
         
+        // Load necessary relationships
+        $booking->load(['user', 'venue', 'package.packageItems.item.category', 'handler']);
+        
         return view('staff.bookings.show', compact('booking'));
     }
 
@@ -247,6 +251,9 @@ class BookingController extends Controller
             return redirect()->route('dashboard')
                 ->with('error', 'You do not have permission to access this resource.');
         }
+        
+        // Load necessary relationships including nested ones
+        $booking->load(['user', 'venue', 'package.packageItems.item.category', 'handler']);
         
         $venues = Venue::orderBy('name')->get();
         $packages = Package::orderBy('name')->get();
@@ -276,8 +283,8 @@ class BookingController extends Controller
             'booking_date' => ['required', 'date'],
             'session' => ['required', 'in:morning,evening'],
             'type' => ['required', 'in:wedding,viewing,reservation'],
-            'status' => ['required', 'in:ongoing,completed,cancelled'],
-            'expiry_date' => ['nullable', 'date', 'after:booking_date'],
+            'status' => ['required', 'in:waiting for deposit,ongoing,completed,cancelled,pending_verification'],
+            'expiry_date' => ['required', 'date', 'after:today'],
         ]);
 
         if ($validator->fails()) {
@@ -329,7 +336,12 @@ class BookingController extends Controller
             $booking->session = $request->session;
             $booking->type = $request->type;
             $booking->status = $request->status;
-            $booking->expiry_date = $request->expiry_date;
+            // Only set automatic expiry date if not provided and booking doesn't already have one
+            if ($request->expiry_date) {
+                $booking->expiry_date = $request->expiry_date;
+            } elseif (!$booking->expiry_date) {
+                $booking->expiry_date = \Carbon\Carbon::now()->addDays(7);
+            }
             $booking->save();
             
             return redirect()->route('staff.bookings.index')

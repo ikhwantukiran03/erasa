@@ -73,7 +73,7 @@
                         <div class="ml-3">
                             <p class="text-sm text-blue-800 font-medium">Reservation Information</p>
                             <p class="text-sm text-blue-700 mt-1">
-                                You have a preliminary reservation for {{ $booking->venue->name }} on {{ $booking->booking_date->format('l, F d, Y') }} 
+                                You have a preliminary reservation for {{ $booking->venue ? $booking->venue->name : 'Venue not found' }} on {{ $booking->booking_date->format('l, F d, Y') }} 
                                 ({{ $booking->session === 'morning' ? 'Morning Session (11:00 AM - 4:00 PM)' : 'Evening Session (7:00 PM - 11:00 PM)' }}).
                                 To confirm this reservation, please click the "Confirm Reservation" button below.
                                 Once confirmed, you will need to proceed with a deposit payment to secure your booking.
@@ -191,7 +191,7 @@
                             @endif
                             
                             <!-- Reservation Action Buttons -->
-                            @if($booking->type === 'reservation' && $booking->status !== 'cancelled' && $booking->status !== 'completed' && ($booking->package_id !== null))
+                            @if($booking->type === 'reservation' && $booking->status !== 'cancelled' && $booking->status !== 'completed')
                             <div class="flex flex-col sm:flex-row pt-4 border-t border-gray-200 mt-2">
                                 <dt class="text-sm font-medium text-gray-500 w-full sm:w-1/3">Actions</dt>
                                 <dd class="text-sm w-full sm:w-2/3 flex flex-col xs:flex-row gap-2">
@@ -262,13 +262,15 @@
                         <dl class="space-y-3 venue-info-details">
                             <div class="flex flex-col sm:flex-row">
                                 <dt class="text-sm font-medium text-gray-500 w-full sm:w-1/3">Venue Name</dt>
-                                <dd class="text-sm text-gray-900 font-medium w-full sm:w-2/3">{{ $booking->venue->name }}</dd>
+                                <dd class="text-sm text-gray-900 font-medium w-full sm:w-2/3">
+                                    {{ $booking->venue ? $booking->venue->name : 'Venue not found' }}
+                                </dd>
                             </div>
                             <div class="flex flex-col sm:flex-row">
                                 <dt class="text-sm font-medium text-gray-500 w-full sm:w-1/3">Address</dt>
                                 <dd class="text-sm text-gray-900 w-full sm:w-2/3">
                                     <address class="not-italic">
-                                        {{ $booking->venue->full_address }}
+                                        {{ $booking->venue ? $booking->venue->full_address : 'Address not available' }}
                                     </address>
                                 </dd>
                             </div>
@@ -298,10 +300,12 @@
                             <dl class="space-y-4">
                                 <div class="flex flex-col sm:flex-row">
                                     <dt class="text-sm font-medium text-gray-500 w-full sm:w-1/4">Package Name</dt>
-                                    <dd class="text-sm text-gray-900 font-medium w-full sm:w-3/4">{{ $booking->package->name }}</dd>
+                                    <dd class="text-sm text-gray-900 font-medium w-full sm:w-3/4">
+                                        {{ $booking->package ? $booking->package->name : 'Package not found' }}
+                                    </dd>
                                 </div>
                                 
-                                @if($booking->package->description)
+                                @if($booking->package && $booking->package->description)
                                 <div class="flex flex-col sm:flex-row">
                                     <dt class="text-sm font-medium text-gray-500 w-full sm:w-1/4">Description</dt>
                                     <dd class="text-sm text-gray-900 w-full sm:w-3/4">{{ $booking->package->description }}</dd>
@@ -333,7 +337,7 @@
                                 </div>
                                 @endif
                                 
-                                @if($booking->package->prices->count() > 0)
+                                @if($booking->package && $booking->package->prices && $booking->package->prices->count() > 0)
                                 <div class="flex flex-col sm:flex-row">
                                     <dt class="text-sm font-medium text-gray-500 w-full sm:w-1/4">Price Range</dt>
                                     <dd class="text-sm font-medium text-primary w-full sm:w-3/4">
@@ -347,7 +351,7 @@
                             </dl>
                         </div>
                         
-                        @if($booking->type === 'wedding' && $booking->status === 'ongoing' && $booking->package && $booking->package->packageItems->count() > 0)
+                        @if($booking->type === 'wedding' && $booking->status === 'ongoing' && $booking->package && $booking->package->packageItems && $booking->package->packageItems->count() > 0)
                         <div class="md:col-span-2 border-t border-gray-200 pt-6">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
                                 <h3 class="text-lg font-semibold text-gray-800 flex items-center">
@@ -378,7 +382,7 @@
                         @endif
                         
                         <!-- Package Items -->
-                        @if($booking->package->packageItems->count() > 0)
+                        @if($booking->package && $booking->package->packageItems && $booking->package->packageItems->count() > 0)
                         <div class="mt-6 col-span-3 package-info-details hidden">
                             <h4 class="text-md font-medium text-gray-800 mb-3 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -389,7 +393,7 @@
                             
                             @php
                                 $packageItemsByCategory = $booking->package->packageItems->groupBy(function($item) {
-                                    return $item->item->category->name;
+                                    return $item->item && $item->item->category ? $item->item->category->name : 'Uncategorized';
                                 });
                             @endphp
                             
@@ -404,61 +408,12 @@
                                         </h5>
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                             @foreach($packageItems as $packageItem)
-                                                @php
-                                                    $customization = $booking->customizations()
-                                                        ->where('package_item_id', $packageItem->id)
-                                                        ->first();
-                                                @endphp
-                                                <div class="flex justify-between items-start space-x-2 p-2 rounded-md bg-gray-50">
-                                                    <div class="flex items-start space-x-2">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                        </svg>
-                                                        <div>
-                                                            <span class="font-medium text-gray-800 text-sm">{{ $packageItem->item->name }}</span>
-                                                            @if($packageItem->description)
-                                                                <p class="text-xs text-gray-600 mt-0.5">{{ $packageItem->description }}</p>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                    @if($booking->status === 'ongoing')
-                                                        @if($customization)
-                                                            @if($customization->status === 'pending')
-                                                                <a href="{{ route('user.customizations.edit', [$booking, $customization]) }}" 
-                                                                   class="inline-flex items-center px-3 py-1.5 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium hover:bg-yellow-200 transition-colors">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                    </svg>
-                                                                    Pending
-                                                                </a>
-                                                            @elseif($customization->status === 'approved')
-                                                                <a href="{{ route('user.customizations.show', [$booking, $customization]) }}" 
-                                                                   class="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-800 rounded-full text-xs font-medium hover:bg-green-200 transition-colors">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                                    </svg>
-                                                                    Approved
-                                                                </a>
-                                                            @elseif($customization->status === 'rejected')
-                                                                <a href="{{ route('user.customizations.show', [$booking, $customization]) }}" 
-                                                                   class="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-800 rounded-full text-xs font-medium hover:bg-red-200 transition-colors">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                                    </svg>
-                                                                    Rejected
-                                                                </a>
-                                                            @endif
-                                                        @else
-                                                            <a href="{{ route('user.customizations.create', [$booking, $packageItem]) }}" 
-                                                               class="inline-flex items-center px-3 py-1.5 bg-primary text-white rounded-md text-xs font-medium hover:bg-primary-dark transition-colors">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                                </svg>
-                                                                Customize
-                                                            </a>
-                                                        @endif
+                                                <li class="text-gray-600 text-sm">
+                                                    <span class="font-medium">{{ $packageItem->item ? $packageItem->item->name : 'Item not found' }}</span>
+                                                    @if($packageItem->description)
+                                                        - {{ $packageItem->description }}
                                                     @endif
-                                                </div>
+                                                </li>
                                             @endforeach
                                         </div>
                                     </div>
@@ -721,7 +676,7 @@
 <div id="packageDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center p-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">Available Wedding Packages for {{ $booking->venue->name }}</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Available Wedding Packages for {{ $booking->venue ? $booking->venue->name : 'Venue not found' }}</h3>
             <button id="closePackageDetails" class="text-gray-500 hover:text-gray-700">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -731,7 +686,9 @@
         <div class="p-6">
             <div id="packageContent" class="space-y-6">
                 @php
-                    $availablePackages = \App\Models\Package::where('venue_id', $booking->venue_id)->get();
+                    $availablePackages = \App\Models\Package::where('venue_id', $booking->venue_id)
+                        ->with(['prices', 'packageItems.item.category'])
+                        ->get();
                 @endphp
                 
                 @if($availablePackages->count() > 0)
@@ -744,13 +701,13 @@
                             <div class="mb-4">
                                 <h5 class="font-medium text-gray-800 mb-2">Package Includes:</h5>
                                 <div class="space-y-1">
-                                    @foreach($package->items as $item)
+                                    @foreach($package->packageItems as $item)
                                     <div class="flex items-start space-x-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                         </svg>
                                         <div>
-                                            <span class="text-sm font-medium text-gray-800">{{ $item->item->name }}</span>
+                                            <span class="text-sm font-medium text-gray-800">{{ $item->item ? $item->item->name : 'Item not found' }}</span>
                                             @if($item->description)
                                                 <p class="text-xs text-gray-600">{{ $item->description }}</p>
                                             @endif

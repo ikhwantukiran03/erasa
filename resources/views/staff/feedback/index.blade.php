@@ -95,8 +95,12 @@
                                 @foreach($feedback as $item)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">{{ $item->user->name }}</div>
-                                        <div class="text-sm text-gray-500">{{ $item->booking->booking_date->format('M d, Y') }}</div>
+                                        <div class="flex items-center">
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900">{{ $item->user ? $item->user->name : 'User not found' }}</div>
+                                                <div class="text-sm text-gray-500">{{ $item->user ? $item->user->email : 'Email not available' }}</div>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">

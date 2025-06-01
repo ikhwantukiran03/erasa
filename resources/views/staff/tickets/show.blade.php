@@ -43,13 +43,19 @@
                 <div class="p-6">
                     <div class="flex items-start space-x-4">
                         <div class="flex-shrink-0">
-                            <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                <span class="text-primary font-semibold">{{ substr($ticket->user->name, 0, 1) }}</span>
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-shrink-0 h-10 w-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center">
+                                    <span class="text-primary font-semibold">{{ $ticket->user ? substr($ticket->user->name, 0, 1) : 'U' }}</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">{{ $ticket->user ? $ticket->user->name : 'User not found' }}</p>
+                                    <p class="text-sm text-gray-500">{{ $ticket->user ? $ticket->user->email : 'Email not available' }}</p>
+                                </div>
                             </div>
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center justify-between">
-                                <p class="text-sm font-medium text-gray-900">{{ $ticket->user->name }}</p>
+                                <p class="text-sm font-medium text-gray-900">{{ $ticket->user ? $ticket->user->name : 'User not found' }}</p>
                                 <p class="text-sm text-gray-500">{{ $ticket->created_at->format('M d, Y H:i') }}</p>
                             </div>
                             <div class="mt-2 text-sm text-gray-700 prose prose-sm max-w-none">
@@ -77,7 +83,7 @@
                             <div class="flex flex-col {{ $reply->is_staff_reply ? 'items-end' : 'items-start' }}">
                                 <div class="flex items-center space-x-2 mb-1">
                                     <p class="text-xs font-medium {{ $reply->is_staff_reply ? 'text-primary' : 'text-blue-600' }}">
-                                        {{ $reply->user->name }}
+                                        {{ $reply->user ? $reply->user->name : 'User not found' }}
                                 @if($reply->is_staff_reply)
                                             <span class="text-xs text-gray-500">(Staff)</span>
                                 @endif

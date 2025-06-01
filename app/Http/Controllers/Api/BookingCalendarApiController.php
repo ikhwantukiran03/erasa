@@ -127,18 +127,25 @@ class BookingCalendarApiController extends Controller
         $date = $request->query('date');
         $session = $request->query('session');
         $venueId = $request->query('venue_id');
+        $excludeBookingId = $request->query('exclude_booking_id'); // For edit mode
         
         if (!$date || !$venueId || !$session) {
             return response()->json(['available' => true]);
         }
         
         // Check if there's already a confirmed booking (wedding or reservation) for this venue, date and session
-        $existingBooking = Booking::where('booking_date', $date)
+        $bookingQuery = Booking::where('booking_date', $date)
             ->where('venue_id', $venueId)
             ->where('session', $session)
             ->whereIn('type', ['wedding', 'reservation']) // Only check wedding and reservation bookings
-            ->where('status', '!=', 'cancelled')
-            ->exists();
+            ->where('status', '!=', 'cancelled');
+            
+        // Exclude current booking if editing
+        if ($excludeBookingId) {
+            $bookingQuery->where('id', '!=', $excludeBookingId);
+        }
+        
+        $existingBooking = $bookingQuery->exists();
 
         // Check if there's already a pending booking request (reservation or booking) for this venue, date and session
         $existingRequest = BookingRequest::where('event_date', $date)

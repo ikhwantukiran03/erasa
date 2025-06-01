@@ -33,11 +33,11 @@
                 @endif
                 
                 <div class="mb-6 bg-gray-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-gray-800 mb-2">Item Information</h3>
-                    <p><span class="font-medium">Item:</span> {{ $packageItem->item->name }}</p>
-                    <p><span class="font-medium">Category:</span> {{ $packageItem->item->category->name }}</p>
+                    <h3 class="font-semibold text-gray-800 mb-3">Item Information</h3>
+                    <p><span class="font-medium">Item:</span> {{ $packageItem->item ? $packageItem->item->name : 'Item not found' }}</p>
+                    <p><span class="font-medium">Category:</span> {{ $packageItem->item && $packageItem->item->category ? $packageItem->item->category->name : 'Category not found' }}</p>
                     @if($packageItem->description)
-                        <p><span class="font-medium">Description:</span> {{ $packageItem->description }}</p>
+                        <p><span class="font-medium">Default Description:</span> {{ $packageItem->description }}</p>
                     @endif
                 </div>
                 

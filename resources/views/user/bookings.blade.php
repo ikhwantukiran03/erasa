@@ -170,7 +170,7 @@
                                     'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=3270&auto=format&fit=crop';
                             @endphp
                             <div class="h-32 bg-gradient-to-r from-primary to-primary-dark relative overflow-hidden">
-                                <img src="{{ $imageUrl }}" alt="{{ $booking->venue->name }}" class="w-full h-full object-cover opacity-80">
+                                <img src="{{ $imageUrl }}" alt="{{ $booking->venue ? $booking->venue->name : 'Venue' }}" class="w-full h-full object-cover opacity-80">
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                                 
                                 <!-- Status Badge -->
@@ -195,7 +195,7 @@
                                             <span class="w-1.5 h-1.5 bg-purple-500 rounded-full mr-1.5"></span>
                                             Pending Verification
                                         </span>
-                                    @elseif($booking->status === 'cancelled')
+                                    @else
                                         <span class="px-3 py-1 inline-flex items-center text-xs font-semibold rounded-full bg-red-100 text-red-800 shadow-sm">
                                             <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
                                             Cancelled
@@ -212,13 +212,10 @@
                                 
                                 <!-- Venue Name -->
                                 <div class="absolute bottom-3 left-3 right-3">
-                                    <h3 class="text-white font-semibold text-lg truncate">{{ $booking->venue->name }}</h3>
-                                    <p class="text-white/80 text-sm">
-                                        @if($booking->package)
-                                            {{ $booking->package->name }}
-                                        @else
-                                            <span class="italic">No package selected</span>
-                                        @endif
+                                    <h3 class="text-white font-semibold text-lg truncate">{{ $booking->venue ? $booking->venue->name : 'Venue not found' }}</h3>
+                                    <p class="text-gray-200 text-sm">
+                                        {{ $booking->booking_date->format('M d, Y') }} • 
+                                        {{ $booking->session === 'morning' ? 'Morning' : 'Evening' }}
                                     </p>
                                 </div>
                             </div>

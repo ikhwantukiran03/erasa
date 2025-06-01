@@ -295,11 +295,11 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">{{ $booking->user->name }}</div>
-                                    <div class="text-sm text-gray-500">{{ $booking->user->whatsapp }}</div>
+                                    <div class="text-sm font-medium text-gray-900">{{ $booking->user ? $booking->user->name : 'User not found' }}</div>
+                                    <div class="text-sm text-gray-500">{{ $booking->user ? $booking->user->whatsapp : 'WhatsApp not available' }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $booking->venue->name }}</div>
+                                    <div class="text-sm text-gray-900">{{ $booking->venue ? $booking->venue->name : 'Venue not found' }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="text-sm capitalize">{{ $booking->type }}</span>
@@ -479,8 +479,8 @@
                                         #{{ $ticket->id }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">{{ $ticket->user->name }}</div>
-                                        <div class="text-sm text-gray-500">{{ $ticket->user->email }}</div>
+                                        <div class="text-sm font-medium text-gray-900">{{ $ticket->user ? $ticket->user->name : 'User not found' }}</div>
+                                        <div class="text-sm text-gray-500">{{ $ticket->user ? $ticket->user->email : 'Email not available' }}</div>
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="text-sm text-gray-900">{{ Str::limit($ticket->title, 30) }}</div>

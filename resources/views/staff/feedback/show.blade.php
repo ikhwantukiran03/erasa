@@ -25,22 +25,23 @@
                     <!-- Customer Information -->
                     <div class="mb-8">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4">Customer Information</h2>
+                        <div class="flex items-center space-x-4 mb-6">
+                            <div class="flex-shrink-0 h-12 w-12 bg-primary bg-opacity-20 rounded-full flex items-center justify-center">
+                                <span class="text-primary font-semibold text-lg">{{ $feedback->user ? substr($feedback->user->name, 0, 1) : 'U' }}</span>
+                            </div>
+                            <div>
+                                <p class="text-lg font-medium text-gray-900">{{ $feedback->user ? $feedback->user->name : 'User not found' }}</p>
+                                <p class="text-sm text-gray-500">{{ $feedback->user ? $feedback->user->email : 'Email not available' }}</p>
+                            </div>
+                        </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <p class="text-sm text-gray-500">Customer Name</p>
-                                <p class="text-lg font-medium text-gray-900">{{ $feedback->user->name }}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Email</p>
-                                <p class="text-lg font-medium text-gray-900">{{ $feedback->user->email }}</p>
-                            </div>
-                            <div>
                                 <p class="text-sm text-gray-500">WhatsApp</p>
-                                <p class="text-lg font-medium text-gray-900">{{ $feedback->user->whatsapp }}</p>
+                                <p class="text-lg font-medium text-gray-900">{{ $feedback->user ? $feedback->user->whatsapp : 'WhatsApp not available' }}</p>
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500">Booking Date</p>
-                                <p class="text-lg font-medium text-gray-900">{{ $feedback->booking->booking_date->format('F d, Y') }}</p>
+                                <p class="text-lg font-medium text-gray-900">{{ $feedback->booking ? $feedback->booking->booking_date->format('F d, Y') : 'Booking date not available' }}</p>
                             </div>
                         </div>
                     </div>
