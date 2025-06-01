@@ -37,7 +37,8 @@ class PromotionController extends Controller
 
     public function create()
     {
-        return view('staff.promotions.create');
+        $packages = \App\Models\Package::orderBy('name')->get();
+        return view('staff.promotions.create', compact('packages'));
     }
 
     public function store(Request $request)
@@ -46,7 +47,8 @@ class PromotionController extends Controller
             $validator = Validator::make($request->all(), [
                 'title' => 'required|string|max:255',
                 'description' => 'required|string',
-                'discount' => 'required|numeric|min:0|max:100',
+                'discount' => 'required|numeric|min:0|max:20000',
+                'package_id' => 'required|exists:packages,id',
                 'start_date' => 'required|date',
                 'end_date' => 'required|date|after:start_date',
                 'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
@@ -73,7 +75,8 @@ class PromotionController extends Controller
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'cloudinary_image_id' => $imageData['image_id'],
-                'cloudinary_image_url' => $imageData['image_url']
+                'cloudinary_image_url' => $imageData['image_url'],
+                'package_id' => $request->package_id,
             ]);
 
             return redirect()->route('staff.promotions.index')
@@ -88,7 +91,8 @@ class PromotionController extends Controller
 
     public function edit(Promotion $promotion)
     {
-        return view('staff.promotions.edit', compact('promotion'));
+        $packages = \App\Models\Package::orderBy('name')->get();
+        return view('staff.promotions.edit', compact('promotion', 'packages'));
     }
 
     public function update(Request $request, Promotion $promotion)
@@ -97,7 +101,8 @@ class PromotionController extends Controller
             $validator = Validator::make($request->all(), [
                 'title' => 'required|string|max:255',
                 'description' => 'required|string',
-                'discount' => 'required|numeric|min:0|max:100',
+                'discount' => 'required|numeric|min:0|max:20000',
+                'package_id' => 'required|exists:packages,id',
                 'start_date' => 'required|date',
                 'end_date' => 'required|date|after:start_date',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
@@ -110,6 +115,7 @@ class PromotionController extends Controller
             }
 
             $data = $request->except('image');
+            $data['package_id'] = $request->package_id;
 
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 // Delete old image from Cloudinary

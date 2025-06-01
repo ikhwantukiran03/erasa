@@ -20,21 +20,23 @@
             <form action="{{ route('wedding-cards.store') }}" method="POST">
                 @csrf
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div>
-                        <label class="font-medium text-gray-700 mb-2 block">Groom's Name</label>
-                        <input type="text" name="groom_name" value="{{ old('groom_name') }}" class="form-input" placeholder="Enter groom's name">
-                        @error('groom_name')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    
-                    <div>
-                        <label class="font-medium text-gray-700 mb-2 block">Bride's Name</label>
-                        <input type="text" name="bride_name" value="{{ old('bride_name') }}" class="form-input" placeholder="Enter bride's name">
-                        @error('bride_name')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-primary mb-4">Names</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="font-medium text-gray-700 mb-2 block">Partner 1 Name <span class="text-xs text-gray-500">(will appear first on the card)</span></label>
+                            <input type="text" name="bride_name" value="{{ old('bride_name') }}" class="form-input" placeholder="Enter first partner's name">
+                            @error('bride_name')
+                                <p class="error-message">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="font-medium text-gray-700 mb-2 block">Partner 2 Name <span class="text-xs text-gray-500">(will appear second on the card)</span></label>
+                            <input type="text" name="groom_name" value="{{ old('groom_name') }}" class="form-input" placeholder="Enter second partner's name">
+                            @error('groom_name')
+                                <p class="error-message">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
                 </div>
                 
@@ -47,32 +49,27 @@
                         @enderror
                     </div>
                     
-                    <div>
-                        <label class="font-medium text-gray-700 mb-2 block">Ceremony Time</label>
-                        <input type="time" name="ceremony_time" value="{{ old('ceremony_time') }}" class="form-input">
-                        @error('ceremony_time')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
+                    <div class="mb-4">
+                        <label for="ceremony_time" class="block text-sm font-medium text-gray-700">Ceremony Time</label>
+                        <input type="time" name="ceremony_time" id="ceremony_time" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" required>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-1 gap-6 mb-8">
                     <div>
-                        <label class="font-medium text-gray-700 mb-2 block">Venue Name</label>
-                        <input type="text" name="venue_name" value="{{ old('venue_name') }}" class="form-input" placeholder="Enter venue name">
-                        @error('venue_name')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
+                        <label class="font-medium text-gray-700 mb-2 block">Venue</label>
+                        <div class="mb-4">
+                            <label for="venue_id" class="block text-sm font-medium text-gray-700">Venue</label>
+                            <select name="venue_id" id="venue_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" required>
+                                <option value="">Select a venue</option>
+                                @foreach($venues as $venue)
+                                    <option value="{{ $venue->id }}">{{ $venue->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     
-                    <div>
-                        <label class="font-medium text-gray-700 mb-2 block">Venue Address</label>
-                        <textarea name="venue_address" class="form-input" rows="3" placeholder="Enter full venue address">{{ old('venue_address') }}</textarea>
-                        @error('venue_address')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
+                    
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div>
@@ -102,13 +99,13 @@
                 
                 <div class="mb-8">
                     <label class="font-medium text-gray-700 mb-2 block">Select Template</label>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
                         @foreach($templates as $id => $name)
                         <div class="relative">
                             <input type="radio" name="template_id" value="{{ $id }}" id="template-{{ $id }}" class="sr-only" {{ old('template_id') == $id ? 'checked' : '' }}>
                             <label for="template-{{ $id }}" class="block cursor-pointer">
                                 <div class="border-2 rounded-lg p-2 overflow-hidden transition-all duration-200 hover:shadow-medium" id="template-container-{{ $id }}">
-                                    <img src="{{ $imageUrls['templates'][$id] ?? asset('assets/wedding-templates/' . $id . '.jpg') }}" alt="{{ $name }}" class="w-full h-48 object-cover rounded">
+                                    <img src="{{ $imageUrls['templates'][$id] }}" alt="{{ $name }}" class="w-full h-48 object-cover rounded">
                                     <div class="mt-2 text-center py-2 font-medium">{{ $name }}</div>
                                 </div>
                             </label>

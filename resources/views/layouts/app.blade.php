@@ -139,6 +139,7 @@
                 <nav class="hidden md:flex items-center space-x-8">
                     <a href="/" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->is('/') ? 'active' : '' }}">Home</a>
                     <a href="{{ route('public.venues') }}" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->routeIs('public.venues') ? 'active' : '' }}">Venues</a>
+                    <a href="{{ route('promotions.index') }}" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->routeIs('promotions.*') ? 'active' : '' }}">Promotions</a>
                     <a href="{{ route('booking.calendar') }}" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->routeIs('booking.calendar') ? 'active' : '' }}">Calendar</a>
                     <a href="{{ route('chatbot.index') }}" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->routeIs('chatbot.index') ? 'active' : '' }}">
                         <span class="flex items-center">
@@ -149,6 +150,7 @@
                             Chat Assistant
                         </span>
                     </a>
+                    <a href="{{ route('public.feedback') }}" class="nav-link text-dark hover:text-primary transition-colors duration-300 py-2 {{ request()->routeIs('public.feedback') ? 'active' : '' }}">Feedback</a>
                     
                     @guest
                         <div class="flex items-center space-x-4 ml-4">
@@ -200,6 +202,7 @@
                 <nav class="mt-4 border-t border-gray-100 pt-4 pb-2 space-y-1">
                     <a href="/" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->is('/') ? 'text-primary' : 'text-dark' }}">Home</a>
                     <a href="{{ route('public.venues') }}" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->routeIs('public.venues') ? 'text-primary' : 'text-dark' }}">Venues</a>
+                    <a href="{{ route('promotions.index') }}" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->routeIs('promotions.*') ? 'text-primary' : 'text-dark' }}">Promotions</a>
                     <a href="{{ route('booking.calendar') }}" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->routeIs('booking.calendar') ? 'text-primary' : 'text-dark' }}">Calendar</a>
                     <a href="{{ route('chatbot.index') }}" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->routeIs('chatbot.index') ? 'text-primary' : 'text-dark' }} flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -208,6 +211,7 @@
                         </svg>
                         Chat Assistant
                     </a>
+                    <a href="{{ route('public.feedback') }}" class="block py-2.5 px-4 rounded-lg hover:bg-gray-50 text-base font-medium {{ request()->routeIs('public.feedback') ? 'text-primary' : 'text-dark' }}">Feedback</a>
                     
                     @guest
                         <div class="border-t border-gray-100 mt-2 pt-2">
@@ -233,86 +237,6 @@
             </div>
         </div>
     </header>
-
-    <!-- Promotional Banner -->
-    @if($globalActivePromotions->isNotEmpty())
-    <div class="bg-gradient-to-r from-primary to-primary-dark text-white py-3 relative overflow-hidden" id="promo-banner">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4 flex-1">
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                        </svg>
-                        <span class="font-semibold text-sm">Special Offer:</span>
-                    </div>
-                    
-                    <!-- Promotion Carousel -->
-                    <div class="flex-1 overflow-hidden">
-                        <div class="promotion-slider flex transition-transform duration-500 ease-in-out" id="promotion-slider">
-                            @foreach($globalActivePromotions as $promotion)
-                                <div class="promotion-slide flex-shrink-0 w-full flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <span class="text-sm">{{ $promotion->title }}</span>
-                                        <span class="bg-white text-primary px-2 py-1 rounded-full text-xs font-bold">{{ $promotion->discount }}% OFF</span>
-                                        <span class="text-xs opacity-90">Valid until {{ $promotion->end_date->format('M d, Y') }}</span>
-                                    </div>
-                                    <div class="flex items-center space-x-2">
-                                        @auth
-                                            <a href="{{ route('booking-requests.create', ['promotion' => $promotion->id]) }}" 
-                                               class="bg-white text-primary px-3 py-1 rounded-full text-xs font-medium hover:bg-gray-100 transition-colors">
-                                                Claim Now
-                                            </a>
-                                        @else
-                                            <a href="{{ route('login') }}" 
-                                               class="bg-white text-primary px-3 py-1 rounded-full text-xs font-medium hover:bg-gray-100 transition-colors">
-                                                Login to Claim
-                                            </a>
-                                        @endauth
-                                        <a href="{{ route('promotions.show', $promotion) }}" 
-                                           class="text-white hover:text-gray-200 text-xs underline">
-                                            Details
-                                        </a>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Navigation arrows (only show if more than 1 promotion) -->
-                @if($globalActivePromotions->count() > 1)
-                <div class="flex items-center space-x-2 ml-4">
-                    <button onclick="previousPromotion()" class="text-white hover:text-gray-200 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
-                    <button onclick="nextPromotion()" class="text-white hover:text-gray-200 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                </div>
-                @endif
-                
-                <!-- Close button -->
-                <button onclick="closeBanner()" class="text-white hover:text-gray-200 transition-colors ml-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Animated background elements -->
-        <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div class="absolute -top-4 -right-4 w-8 h-8 bg-white opacity-10 rounded-full animate-bounce"></div>
-            <div class="absolute top-2 left-1/4 w-2 h-2 bg-white opacity-20 rounded-full animate-pulse"></div>
-            <div class="absolute bottom-1 right-1/3 w-3 h-3 bg-white opacity-15 rounded-full animate-bounce" style="animation-delay: 0.5s;"></div>
-        </div>
-    </div>
-    @endif
 
     <main>
         @yield('content')
@@ -484,80 +408,6 @@
         });
     </script>
     @stack('scripts')
-    
-    <!-- Promotional Banner JavaScript -->
-    <script>
-        // Promotional Banner Functionality
-        let currentPromotionIndex = 0;
-        const promotionSlider = document.getElementById('promotion-slider');
-        const totalPromotions = {{ $globalActivePromotions->count() ?? 0 }};
-        
-        function nextPromotion() {
-            if (totalPromotions <= 1) return;
-            
-            currentPromotionIndex = (currentPromotionIndex + 1) % totalPromotions;
-            updatePromotionSlider();
-        }
-        
-        function previousPromotion() {
-            if (totalPromotions <= 1) return;
-            
-            currentPromotionIndex = (currentPromotionIndex - 1 + totalPromotions) % totalPromotions;
-            updatePromotionSlider();
-        }
-        
-        function updatePromotionSlider() {
-            if (promotionSlider) {
-                const translateX = -currentPromotionIndex * 100;
-                promotionSlider.style.transform = `translateX(${translateX}%)`;
-            }
-        }
-        
-        function closeBanner() {
-            const banner = document.getElementById('promo-banner');
-            if (banner) {
-                banner.style.transform = 'translateY(-100%)';
-                banner.style.opacity = '0';
-                setTimeout(() => {
-                    banner.style.display = 'none';
-                }, 300);
-                
-                // Store in localStorage to remember user preference
-                localStorage.setItem('promoBannerClosed', 'true');
-            }
-        }
-        
-        // Auto-rotate promotions every 5 seconds if there are multiple
-        if (totalPromotions > 1) {
-            setInterval(nextPromotion, 5000);
-        }
-        
-        // Check if user previously closed the banner
-        document.addEventListener('DOMContentLoaded', function() {
-            const bannerClosed = localStorage.getItem('promoBannerClosed');
-            const banner = document.getElementById('promo-banner');
-            
-            if (bannerClosed === 'true' && banner) {
-                banner.style.display = 'none';
-            }
-            
-            // Clear the localStorage after 24 hours (optional)
-            const lastClosed = localStorage.getItem('promoBannerClosedTime');
-            const now = new Date().getTime();
-            
-            if (lastClosed && (now - parseInt(lastClosed)) > 24 * 60 * 60 * 1000) {
-                localStorage.removeItem('promoBannerClosed');
-                localStorage.removeItem('promoBannerClosedTime');
-            }
-            
-            // Store close time when banner is closed
-            const originalCloseBanner = window.closeBanner;
-            window.closeBanner = function() {
-                localStorage.setItem('promoBannerClosedTime', new Date().getTime().toString());
-                originalCloseBanner();
-            };
-        });
-    </script>
     
     <!-- Floating Chatbot Button -->
     <div class="fixed bottom-6 right-6 z-50">

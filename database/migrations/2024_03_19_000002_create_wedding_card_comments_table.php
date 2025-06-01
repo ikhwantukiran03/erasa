@@ -6,27 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('wedding_card_comments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('wedding_card_id');
-            $table->foreign('wedding_card_id')->references('id')->on('wedding_cards')->onDelete('cascade');
+            $table->foreignId('wedding_card_id')->constrained()->onDelete('cascade');
             $table->string('commenter_name');
             $table->string('commenter_email')->nullable();
             $table->text('comment');
-            $table->boolean('is_approved')->default(true);
+            $table->tinyInteger('is_approved')->default(0);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('wedding_card_comments');
     }

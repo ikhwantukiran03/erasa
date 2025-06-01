@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WeddingCardComment extends Model
 {
@@ -19,11 +18,11 @@ class WeddingCardComment extends Model
     ];
 
     protected $casts = [
-        'is_approved' => 'boolean',
+        'is_approved' => 'integer'
     ];
 
-    public function weddingCard(): BelongsTo
+    public function weddingCard()
     {
         return $this->belongsTo(WeddingCard::class);
     }
-} 
+}

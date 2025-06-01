@@ -49,16 +49,12 @@ Route::post('/booking-request', [BookingRequestController::class, 'store'])->nam
 Route::get('/booking-request/confirmation', [BookingRequestController::class, 'confirmation'])->name('booking-requests.confirmation');
 Route::get('/my-requests', [BookingRequestController::class, 'myRequests'])->name('booking-requests.my-requests');
 
-// API route for checking session availability
-Route::post('/api/check-availability', [BookingRequestController::class, 'checkAvailability'])->name('api.check-availability');
-
 // Booking Calendar Route 
 Route::get('/booking-calendar', [App\Http\Controllers\BookingCalendarController::class, 'index'])->name('booking.calendar');
 
 Route::get('/api/calendar-data', [BookingCalendarApiController::class, 'getCalendarData']);
 Route::get('/api/upcoming-bookings', [BookingCalendarApiController::class, 'getUpcomingBookings']);
 Route::get('/api/venues', [BookingCalendarApiController::class, 'getVenues']);
-Route::get('/api/check-availability', [BookingCalendarApiController::class, 'checkAvailability']);
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
@@ -96,13 +92,15 @@ Route::middleware('auth')->group(function () {
         return view('bookings.index');
     })->name('bookings.index');
 
-    // Wedding Card Routes - Protected
-Route::get('/wedding-cards', [WeddingCardController::class, 'index'])->name('wedding-cards.index');
-Route::get('/wedding-cards/create', [WeddingCardController::class, 'create'])->name('wedding-cards.create');
-Route::post('/wedding-cards', [WeddingCardController::class, 'store'])->name('wedding-cards.store');
-Route::get('/wedding-cards/{uuid}/edit', [WeddingCardController::class, 'edit'])->name('wedding-cards.edit');
-Route::put('/wedding-cards/{uuid}', [WeddingCardController::class, 'update'])->name('wedding-cards.update');
-Route::delete('/wedding-cards/{uuid}', [WeddingCardController::class, 'destroy'])->name('wedding-cards.destroy');
+    // Wedding Cards Routes
+    Route::get('/wedding-cards', [WeddingCardController::class, 'index'])->name('wedding-cards.index');
+    Route::get('/wedding-cards/create', [WeddingCardController::class, 'create'])->name('wedding-cards.create');
+    Route::post('/wedding-cards', [WeddingCardController::class, 'store'])->name('wedding-cards.store');
+    Route::get('/wedding-cards/{uuid}', [WeddingCardController::class, 'show'])->name('wedding-cards.show');
+    Route::get('/wedding-cards/{uuid}/edit', [WeddingCardController::class, 'edit'])->name('wedding-cards.edit');
+    Route::put('/wedding-cards/{uuid}', [WeddingCardController::class, 'update'])->name('wedding-cards.update');
+    Route::delete('/wedding-cards/{uuid}', [WeddingCardController::class, 'destroy'])->name('wedding-cards.destroy');
+    Route::post('/wedding-cards/{uuid}/comments', [WeddingCardController::class, 'addComment'])->name('wedding-cards.add-comment');
 });
 
 // Public wedding card routes - Not protected
@@ -261,53 +259,12 @@ Route::middleware(['auth'])->prefix('staff')->name('staff.')->group(function () 
     Route::patch('/feedback/{feedback}', [FeedbackController::class, 'update'])->name('feedback.update');
 
     // Promotion routes
-    Route::get('/promotions', function () {
-        if (!auth()->user()->isStaff()) {
-            return redirect()->route('dashboard')
-                ->with('error', 'You do not have permission to access this resource.');
-        }
-        return app()->make(App\Http\Controllers\Staff\PromotionController::class)->index();
-    })->name('promotions.index');
-
-    Route::get('/promotions/create', function () {
-        if (!auth()->user()->isStaff()) {
-            return redirect()->route('dashboard')
-                ->with('error', 'You do not have permission to access this resource.');
-        }
-        return app()->make(App\Http\Controllers\Staff\PromotionController::class)->create();
-    })->name('promotions.create');
-
-    Route::post('/promotions', function () {
-        if (!auth()->user()->isStaff()) {
-            return redirect()->route('dashboard')
-                ->with('error', 'You do not have permission to access this resource.');
-        }
-        return app()->make(App\Http\Controllers\Staff\PromotionController::class)->store(request());
-    })->name('promotions.store');
-
-    Route::get('/promotions/{promotion}/edit', function (App\Models\Promotion $promotion) {
-        if (!auth()->user()->isStaff()) {
-            return redirect()->route('dashboard')
-                ->with('error', 'You do not have permission to access this resource.');
-        }
-        return app()->make(App\Http\Controllers\Staff\PromotionController::class)->edit($promotion);
-    })->name('promotions.edit');
-
-    Route::put('/promotions/{promotion}', function (App\Models\Promotion $promotion) {
-        if (!auth()->user()->isStaff()) {
-            return redirect()->route('dashboard')
-                ->with('error', 'You do not have permission to access this resource.');
-        }
-        return app()->make(App\Http\Controllers\Staff\PromotionController::class)->update(request(), $promotion);
-    })->name('promotions.update');
-
-    Route::delete('/promotions/{promotion}', function (App\Models\Promotion $promotion) {
-        if (!auth()->user()->isStaff()) {
-            return redirect()->route('dashboard')
-                ->with('error', 'You do not have permission to access this resource.');
-        }
-        return app()->make(App\Http\Controllers\Staff\PromotionController::class)->destroy($promotion);
-    })->name('promotions.destroy');
+    Route::get('/promotions', [App\Http\Controllers\Staff\PromotionController::class, 'index'])->name('promotions.index');
+    Route::get('/promotions/create', [App\Http\Controllers\Staff\PromotionController::class, 'create'])->name('promotions.create');
+    Route::post('/promotions', [App\Http\Controllers\Staff\PromotionController::class, 'store'])->name('promotions.store');
+    Route::get('/promotions/{promotion}/edit', [App\Http\Controllers\Staff\PromotionController::class, 'edit'])->name('promotions.edit');
+    Route::put('/promotions/{promotion}', [App\Http\Controllers\Staff\PromotionController::class, 'update'])->name('promotions.update');
+    Route::delete('/promotions/{promotion}', [App\Http\Controllers\Staff\PromotionController::class, 'destroy'])->name('promotions.destroy');
 
     // Staff Chat Routes
     Route::get('/chat', [App\Http\Controllers\Staff\ChatController::class, 'index'])->name('chat.index');

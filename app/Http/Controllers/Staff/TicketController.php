@@ -10,13 +10,30 @@ use Illuminate\Support\Facades\Auth;
 
 class TicketController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tickets = Ticket::with(['user', 'replies'])
-            ->latest()
-            ->paginate(15);
+        $categories = ['general', 'technical', 'billing', 'other'];
 
-        return view('staff.tickets.index', compact('tickets'));
+        $query = Ticket::with(['user', 'replies']);
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%$search%")
+                  ->orWhereHas('user', function($uq) use ($search) {
+                      $uq->where('name', 'like', "%$search%")
+                         ->orWhere('email', 'like', "%$search%") ;
+                  });
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->input('category'));
+        }
+
+        $tickets = $query->latest()->paginate(15)->appends($request->all());
+
+        return view('staff.tickets.index', compact('tickets', 'categories'));
     }
 
     public function show(Ticket $ticket)

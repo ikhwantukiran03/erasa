@@ -15,11 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
-            $table->decimal('discount', 5, 2);
+            $table->decimal('discount', 8, 2);
             $table->date('start_date');
             $table->date('end_date');
             $table->string('cloudinary_image_id')->nullable();
             $table->string('cloudinary_image_url')->nullable();
+            $table->unsignedBigInteger('package_id')->nullable();
+            $table->foreign('package_id')->references('id')->on('packages')->onDelete('set null');
             $table->timestamps();
         });
     }

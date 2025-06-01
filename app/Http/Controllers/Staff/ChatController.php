@@ -17,7 +17,7 @@ class ChatController extends Controller
                 $query->latest();
             }])
             ->withCount(['messages as unread_count' => function ($query) {
-                $query->where('is_staff_reply', '=', 0)
+                $query->where('is_staff_reply', false)
                     ->whereNull('read_at');
             }])
             ->get()
@@ -37,7 +37,7 @@ class ChatController extends Controller
 
         // Mark unread messages as read
         Message::where('user_id', $user->id)
-            ->where('is_staff_reply', '=', 0)
+            ->where('is_staff_reply', false)
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 
@@ -46,7 +46,7 @@ class ChatController extends Controller
                 $query->latest();
             }])
             ->withCount(['messages as unread_count' => function ($query) {
-                $query->where('is_staff_reply', '=', 0)
+                $query->where('is_staff_reply', false)
                     ->whereNull('read_at');
             }])
             ->get()
@@ -67,7 +67,7 @@ class ChatController extends Controller
         $message = Message::create([
             'user_id' => $user->id,
             'message' => $request->message,
-            'is_staff_reply' => 1,
+            'is_staff_reply' => true,
         ]);
 
         broadcast(new NewMessage($message))->toOthers();

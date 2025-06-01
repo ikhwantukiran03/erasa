@@ -6,6 +6,24 @@
         <h1 class="text-2xl font-bold text-gray-800">Support Tickets</h1>
     </div>
 
+    <!-- Search and Filter Form -->
+    <form method="GET" action="" class="mb-6 flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0">
+        <div class="flex-1">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by title, user name, or email..." class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+        </div>
+        <div>
+            <select name="category" class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                <option value="">All Categories</option>
+                @foreach($categories as $cat)
+                    <option value="{{ $cat }}" @if(request('category') == $cat) selected @endif>{{ ucfirst($cat) }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition">Search</button>
+        </div>
+    </form>
+
     <div class="bg-white rounded-lg shadow overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">

@@ -81,7 +81,7 @@
                     <a href="#gallery" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Gallery</a>
                     <a href="{{ route('booking.calendar') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Calendar</a>
                     <a href="{{ route('public.venues') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Packages</a>
-                    <a href="{{ route('wedding-cards.index') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Wedding Cards</a>
+                    <a href="{{ route('promotions.index') }}" class="text-white hover:text-primary transition-colors duration-300 text-sm font-medium py-2">Promotions</a>
                     
                     @guest
                         <div class="flex items-center space-x-3 ml-2">
@@ -127,6 +127,8 @@
                 <a href="{{ route('booking.calendar') }}" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Calendar</a>
                 <a href="{{ route('public.venues') }}" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Packages</a>
                 
+                <a href="{{ route('promotions.index') }}" class="text-dark hover:text-primary hover:bg-gray-50 transition-colors px-4 py-3 font-medium">Promotions</a>
+                
                 @guest
                     <div class="flex flex-col space-y-2 p-4">
                         <a href="{{ route('login') }}" class="text-dark hover:text-primary transition-colors py-2 font-medium text-center border border-gray-200 rounded-lg">Login</a>
@@ -165,21 +167,12 @@
                                 <div class="promotion-slide flex-shrink-0 w-full flex items-center justify-between">
                                     <div class="flex items-center space-x-3">
                                         <span class="text-sm">{{ $promotion->title }}</span>
-                                        <span class="bg-white text-primary px-2 py-1 rounded-full text-xs font-bold">{{ $promotion->discount }}% OFF</span>
+                                        <span class="bg-white text-primary px-2 py-1 rounded-full text-xs font-bold">
+                                            RM{{ number_format($promotion->discount, 2) }} OFF
+                                        </span>
                                         <span class="text-xs opacity-90">Valid until {{ $promotion->end_date->format('M d, Y') }}</span>
                                     </div>
                                     <div class="flex items-center space-x-2">
-                                        @auth
-                                            <a href="{{ route('booking-requests.create', ['promotion' => $promotion->id]) }}" 
-                                               class="bg-white text-primary px-3 py-1 rounded-full text-xs font-medium hover:bg-gray-100 transition-colors">
-                                                Claim Now
-                                            </a>
-                                        @else
-                                            <a href="{{ route('login') }}" 
-                                               class="bg-white text-primary px-3 py-1 rounded-full text-xs font-medium hover:bg-gray-100 transition-colors">
-                                                Login to Claim
-                                            </a>
-                                        @endauth
                                         <a href="{{ route('promotions.show', $promotion) }}" 
                                            class="text-white hover:text-gray-200 text-xs underline">
                                             Details

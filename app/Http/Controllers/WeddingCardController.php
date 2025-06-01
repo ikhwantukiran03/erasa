@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\WeddingCard;
 use App\Models\WeddingCardComment;
+use App\Models\Venue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -55,16 +56,21 @@ class WeddingCardController extends Controller
     {
         // Define available templates
         $templates = [
-            1 => 'Elegant Floral',
-            2 => 'Modern Minimalist',
-            3 => 'Rustic Romance',
-            4 => 'Classic Gold',
-            5 => 'Vintage Lace'
+            1 => 'Floral Elegance',
+            2 => 'Pink Romance'
         ];
         
-        $imageUrls = $this->getWeddingImageUrls();
+        $imageUrls = [
+            'templates' => [
+                '1' => 'https://res.cloudinary.com/dwqzoq6lc/image/upload/v1748688655/flower_l3u88l.jpg',
+                '2' => 'https://res.cloudinary.com/dwqzoq6lc/image/upload/v1748688644/pink_gjcsvt.jpg'
+            ]
+        ];
+
+        // Get all venues for selection
+        $venues = Venue::orderBy('name')->get();
         
-        return view('wedding_cards.create', compact('templates', 'imageUrls'));
+        return view('wedding_cards.create', compact('templates', 'imageUrls', 'venues'));
     }
 
     public function store(Request $request)
@@ -74,12 +80,11 @@ class WeddingCardController extends Controller
             'bride_name' => 'required|string|max:255',
             'wedding_date' => 'required|date|after:today',
             'ceremony_time' => 'required|date_format:H:i',
-            'venue_name' => 'required|string|max:255',
-            'venue_address' => 'required|string',
+            'venue_id' => 'required|exists:venues,id',
             'rsvp_contact_name' => 'required|string|max:255',
             'rsvp_contact_info' => 'required|string|max:255',
             'custom_message' => 'nullable|string',
-            'template_id' => 'required|integer|min:1|max:5',
+            'template_id' => 'required|integer|min:1|max:2',
         ]);
 
         if ($validator->fails()) {
@@ -88,7 +93,20 @@ class WeddingCardController extends Controller
                 ->withInput();
         }
 
-        $card = Auth::user()->weddingCards()->create($request->all());
+        $venue = Venue::findOrFail($request->venue_id);
+        
+        $card = Auth::user()->weddingCards()->create([
+            'groom_name' => $request->groom_name,
+            'bride_name' => $request->bride_name,
+            'wedding_date' => $request->wedding_date,
+            'ceremony_time' => $request->ceremony_time,
+            'venue_name' => $venue->name,
+            'venue_address' => $venue->getFullAddressAttribute(),
+            'rsvp_contact_name' => $request->rsvp_contact_name,
+            'rsvp_contact_info' => $request->rsvp_contact_info,
+            'custom_message' => $request->custom_message,
+            'template_id' => $request->template_id,
+        ]);
         
         return redirect()->route('wedding-cards.show', $card->uuid)
             ->with('success', 'Wedding card created successfully!');
@@ -97,8 +115,14 @@ class WeddingCardController extends Controller
     public function show($uuid)
     {
         $card = WeddingCard::where('uuid', $uuid)->firstOrFail();
-        $comments = $card->comments()->where('is_approved', true)->latest()->get();
-        $imageUrls = $this->getWeddingImageUrls();
+        $comments = $card->comments()->where('is_approved', 1)->latest()->get();
+        $imageUrls = [
+            'templates' => [
+                '1' => 'https://res.cloudinary.com/dwqzoq6lc/image/upload/v1748688655/flower_l3u88l.jpg',
+                '2' => 'https://res.cloudinary.com/dwqzoq6lc/image/upload/v1748688644/pink_gjcsvt.jpg',
+                '3' => 'https://res.cloudinary.com/dwqzoq6lc/image/upload/v1748688635/Blush-Gold-Wedding-invitation-_suow1j.jpg'
+            ]
+        ];
         
         return view('wedding_cards.show', compact('card', 'comments', 'imageUrls'));
     }
@@ -114,16 +138,21 @@ class WeddingCardController extends Controller
         }
         
         $templates = [
-            1 => 'Elegant Floral',
-            2 => 'Modern Minimalist',
-            3 => 'Rustic Romance',
-            4 => 'Classic Gold',
-            5 => 'Vintage Lace'
+            1 => 'Floral Elegance',
+            2 => 'Pink Romance'
         ];
         
-        $imageUrls = $this->getWeddingImageUrls();
+        $imageUrls = [
+            'templates' => [
+                '1' => 'https://res.cloudinary.com/dwqzoq6lc/image/upload/v1748688655/flower_l3u88l.jpg',
+                '2' => 'https://res.cloudinary.com/dwqzoq6lc/image/upload/v1748688644/pink_gjcsvt.jpg'
+            ]
+        ];
+
+        // Get all venues for selection
+        $venues = Venue::orderBy('name')->get();
         
-        return view('wedding_cards.edit', compact('card', 'templates', 'imageUrls'));
+        return view('wedding_cards.edit', compact('card', 'templates', 'imageUrls', 'venues'));
     }
 
     public function update(Request $request, $uuid)
@@ -141,12 +170,11 @@ class WeddingCardController extends Controller
             'bride_name' => 'required|string|max:255',
             'wedding_date' => 'required|date',
             'ceremony_time' => 'required|date_format:H:i',
-            'venue_name' => 'required|string|max:255',
-            'venue_address' => 'required|string',
+            'venue_id' => 'required|exists:venues,id',
             'rsvp_contact_name' => 'required|string|max:255',
             'rsvp_contact_info' => 'required|string|max:255',
             'custom_message' => 'nullable|string',
-            'template_id' => 'required|integer|min:1|max:5',
+            'template_id' => 'required|integer|min:1|max:2',
         ]);
 
         if ($validator->fails()) {
@@ -155,7 +183,20 @@ class WeddingCardController extends Controller
                 ->withInput();
         }
 
-        $card->update($request->all());
+        $venue = Venue::findOrFail($request->venue_id);
+        
+        $card->update([
+            'groom_name' => $request->groom_name,
+            'bride_name' => $request->bride_name,
+            'wedding_date' => $request->wedding_date,
+            'ceremony_time' => $request->ceremony_time,
+            'venue_name' => $venue->name,
+            'venue_address' => $venue->getFullAddressAttribute(),
+            'rsvp_contact_name' => $request->rsvp_contact_name,
+            'rsvp_contact_info' => $request->rsvp_contact_info,
+            'custom_message' => $request->custom_message,
+            'template_id' => $request->template_id,
+        ]);
         
         return redirect()->route('wedding-cards.show', $card->uuid)
             ->with('success', 'Wedding card updated successfully!');
@@ -197,7 +238,7 @@ class WeddingCardController extends Controller
             'commenter_name' => $request->commenter_name,
             'commenter_email' => $request->commenter_email,
             'comment' => $request->comment,
-            'is_approved' => true, // Auto-approve for simplicity
+            'is_approved' => 1, // Changed from true to 1
         ]);
         
         return redirect()->back()

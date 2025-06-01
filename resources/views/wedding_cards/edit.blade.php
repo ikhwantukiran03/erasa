@@ -48,42 +48,32 @@
                         @enderror
                     </div>
                     
-                    <div>
-                        <label class="font-medium text-gray-700 mb-2 block">Ceremony Time</label>
-                        <input type="time" name="ceremony_time" value="{{ old('ceremony_time', date('H:i', strtotime($card->ceremony_time))) }}" class="form-input">
-                        @error('ceremony_time')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 gap-6 mb-8">
-                    <div>
-                        <label class="font-medium text-gray-700 mb-2 block">Venue Name</label>
-                        <input type="text" name="venue_name" value="{{ old('venue_name', $card->venue_name) }}" class="form-input" placeholder="Enter venue name">
-                        @error('venue_name')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    
-                    <div>
-                        <label class="font-medium text-gray-700 mb-2 block">Venue Address</label>
-                        <textarea name="venue_address" class="form-input" rows="3" placeholder="Enter full venue address">{{ old('venue_address', $card->venue_address) }}</textarea>
-                        @error('venue_address')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
+                    <div class="mb-4">
+                        <label for="ceremony_time" class="block text-sm font-medium text-gray-700">Ceremony Time</label>
+                        <input type="time" name="ceremony_time" id="ceremony_time" value="{{ old('ceremony_time', $card->ceremony_time) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" required>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div>
-                        <label class="font-medium text-gray-700 mb-2 block">RSVP Contact Name</label>
-                        <input type="text" name="rsvp_contact_name" value="{{ old('rsvp_contact_name', $card->rsvp_contact_name) }}" class="form-input" placeholder="Enter contact person name">
-                        @error('rsvp_contact_name')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
+                        <label class="font-medium text-gray-700 mb-2 block">Venue</label>
+                        <select name="venue_id" id="venue_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" required>
+                            <option value="">Select a venue</option>
+                            @foreach($venues as $venue)
+                                <option value="{{ $venue->id }}" {{ old('venue_id', $card->venue_name == $venue->name ? $venue->id : '') == $venue->id ? 'selected' : '' }}>
+                                    {{ $venue->name }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                     
+                    <div>
+                        <label class="font-medium text-gray-700 mb-2 block">RSVP Contact Name</label>
+                        <input type="text" name="rsvp_contact_name" id="rsvp_contact_name" value="{{ old('rsvp_contact_name', $card->rsvp_contact_name) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" required>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div>
                         <label class="font-medium text-gray-700 mb-2 block">RSVP Contact Info</label>
                         <input type="text" name="rsvp_contact_info" value="{{ old('rsvp_contact_info', $card->rsvp_contact_info) }}" class="form-input" placeholder="Enter phone number or email">
@@ -103,13 +93,13 @@
                 
                 <div class="mb-8">
                     <label class="font-medium text-gray-700 mb-2 block">Select Template</label>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
                         @foreach($templates as $id => $name)
                         <div class="relative">
                             <input type="radio" name="template_id" value="{{ $id }}" id="template-{{ $id }}" class="sr-only" {{ old('template_id', $card->template_id) == $id ? 'checked' : '' }}>
                             <label for="template-{{ $id }}" class="block cursor-pointer">
                                 <div class="border-2 rounded-lg p-2 overflow-hidden transition-all duration-200 hover:shadow-medium" id="template-container-{{ $id }}">
-                                    <img src="{{ $imageUrls['templates'][$id] ?? asset('assets/wedding-templates/' . $id . '.jpg') }}" alt="{{ $name }}" class="w-full h-48 object-cover rounded">
+                                    <img src="{{ $imageUrls['templates'][$id] }}" alt="{{ $name }}" class="w-full h-48 object-cover rounded">
                                     <div class="mt-2 text-center py-2 font-medium">{{ $name }}</div>
                                 </div>
                             </label>

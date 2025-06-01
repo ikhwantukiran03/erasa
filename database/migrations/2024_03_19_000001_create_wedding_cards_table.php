@@ -6,13 +6,12 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('wedding_cards', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('groom_name');
             $table->string('bride_name');
             $table->date('wedding_date');
@@ -22,18 +21,12 @@ return new class extends Migration
             $table->string('rsvp_contact_name');
             $table->string('rsvp_contact_info');
             $table->text('custom_message')->nullable();
-            $table->unsignedTinyInteger('template_id');
-            $table->string('uuid')->unique();
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            $table->integer('template_id');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('wedding_cards');
     }
