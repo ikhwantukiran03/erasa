@@ -63,6 +63,15 @@
                 background-attachment: scroll;
             }
         }
+        
+        /* Banner positioning */
+        #promo-banner {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        
+        .banner-closed #home {
+            padding-top: 0 !important;
+        }
     </style>
 </head>
 <body>
@@ -149,7 +158,7 @@
 
     <!-- Promotional Banner -->
     @if($activePromotions->isNotEmpty())
-    <div class="bg-gradient-to-r from-primary to-primary-dark text-white py-3 relative overflow-hidden" id="promo-banner">
+    <div class="bg-gradient-to-r from-primary to-primary-dark text-white py-3 relative overflow-hidden fixed w-full z-40" id="promo-banner" style="top: 3rem;">
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4 flex-1">
@@ -219,7 +228,7 @@
     @endif
 
     <!-- Hero Section -->
-    <section class="hero-bg min-h-screen flex items-center justify-center text-white" id="home">
+    <section class="hero-bg min-h-screen flex items-center justify-center text-white pt-20" id="home">
         <div class="container mx-auto px-4">
        
 
@@ -691,11 +700,18 @@
         
         function closeBanner() {
             const banner = document.getElementById('promo-banner');
+            const heroSection = document.getElementById('home');
+            
             if (banner) {
                 banner.style.transform = 'translateY(-100%)';
                 banner.style.opacity = '0';
                 setTimeout(() => {
                     banner.style.display = 'none';
+                    // Adjust hero section padding when banner is closed
+                    if (heroSection) {
+                        heroSection.classList.remove('pt-20');
+                        heroSection.classList.add('pt-16');
+                    }
                 }, 300);
                 
                 // Store in localStorage to remember user preference
@@ -713,6 +729,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const bannerClosed = localStorage.getItem('promoBannerClosed');
             const banner = document.getElementById('promo-banner');
+            const heroSection = document.getElementById('home');
             
             if (bannerClosed === 'true' && banner) {
                 // Check if 24 hours have passed since closing
@@ -726,6 +743,11 @@
                 } else {
                     // Still within 24 hours, keep banner hidden
                     banner.style.display = 'none';
+                    // Adjust hero section padding when banner is hidden
+                    if (heroSection) {
+                        heroSection.classList.remove('pt-20');
+                        heroSection.classList.add('pt-16');
+                    }
                 }
             }
         });

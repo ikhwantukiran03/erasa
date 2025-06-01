@@ -77,13 +77,66 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
                 @forelse($venues as $venue)
                     <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
-                        <div class="h-48 bg-gray-200 flex items-center justify-center">
-                            @if($venue->image)
-                            <img src="{{ $venueImage->image_path }}"  alt="{{ $venue->name }}" class="w-full h-full object-cover">
+                        <div class="h-48 bg-gray-200 flex items-center justify-center relative">
+                            @php
+                                // Get venue images from Gallery model
+                                $venueImages = $venue->galleries()->whereRaw('is_featured = true')->get();
+                                if ($venueImages->isEmpty()) {
+                                    $venueImages = $venue->galleries()->take(1)->get();
+                                }
+                                $venueImage = $venueImages->first();
+                                
+                                // Debug: Check if we have any galleries
+                                $totalGalleries = $venue->galleries()->count();
+                                
+                                // Debug: Get all galleries for this venue
+                                $allGalleries = $venue->galleries()->get();
+                            @endphp
+                            
+                            @if($venueImage)
+                                @php
+                                    // Fix for Cloudinary URLs that are marked as 'local' in database
+                                    $imageUrl = $venueImage->image_path;
+                                    
+                                    // If the path starts with http/https, use it directly (Cloudinary)
+                                    if (str_starts_with($venueImage->image_path, 'http')) {
+                                        $imageUrl = $venueImage->image_path;
+                                    } 
+                                    // If source is external or has image_url, use that
+                                    elseif ($venueImage->source === 'external' || $venueImage->image_url) {
+                                        $imageUrl = $venueImage->image_url;
+                                    }
+                                    // Otherwise, treat as local storage
+                                    else {
+                                        $imageUrl = asset('storage/' . $venueImage->image_path);
+                                    }
+                                @endphp
+                                
+                                <img src="{{ $imageUrl }}" 
+                                     alt="{{ $venue->name }}" 
+                                     class="w-full h-full object-cover">
+                            @elseif($totalGalleries > 0)
+                                <!-- Debug: Show that galleries exist but no featured/first image -->
+                                <div class="text-center p-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <p class="text-xs text-gray-500">{{ $totalGalleries }} images available</p>
+                                    <p class="text-xs text-gray-400">Image loading issue</p>
+                                </div>
                             @else
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                </svg>
+                                <!-- No galleries - show placeholder image -->
+                                <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=400&h=300&fit=crop&crop=center" 
+                                     alt="{{ $venue->name }} placeholder" 
+                                     class="w-full h-full object-cover opacity-60">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <div class="text-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                        <p class="text-xs text-white">No images uploaded</p>
+                                    </div>
+                                </div>
                             @endif
                         </div>
                         <div class="p-4">
