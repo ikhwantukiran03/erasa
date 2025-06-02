@@ -35,6 +35,18 @@ class Gallery extends Model
         'is_featured' => 'boolean',
     ];
 
+    /**
+     * Set the is_featured attribute.
+     * Ensures proper boolean conversion for PostgreSQL.
+     *
+     * @param  mixed  $value
+     * @return void
+     */
+    public function setIsFeaturedAttribute($value)
+    {
+        $this->attributes['is_featured'] = $value ? 'true' : 'false';
+    }
+
         /**
         * Get the venue that owns the gallery.
         */
