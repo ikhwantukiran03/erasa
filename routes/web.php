@@ -31,6 +31,7 @@ use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\User\ChatController;
 use App\Http\Controllers\Staff\ChatController as StaffChatController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\BookingReminderController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -340,6 +341,13 @@ Route::get('/chatbot', [ChatbotController::class, 'index'])->name('chatbot.index
 Route::post('/chatbot/query', [ChatbotController::class, 'query'])->name('chatbot.query');
 Route::post('/chatbot/clear-conversation', [ChatbotController::class, 'clearConversation'])->name('chatbot.clear');
 Route::get('/chatbot/conversation-history', [ChatbotController::class, 'getConversationHistory'])->name('chatbot.history');
+
+// Booking Reminder Routes
+Route::prefix('reminders')->group(function () {
+    Route::get('/payment', [BookingReminderController::class, 'sendPaymentReminders']);
+    Route::get('/event', [BookingReminderController::class, 'sendEventReminders']);
+    Route::get('/all', [BookingReminderController::class, 'sendAllReminders']);
+});
 
 
     

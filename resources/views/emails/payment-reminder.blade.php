@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Reset - Enak Rasa Wedding Hall</title>
+    <title>Payment Reminder - Enak Rasa Wedding Hall</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -31,8 +31,8 @@
             font-weight: bold;
             color: #8B5CF6;
         }
-        .password-badge {
-            background-color: #10B981;
+        .reminder-badge {
+            background-color: #F59E0B;
             color: white;
             padding: 10px 20px;
             border-radius: 25px;
@@ -40,24 +40,27 @@
             margin: 20px 0;
             font-weight: bold;
         }
-        .password-box {
+        .payment-details {
             background-color: #f8f9fa;
             padding: 20px;
             border-radius: 8px;
             margin: 20px 0;
-            text-align: center;
         }
-        .password {
-            font-size: 24px;
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .detail-label {
             font-weight: bold;
-            color: #8B5CF6;
-            letter-spacing: 2px;
-            padding: 15px;
-            background-color: #F3F4F6;
-            border-radius: 5px;
-            margin: 10px 0;
+            color: #666;
         }
-        .warning-box {
+        .detail-value {
+            color: #333;
+        }
+        .reminder-box {
             background-color: #FEF3C7;
             border-left: 4px solid #F59E0B;
             padding: 15px;
@@ -96,30 +99,45 @@
         <div class="header">
             <div class="logo">Enak Rasa Wedding Hall</div>
             <p>Your Dream Wedding Venue</p>
-            <div class="password-badge">🔑 NEW PASSWORD GENERATED 🔑</div>
+            <div class="reminder-badge">⚠️ PAYMENT DUE SOON! ⚠️</div>
         </div>
         
         <div class="content">
-            <h2>Hello {{ $user->name }},</h2>
+            <h2>Hello {{ $booking->user->name }},</h2>
             
-            <p>Your password has been reset successfully. Here is your new password:</p>
+            <p>This is a friendly reminder that your payment for booking at Enak Rasa Wedding Hall is due in 5 days.</p>
             
-            <div class="password-box">
-                <h3>Your New Password</h3>
-                <div class="password">{{ $password }}</div>
-                <p>Please login with this new password and change it immediately for security reasons.</p>
-            </div>
-            
-            <div class="warning-box">
-                <h4>⚠️ Important Security Notice</h4>
-                <p>If you did not request this password reset, please contact our support team immediately.</p>
-            </div>
-            
-            <div class="warning-box">
-                <h4>🔗 Login to Your Account</h4>
-                <p>Click the button below to login with your new password:</p>
+            <div class="payment-details">
+                <h3>💳 Payment Details</h3>
                 
-                <a href="{{ route('login') }}" class="btn">Login Now</a>
+                <div class="detail-row">
+                    <span class="detail-label">Booking Reference:</span>
+                    <span class="detail-value">B-{{ $booking->id }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Amount Due:</span>
+                    <span class="detail-value">RM {{ number_format($booking->total_amount, 2) }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Due Date:</span>
+                    <span class="detail-value">{{ $booking->payment_due_date->format('d F Y') }}</span>
+                </div>
+            </div>
+            
+            <div class="reminder-box">
+                <h4>📝 Important Reminder</h4>
+                <p>Please ensure your payment is made before the due date to avoid any inconvenience.</p>
+                <p>If you have already made the payment, please disregard this reminder.</p>
+            </div>
+            
+            <div class="reminder-box">
+                <h4>🔗 Manage Your Booking</h4>
+                <p>You can view your booking details and make payments through your account:</p>
+                
+                <a href="{{ route('user.bookings.show', $booking->id) }}" class="btn">View Booking Details</a>
+                <a href="{{ route('user.bookings') }}" class="btn">My Bookings</a>
             </div>
         </div>
         
@@ -136,7 +154,7 @@
             <p><em>Making your dream wedding come true</em></p>
             <br>
             <p>Thank you for choosing Enak Rasa Wedding Hall! 🙏</p>
-            <p>If you have any questions about your account, please don't hesitate to contact us.</p>
+            <p>If you have any questions about your payment or booking, please don't hesitate to contact us.</p>
             <p>&copy; {{ date('Y') }} Enak Rasa Wedding Hall. All rights reserved.</p>
         </div>
     </div>
