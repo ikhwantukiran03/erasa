@@ -145,78 +145,78 @@
                 @endguest
             </nav>
         </div>
-    </header>
 
-    <!-- Promotional Banner -->
-    @if($activePromotions->isNotEmpty())
-    <div class="bg-gradient-to-r from-primary to-primary-dark text-white py-3 relative overflow-hidden" id="promo-banner">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4 flex-1">
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                        </svg>
-                        <span class="font-semibold text-sm">Special Offer:</span>
-                    </div>
-                    
-                    <!-- Promotion Carousel -->
-                    <div class="flex-1 overflow-hidden">
-                        <div class="promotion-slider flex transition-transform duration-500 ease-in-out" id="promotion-slider">
-                            @foreach($activePromotions as $promotion)
-                                <div class="promotion-slide flex-shrink-0 w-full flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <span class="text-sm">{{ $promotion->title }}</span>
-                                        <span class="bg-white text-primary px-2 py-1 rounded-full text-xs font-bold">
-                                            RM{{ number_format($promotion->discount, 2) }} OFF
-                                        </span>
-                                        <span class="text-xs opacity-90">Valid until {{ $promotion->end_date->format('M d, Y') }}</span>
+        <!-- Promotional Banner -->
+        @if($activePromotions->isNotEmpty())
+        <div class="bg-gradient-to-r from-primary to-primary-dark text-white py-3 relative overflow-hidden" id="promo-banner">
+            <div class="container mx-auto px-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4 flex-1">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                            </svg>
+                            <span class="font-semibold text-sm">Special Offer:</span>
+                        </div>
+                        
+                        <!-- Promotion Carousel -->
+                        <div class="flex-1 overflow-hidden">
+                            <div class="promotion-slider flex transition-transform duration-500 ease-in-out" id="promotion-slider">
+                                @foreach($activePromotions as $promotion)
+                                    <div class="promotion-slide flex-shrink-0 w-full flex items-center justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <span class="text-sm">{{ $promotion->title }}</span>
+                                            <span class="bg-white text-primary px-2 py-1 rounded-full text-xs font-bold">
+                                                RM{{ number_format($promotion->discount, 2) }} OFF
+                                            </span>
+                                            <span class="text-xs opacity-90">Valid until {{ $promotion->end_date->format('M d, Y') }}</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <a href="{{ route('promotions.show', $promotion) }}" 
+                                               class="text-white hover:text-gray-200 text-xs underline">
+                                                Details
+                                            </a>
+                                        </div>
                                     </div>
-                                    <div class="flex items-center space-x-2">
-                                        <a href="{{ route('promotions.show', $promotion) }}" 
-                                           class="text-white hover:text-gray-200 text-xs underline">
-                                            Details
-                                        </a>
-                                    </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Navigation arrows (only show if more than 1 promotion) -->
-                @if($activePromotions->count() > 1)
-                <div class="flex items-center space-x-2 ml-4">
-                    <button onclick="previousPromotion()" class="text-white hover:text-gray-200 transition-colors">
+                    
+                    <!-- Navigation arrows (only show if more than 1 promotion) -->
+                    @if($activePromotions->count() > 1)
+                    <div class="flex items-center space-x-2 ml-4">
+                        <button onclick="previousPromotion()" class="text-white hover:text-gray-200 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <button onclick="nextPromotion()" class="text-white hover:text-gray-200 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                    @endif
+                    
+                    <!-- Close button -->
+                    <button onclick="closeBanner()" class="text-white hover:text-gray-200 transition-colors ml-4">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
-                    <button onclick="nextPromotion()" class="text-white hover:text-gray-200 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
                 </div>
-                @endif
-                
-                <!-- Close button -->
-                <button onclick="closeBanner()" class="text-white hover:text-gray-200 transition-colors ml-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
+            </div>
+            
+            <!-- Animated background elements -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <div class="absolute -top-4 -right-4 w-8 h-8 bg-white opacity-10 rounded-full animate-bounce"></div>
+                <div class="absolute top-2 left-1/4 w-2 h-2 bg-white opacity-20 rounded-full animate-pulse"></div>
+                <div class="absolute bottom-1 right-1/3 w-3 h-3 bg-white opacity-15 rounded-full animate-bounce" style="animation-delay: 0.5s;"></div>
             </div>
         </div>
-        
-        <!-- Animated background elements -->
-        <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div class="absolute -top-4 -right-4 w-8 h-8 bg-white opacity-10 rounded-full animate-bounce"></div>
-            <div class="absolute top-2 left-1/4 w-2 h-2 bg-white opacity-20 rounded-full animate-pulse"></div>
-            <div class="absolute bottom-1 right-1/3 w-3 h-3 bg-white opacity-15 rounded-full animate-bounce" style="animation-delay: 0.5s;"></div>
-        </div>
-    </div>
-    @endif
+        @endif
+    </header>
 
     <!-- Hero Section -->
     <section class="hero-bg min-h-screen flex items-center justify-center text-white" id="home">
