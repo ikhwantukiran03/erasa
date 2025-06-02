@@ -172,7 +172,7 @@
                                             <span class="text-xs opacity-90">Valid until {{ $promotion->end_date->format('M d, Y') }}</span>
                                         </div>
                                         <div class="flex items-center space-x-2">
-                                            <a href="{{ route('promotions.show', $promotion) }}" 
+                                            <a href="{{ route('public.package', $promotion->package_id) }}" 
                                                class="text-white hover:text-gray-200 text-xs underline">
                                                 Details
                                             </a>
