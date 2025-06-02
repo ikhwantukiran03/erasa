@@ -7,6 +7,7 @@ use App\Services\SupabaseStorageService;
 use App\Models\Promotion;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -41,5 +42,10 @@ class AppServiceProvider extends ServiceProvider
             
             $view->with('globalActivePromotions', $activePromotions);
         });
+
+        // Force HTTPS in production
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
     }
 }
