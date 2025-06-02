@@ -30,6 +30,7 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\User\ChatController;
 use App\Http\Controllers\Staff\ChatController as StaffChatController;
+use App\Http\Controllers\ForgotPasswordController;
 
 // Home page
 Route::get('/', [HomeController::class, 'index']);
@@ -67,6 +68,10 @@ Route::middleware('guest')->group(function () {
     // Registration Routes
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
+    
+    // Forgot Password Routes
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])->name('forgot-password');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'handle']);
 });
 
 Route::middleware('auth')->group(function () {

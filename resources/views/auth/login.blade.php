@@ -47,6 +47,9 @@
                     @error('password')
                         <p class="error-message">{{ $message }}</p>
                     @enderror
+                    <div class="text-right mt-2">
+                        <a href="{{ route('forgot-password') }}" class="text-primary text-sm hover:underline">Forgot Password?</a>
+                    </div>
                 </div>
                 
                 <div class="mb-6 flex items-center">

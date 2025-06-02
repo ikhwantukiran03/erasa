@@ -162,4 +162,32 @@ class EmailService
             return false;
         }
     }
+
+    /**
+     * Send forgot password email.
+     *
+     * @param string $to The recipient's email address
+     * @param array $data User and new password information
+     * @return bool Whether the email was sent successfully
+     */
+    public function sendForgotPasswordEmail($to, $data)
+    {
+        $subject = "🔑 Your New Password - Enak Rasa Wedding Hall";
+        
+        try {
+            $staffConfig = $this->getStaffEmailConfig();
+            
+            Mail::send('emails.forgot-password', $data, function ($mail) use ($to, $subject, $staffConfig) {
+                $mail->to($to)
+                     ->subject($subject)
+                     ->from($staffConfig['address'], $staffConfig['name']);
+            });
+
+            Log::info("Forgot password email sent to {$to} successfully.");
+            return true;
+        } catch (\Exception $e) {
+            Log::error("Failed to send forgot password email: " . $e->getMessage());
+            return false;
+        }
+    }
 } 
