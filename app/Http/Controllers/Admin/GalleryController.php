@@ -174,7 +174,7 @@ class GalleryController extends Controller
                 $title = $request->titles[$index] ?? $default_title ?? $image->getClientOriginalName();
                 $description = $request->descriptions[$index] ?? $default_description;
                 
-                // Mark first image as featured if requested
+                // Mark first image as featured if requested - explicitly convert to boolean
                 $is_image_featured = ($count === 0 && $is_featured) ? true : false;
                 
                 // Create gallery item
@@ -184,7 +184,7 @@ class GalleryController extends Controller
                     'description' => $description,
                     'image_path' => $result['url'], // Store the URL from Cloudinary
                     'image_url' => null,
-                    'is_featured' => $is_image_featured,
+                    'is_featured' => (bool) $is_image_featured,
                     'display_order' => $display_order + $count,
                     'source' => 'local',
                 ]);
@@ -210,7 +210,7 @@ class GalleryController extends Controller
                 $title = $request->url_titles[$index] ?? $default_title ?? 'Gallery Image';
                 $description = $request->url_descriptions[$index] ?? $default_description;
                 
-                // Mark first image as featured if requested
+                // Mark first image as featured if requested - explicitly convert to boolean
                 $is_image_featured = ($count === 0 && $is_featured) ? true : false;
                 
                 // Create gallery item
@@ -220,7 +220,7 @@ class GalleryController extends Controller
                     'description' => $description,
                     'image_path' => null,
                     'image_url' => $url,
-                    'is_featured' => $is_image_featured,
+                    'is_featured' => (bool) $is_image_featured,
                     'display_order' => $display_order + $count,
                     'source' => 'external',
                 ]);
@@ -304,6 +304,11 @@ class GalleryController extends Controller
         }
 
         $data = $request->except(['image']);
+        
+        // Explicitly convert is_featured to boolean if present
+        if (isset($data['is_featured'])) {
+            $data['is_featured'] = (bool) $data['is_featured'];
+        }
         
         // Handle file upload or source change
         if ($request->source === 'local') {
@@ -470,8 +475,8 @@ class GalleryController extends Controller
         $gallery_ids = $request->gallery_ids;
         $action = $request->action;
         
-        // Update featured status based on action
-        $featureValue = ($action === 'feature') ? true : false;
+        // Update featured status based on action - convert to PostgreSQL-compatible format
+        $featureValue = ($action === 'feature') ? 'true' : 'false';
         
         // Update all selected galleries
         $updated = Gallery::whereIn('id', $gallery_ids)->update(['is_featured' => $featureValue]);

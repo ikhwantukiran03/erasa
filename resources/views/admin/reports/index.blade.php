@@ -110,8 +110,10 @@
                 <!-- Monthly Bookings Chart -->
                 <div class="mb-8">
                     <h3 class="text-lg font-medium text-gray-700 mb-4">Monthly Bookings</h3>
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <canvas id="bookingsChart" height="100"></canvas>
+                    <div class="bg-gray-50 p-4 rounded-lg flex justify-center">
+                        <div class="w-96">
+                            <canvas id="bookingsChart" height="300"></canvas>
+                        </div>
                     </div>
                 </div>
 
@@ -183,29 +185,61 @@ document.addEventListener('DOMContentLoaded', function() {
     // Bookings Chart
     const bookingsCtx = document.getElementById('bookingsChart').getContext('2d');
     new Chart(bookingsCtx, {
-        type: 'bar',
+        type: 'pie',
         data: {
             labels: {!! json_encode($monthlyBookings->pluck('month')) !!},
             datasets: [{
-                label: 'Monthly Bookings',
                 data: {!! json_encode($monthlyBookings->pluck('total')) !!},
-                backgroundColor: 'rgba(16, 185, 129, 0.5)',
-                borderColor: 'rgb(16, 185, 129)',
+                backgroundColor: [
+                    'rgba(16, 185, 129, 0.5)',
+                    'rgba(59, 130, 246, 0.5)',
+                    'rgba(245, 158, 11, 0.5)',
+                    'rgba(239, 68, 68, 0.5)',
+                    'rgba(139, 92, 246, 0.5)',
+                    'rgba(236, 72, 153, 0.5)',
+                    'rgba(14, 165, 233, 0.5)',
+                    'rgba(34, 197, 94, 0.5)',
+                    'rgba(249, 115, 22, 0.5)',
+                    'rgba(168, 85, 247, 0.5)',
+                    'rgba(236, 72, 153, 0.5)',
+                    'rgba(6, 182, 212, 0.5)'
+                ],
+                borderColor: [
+                    'rgb(16, 185, 129)',
+                    'rgb(59, 130, 246)',
+                    'rgb(245, 158, 11)',
+                    'rgb(239, 68, 68)',
+                    'rgb(139, 92, 246)',
+                    'rgb(236, 72, 153)',
+                    'rgb(14, 165, 233)',
+                    'rgb(34, 197, 94)',
+                    'rgb(249, 115, 22)',
+                    'rgb(168, 85, 247)',
+                    'rgb(236, 72, 153)',
+                    'rgb(6, 182, 212)'
+                ],
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: true,
             plugins: {
                 legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
+                    position: 'right',
+                    labels: {
+                        padding: 10,
+                        boxWidth: 12,
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Monthly Bookings Distribution',
+                    font: {
+                        size: 14
                     }
                 }
             }
