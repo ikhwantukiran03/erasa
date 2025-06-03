@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Staff;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Promotion;
@@ -32,13 +32,13 @@ class PromotionController extends Controller
         
         $promotions = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
         
-        return view('staff.promotions.index', compact('promotions', 'search'));
+        return view('admin.promotions.index', compact('promotions', 'search'));
     }
 
     public function create()
     {
         $packages = \App\Models\Package::orderBy('name')->get();
-        return view('staff.promotions.create', compact('packages'));
+        return view('admin.promotions.create', compact('packages'));
     }
 
     public function store(Request $request)
@@ -79,7 +79,7 @@ class PromotionController extends Controller
                 'package_id' => $request->package_id,
             ]);
 
-            return redirect()->route('staff.promotions.index')
+            return redirect()->route('admin.promotions.index')
                 ->with('success', 'Promotion created successfully.');
         } catch (\Exception $e) {
             \Log::error('Promotion creation failed: ' . $e->getMessage());
@@ -92,7 +92,7 @@ class PromotionController extends Controller
     public function edit(Promotion $promotion)
     {
         $packages = \App\Models\Package::orderBy('name')->get();
-        return view('staff.promotions.edit', compact('promotion', 'packages'));
+        return view('admin.promotions.edit', compact('promotion', 'packages'));
     }
 
     public function update(Request $request, Promotion $promotion)
@@ -131,7 +131,7 @@ class PromotionController extends Controller
 
             $promotion->update($data);
 
-            return redirect()->route('staff.promotions.index')
+            return redirect()->route('admin.promotions.index')
                 ->with('success', 'Promotion updated successfully.');
         } catch (\Exception $e) {
             \Log::error('Promotion update failed: ' . $e->getMessage());
@@ -149,7 +149,7 @@ class PromotionController extends Controller
 
         $promotion->delete();
 
-        return redirect()->route('staff.promotions.index')
+        return redirect()->route('admin.promotions.index')
             ->with('success', 'Promotion deleted successfully.');
     }
-}
+} 

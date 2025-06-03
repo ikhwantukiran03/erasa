@@ -26,6 +26,44 @@
     <div class="container mx-auto px-4">
         <!-- Quick Actions -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <!-- Unread Messages -->
+            @php
+                $unreadMessages = \App\Models\Message::where('user_id', Auth::id())
+                    ->where('is_staff_reply', true)
+                    ->whereNull('read_at')
+                    ->count();
+                $lastMessage = \App\Models\Message::where('user_id', Auth::id())
+                    ->where('is_staff_reply', true)
+                    ->latest()
+                    ->first();
+            @endphp
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="100">
+                <div class="flex items-center">
+                    <div class="bg-red-50 rounded-full p-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Unread Messages</p>
+                        <p class="text-lg font-semibold text-gray-800">{{ $unreadMessages }}</p>
+                    </div>
+                </div>
+                @if($lastMessage)
+                    <div class="mt-4 text-sm text-gray-600">
+                        <p class="font-medium text-gray-900">Last Message:</p>
+                        <p class="mt-1 truncate">{{ Str::limit($lastMessage->message, 50) }}</p>
+                        <p class="mt-1 text-xs text-gray-500">{{ $lastMessage->created_at->diffForHumans() }}</p>
+                    </div>
+                @endif
+                <a href="{{ route('user.chat.index') }}" class="mt-4 inline-flex items-center text-sm text-red-600 hover:underline">
+                    View all messages
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </div>
+
             <!-- Book Now -->
             <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="100">
                 <div class="flex items-center">

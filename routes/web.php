@@ -191,6 +191,14 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/galleries/update-order', [GalleryController::class, 'updateOrder'])->name('galleries.updateOrder');
     Route::post('/galleries/bulk-feature', [GalleryController::class, 'bulkFeature'])->name('galleries.bulkFeature');
 
+    // Promotion Management Routes
+    Route::get('/promotions', [App\Http\Controllers\Admin\PromotionController::class, 'index'])->name('promotions.index');
+    Route::get('/promotions/create', [App\Http\Controllers\Admin\PromotionController::class, 'create'])->name('promotions.create');
+    Route::post('/promotions', [App\Http\Controllers\Admin\PromotionController::class, 'store'])->name('promotions.store');
+    Route::get('/promotions/{promotion}/edit', [App\Http\Controllers\Admin\PromotionController::class, 'edit'])->name('promotions.edit');
+    Route::put('/promotions/{promotion}', [App\Http\Controllers\Admin\PromotionController::class, 'update'])->name('promotions.update');
+    Route::delete('/promotions/{promotion}', [App\Http\Controllers\Admin\PromotionController::class, 'destroy'])->name('promotions.destroy');
+
     Route::get('/bookings', function () {
         if (!auth()->user()->isAdmin()) {
             return redirect()->route('dashboard')
