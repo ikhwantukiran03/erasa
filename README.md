@@ -1,66 +1,325 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Enak Rasa Wedding Hall Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A comprehensive wedding hall management system built with Laravel, featuring booking management, payment processing, AI-powered chatbot, and customer relationship management.
 
-## About Laravel
+## 🌟 Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 👥 User Management
+- **Multi-role authentication** (Admin, Staff, Customer)
+- **User registration and login** with secure authentication
+- **Profile management** with password change functionality
+- **Role-based access control** with middleware protection
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 🏛️ Venue & Package Management
+- **Venue management** with detailed information and gallery
+- **Package creation** with customizable items and pricing tiers
+- **Category and item management** for package components
+- **Gallery management** with Cloudinary integration for image storage
+- **Price management** with multiple pricing options per package
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 📅 Booking System
+- **Booking requests** with approval workflow
+- **Calendar integration** for availability checking
+- **Session management** (Morning/Evening slots)
+- **Booking types**: Wedding, Viewing, Reservation, Appointment
+- **Automated conflict detection** and resolution
+- **Expiry date tracking** for reservations
 
-## Learning Laravel
+### 💰 Payment Management
+- **Invoice submission** with file upload to Cloudinary
+- **Payment verification** workflow for staff
+- **Multiple payment types**: Deposit, Second Deposit, Balance, Full Payment
+- **Payment schedule calculation** based on booking type
+- **Automated email notifications** for payment status updates
+- **Bulk payment processing** for staff efficiency
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 🎨 Customization System
+- **Package item customization** requests from customers
+- **Staff approval workflow** for customizations
+- **Detailed customization tracking** and status management
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 🤖 AI-Powered Chatbot
+- **DeepSeek AI integration** for intelligent customer support
+- **Contextual conversations** with business knowledge
+- **Automated responses** for common inquiries
+- **Dynamic link generation** based on conversation context
+- **Session-based conversation history**
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 💌 Wedding Card Creator
+- **Digital wedding invitation** creation
+- **Multiple templates** with customizable designs
+- **Guest comment system** with moderation
+- **Shareable UUID-based links**
+- **Venue integration** for automatic address population
 
-## Laravel Sponsors
+### 📧 Communication System
+- **Email notifications** for all major events
+- **WhatsApp integration** via Twilio (optional)
+- **Staff-customer messaging** system
+- **Support ticket system** with categorization and replies
+- **Automated email templates** for various scenarios
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 📊 Analytics & Reporting
+- **Financial reporting** with monthly/yearly summaries
+- **Revenue tracking** and invoice analytics
+- **Popular package analytics**
+- **Booking trend analysis**
+- **Dashboard metrics** for quick insights
 
-### Premium Partners
+### 🎯 Promotional System
+- **Promotion management** with image uploads
+- **Package-specific discounts**
+- **Date-based promotional campaigns**
+- **Homepage promotional banners**
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### ⭐ Feedback System
+- **Customer feedback collection** for completed bookings
+- **Rating system** (1-5 stars)
+- **Feedback moderation** and publishing workflow
+- **Public testimonial display**
 
-## Contributing
+### 🔍 Package Recommendation
+- **AI-powered package suggestions** based on budget and preferences
+- **Filtering by venue, capacity, and budget**
+- **Intelligent scoring algorithm** for best matches
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🛠️ Technology Stack
 
-## Code of Conduct
+- **Backend**: Laravel 10+
+- **Database**: PostgreSQL (with MySQL compatibility)
+- **File Storage**: Cloudinary for images and documents
+- **AI Service**: DeepSeek via OpenRouter
+- **Email**: Laravel Mail with SMTP
+- **WhatsApp**: Twilio API
+- **Frontend**: Blade templates with Tailwind CSS
+- **Authentication**: Laravel Sanctum
+- **Broadcasting**: Laravel Echo (for real-time features)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 📋 Prerequisites
 
-## Security Vulnerabilities
+- PHP 8.1 or higher
+- Composer
+- Node.js & NPM
+- PostgreSQL or MySQL database
+- Cloudinary account
+- DeepSeek API key (via OpenRouter)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🚀 Installation
 
-## License
+1. **Clone the repository**
+```bash
+git clone <repository-url>
+cd enak-rasa-wedding-hall
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+2. **Install PHP dependencies**
+```bash
+composer install
+```
+
+3. **Install Node.js dependencies**
+```bash
+npm install
+```
+
+4. **Environment setup**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+5. **Configure environment variables**
+```env
+# Database
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=your_database
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+# Cloudinary (for file storage)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_KEY=your_api_key
+CLOUDINARY_SECRET=your_api_secret
+
+# DeepSeek AI (via OpenRouter)
+DEEPSEEK_API_KEY=your_openrouter_api_key
+DEEPSEEK_API_URL=https://openrouter.ai/api/v1/chat/completions
+DEEPSEEK_MODEL=deepseek/deepseek-r1
+
+# Email configuration
+MAIL_MAILER=smtp
+MAIL_HOST=your_smtp_host
+MAIL_PORT=587
+MAIL_USERNAME=your_email
+MAIL_PASSWORD=your_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@enakrasa.com
+MAIL_FROM_NAME="Enak Rasa Wedding Hall"
+
+# Staff email for notifications
+STAFF_EMAIL_ADDRESS=staff@enakrasa.com
+STAFF_EMAIL_NAME="Enak Rasa Wedding Hall Staff"
+
+# WhatsApp (Optional - via Twilio)
+TWILIO_SID=your_twilio_sid
+TWILIO_AUTH_TOKEN=your_twilio_token
+TWILIO_WHATSAPP_FROM=whatsapp:+1234567890
+```
+
+6. **Run database migrations**
+```bash
+php artisan migrate
+```
+
+7. **Seed the database (optional)**
+```bash
+php artisan db:seed
+```
+
+8. **Build frontend assets**
+```bash
+npm run build
+```
+
+9. **Start the development server**
+```bash
+php artisan serve
+```
+
+## 👤 Default User Accounts
+
+After seeding, you can log in with:
+
+- **Admin**: admin@enakrasa.com / password
+- **Staff**: staff@enakrasa.com / password
+- **Customer**: customer@enakrasa.com / password
+
+## 🎯 Key Features Explained
+
+### Booking Workflow
+1. **Customer submits** booking request via public form
+2. **Staff reviews** and approves/rejects request
+3. **Approved requests** automatically create user accounts
+4. **Booking confirmation** sent via email
+5. **Payment workflow** begins based on booking type
+
+### Payment System
+- **Wedding bookings**: RM3000 deposit → 50% second deposit → balance
+- **Other events**: 50% deposit → 50% balance
+- **Alternative**: Full payment option available
+- **Automatic status updates** based on payment verification
+
+### AI Chatbot Integration
+- **Business context aware** responses
+- **Package and venue information** integration
+- **Intelligent link suggestions** based on conversation
+- **Conversation history** for context retention
+
+### File Management
+- **Cloudinary integration** for secure, scalable file storage
+- **Automatic image optimization** and format conversion
+- **Public URL generation** for easy access
+- **File deletion** when records are removed
+
+## 🔧 Console Commands
+
+### Email Testing
+```bash
+# Test invoice verification email
+php artisan test:invoice-email verified test@example.com
+
+# Test invoice rejection email
+php artisan test:invoice-email rejected test@example.com
+```
+
+### Additional Commands
+```bash
+# Clear application cache
+php artisan cache:clear
+
+# Clear configuration cache
+php artisan config:clear
+
+# Clear route cache
+php artisan route:clear
+
+# Clear view cache
+php artisan view:clear
+```
+
+## 📝 API Endpoints
+
+### Booking Calendar API
+- `GET /api/calendar/data` - Get calendar events
+- `GET /api/calendar/venues` - Get venue list
+- `GET /api/calendar/customers` - Get customer list
+- `POST /api/calendar/check-availability` - Check date availability
+- `POST /api/calendar/quick-booking` - Create quick booking
+
+### Package Recommendation
+- `POST /api/packages/recommend` - Get package recommendations
+
+## 🔐 Security Features
+
+- **CSRF protection** on all forms
+- **Role-based middleware** for route protection
+- **File upload validation** and sanitization
+- **SQL injection prevention** via Eloquent ORM
+- **Password hashing** with bcrypt
+- **Secure file storage** via Cloudinary
+
+## 🚀 Deployment
+
+### Production Setup
+1. **Set environment to production**
+```env
+APP_ENV=production
+APP_DEBUG=false
+```
+
+2. **Optimize for production**
+```bash
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+composer install --optimize-autoloader --no-dev
+```
+
+3. **Set up queue worker** (if using queues)
+```bash
+php artisan queue:work --daemon
+```
+
+4. **Configure web server** (Apache/Nginx) to point to `/public` directory
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 📞 Support
+
+For support and inquiries:
+- **Email**: rasa.enak@gmail.com
+- **Phone**: 013-331 4389
+- **Address**: No. 3, Jalan Lintang 1 Off Jalan Lintang, Kuala Lumpur, Malaysia
+
+## 🔄 Version History
+
+- **v1.0.0** - Initial release with core booking and payment features
+- **v1.1.0** - Added AI chatbot integration
+- **v1.2.0** - Wedding card creator and enhanced reporting
+- **v1.3.0** - Customization system and improved UI/UX
+
+---
+
+Built with ❤️ for Enak Rasa Wedding Hall
